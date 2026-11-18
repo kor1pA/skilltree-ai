@@ -1,886 +1,1771 @@
 <!DOCTYPE html>
-<html lang="uk" data-theme="dark">
+<html class="dark h-full bg-[#0b0d14] text-[#e3e1eb]" lang="uk">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:," />
   <title>SkillTree AI — Персоналізовані карти розвитку та ШІ-навчання</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'surface-tint': '#d0bcff',
+            'primary': '#d0bcff',
+            'primary-container': '#a078ff',
+            'on-primary': '#3c0091',
+            'on-primary-container': '#340080',
+            'primary-fixed': '#e9ddff',
+            'primary-fixed-dim': '#d0bcff',
+            'secondary': '#c0c1ff',
+            'secondary-container': '#3131c0',
+            'on-secondary': '#1000a9',
+            'secondary-fixed': '#e1e0ff',
+            'secondary-fixed-dim': '#c0c1ff',
+            'tertiary': '#7bd0ff',
+            'tertiary-container': '#009bd1',
+            'on-tertiary': '#00354a',
+            'tertiary-fixed': '#c4e7ff',
+            'tertiary-fixed-dim': '#7bd0ff',
+            'surface': '#121319',
+            'surface-dim': '#121319',
+            'surface-bright': '#383940',
+            'surface-container-lowest': '#0d0e14',
+            'surface-container-low': '#1a1b22',
+            'surface-container': '#1e1f26',
+            'surface-container-high': '#292930',
+            'surface-container-highest': '#34343b',
+            'surface-variant': '#34343b',
+            'background': '#0b0d14',
+            'on-background': '#e3e1eb',
+            'on-surface': '#e3e1eb',
+            'on-surface-variant': '#cbc3d7',
+            'outline': '#958ea0',
+            'outline-variant': '#494454',
+            'inverse-primary': '#6d3bd7',
+            'error': '#ffb4ab',
+            'error-container': '#93000a',
+            'on-error-container': '#ffdad6',
+            'status-done': '#10b981',
+            'status-in-progress': '#06b6d4',
+            'status-not-started': '#494454',
+            brand: {
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            },
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            'title-sm': ['Plus Jakarta Sans', 'sans-serif'],
+            'title-md': ['Plus Jakarta Sans', 'sans-serif'],
+            'title-lg': ['Plus Jakarta Sans', 'sans-serif'],
+            'headline-sm': ['Plus Jakarta Sans', 'sans-serif'],
+            'headline-md': ['Plus Jakarta Sans', 'sans-serif'],
+            'headline-lg': ['Plus Jakarta Sans', 'sans-serif'],
+            'headline-xl': ['Plus Jakarta Sans', 'sans-serif'],
+            'display-lg': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-sm': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-md': ['Plus Jakarta Sans', 'sans-serif'],
+            'body-lg': ['Plus Jakarta Sans', 'sans-serif'],
+            'label-sm': ['Space Grotesk', 'sans-serif'],
+            'label-md': ['Space Grotesk', 'sans-serif'],
+            'label-lg': ['Space Grotesk', 'sans-serif'],
+          },
+          spacing: {
+            'space-xs': '0.25rem',
+            'space-sm': '0.5rem',
+            'space-md': '1rem',
+            'space-lg': '1.5rem',
+            'space-xl': '2.5rem',
+            margin: '2.5rem',
+            gutter: '1.5rem',
+          },
+        },
+      },
+    };
+  </script>
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body>
-  <!-- Sticky Top Navbar -->
-  <header class="navbar">
-    <div class="container nav-inner">
-      <a href="/" data-route="/" class="brand" aria-label="SkillTree AI На головну">
-        <span class="brand-logo" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="5" r="3"></circle>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="18" r="3"></circle>
-            <path d="M12 8v4l-4.5 3.5M12 12l4.5 3.5"></path>
-          </svg>
-        </span>
-        <span class="brand-text">
-          <strong>SkillTree AI</strong>
-          <small>Розумний трек кар'єри</small>
-        </span>
+<body class="bg-[#0b0d14] font-sans text-[#e3e1eb] min-h-screen selection:bg-brand-500 selection:text-white relative overflow-x-hidden antialiased">
+
+  <!-- ======================================================================= -->
+  <!-- SCREEN 1: FULL-SCREEN 3D PORTAL AUTHENTICATION (/auth, /login)          -->
+  <!-- ======================================================================= -->
+  <section id="page-auth" class="page-view min-h-screen w-full flex-col justify-between items-center relative overflow-hidden bg-[#0d0e14]">
+    <canvas id="antigravity-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+    <div id="cursor-glow" class="fixed pointer-events-none w-[520px] h-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-brand-600/20 via-cyan-500/12 to-transparent blur-3xl opacity-0 transition-opacity duration-500 z-0"></div>
+    <div class="fixed top-12 left-1/2 -translate-x-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-brand-600/20 via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none ambient-glow z-0"></div>
+    <div class="fixed bottom-10 right-10 w-[420px] h-[420px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+    <!-- Top Brand Navigation -->
+    <header class="relative z-10 w-full max-w-5xl px-6 pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between gap-4 mx-auto">
+      <a href="/roadmap" data-route="/roadmap" class="flex items-center gap-3 self-start sm:self-auto group">
+        <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-brand-500 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-brand-500/30 flex items-center justify-center">
+          <div class="w-full h-full bg-[#121422] rounded-[15px] flex items-center justify-center text-cyan-300">
+            <span class="material-symbols-outlined text-2xl">account_tree</span>
+          </div>
+        </div>
+        <div>
+          <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-brand-300 bg-clip-text text-transparent font-display">SkillTree AI</span>
+          <p class="text-xs text-slate-400 hidden sm:block">Платформа персоналізованих карт розвитку з гібридним менторством та ШІ</p>
+        </div>
       </a>
 
-      <nav class="nav-links" aria-label="Головна навігація">
-        <a href="/" data-route="/" class="nav-link active">Головна</a>
-        <a href="/roadmap" data-route="/roadmap" class="nav-link" id="navRoadmapLink">Карта навичок</a>
-        <a href="/mentors" data-route="/mentors" class="nav-link" id="navMentorsLink">Ментори</a>
-        <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="nav-link" id="navMentorLink">Кабінет ментора</a>
-        <a href="/b2b" data-route="/b2b" class="nav-link" id="navB2bLink">Для команд (B2B)</a>
-        <a href="/profile" data-route="/profile" class="nav-link hidden" id="navProfileLink">Мій профіль</a>
-      </nav>
+      <div class="flex items-center gap-2.5 self-end sm:self-auto">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161827]/90 border border-brand-500/30 text-xs text-slate-300 backdrop-blur-md shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span class="font-mono text-[11px]">SHA-256 Auth</span>
+        </div>
+        <a href="/roadmap" data-route="/roadmap" class="px-3.5 py-1.5 rounded-full bg-[#181b2c] hover:bg-[#22263f] border border-brand-500/40 text-xs text-white font-semibold transition-all">
+          Перейти в дашборд →
+        </a>
+      </div>
+    </header>
 
-      <div class="nav-actions">
-        <button type="button" id="themeToggleBtn" class="icon-btn" title="Змінити тему (Світла / Темна)" aria-label="Змінити тему">☀️</button>
-        <button type="button" id="openAiSettingsBtn" class="icon-btn" title="Налаштування ШІ-асистента" aria-label="Налаштування ШІ">⚙️</button>
+    <!-- Main Portal Card with 3D Perspective -->
+    <main class="relative z-10 w-full max-w-xl px-4 sm:px-6 py-6 card-perspective-wrapper my-auto mx-auto">
+      <div id="interactive-card" class="glass-card rounded-3xl p-6 sm:p-7 relative overflow-hidden">
+        <div id="card-glare" class="holographic-glare absolute inset-0 z-0"></div>
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-400 via-cyan-400 to-transparent z-10"></div>
 
-        <button type="button" id="openAuthBtn" class="st-btn st-btn-primary">Увійти / Реєстрація</button>
+        <div class="relative z-10" style="transform: translateZ(20px);">
+          <div class="text-center mb-5">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold mb-2.5">
+              <span class="material-symbols-outlined text-sm text-cyan-300">lock</span>
+              <span>Безпечна автентифікація користувача (UC1)</span>
+            </div>
+            <h1 id="portal-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1.5 font-display">Вхід до SkillTree AI</h1>
+            <p id="portal-subtitle" class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">Оберіть роль у системі, увійдіть за паролем або використайте швидкий вхід</p>
+          </div>
 
-        <div id="userMenu" class="user-menu hidden">
-          <a href="/profile" data-route="/profile" id="openProfileBtn" class="user-chip" title="Відкрити мій профіль">
-            <span id="navAvatar" class="user-avatar">ВГ</span>
-            <span id="navUserName" class="user-name">Профіль</span>
+          <!-- Mode Tabs -->
+          <div class="grid grid-cols-2 p-1 mb-5 rounded-2xl bg-[#0e101a]/95 border border-slate-800 text-xs font-semibold">
+            <button id="tab-login" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-600/30">
+              <span class="material-symbols-outlined text-base">login</span>
+              <span>Увійти</span>
+            </button>
+            <button id="tab-register" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+              <span class="material-symbols-outlined text-base">person_add</span>
+              <span>Реєстрація (+100 XP)</span>
+            </button>
+          </div>
+
+          <!-- Quick Demo Profiles Strip -->
+          <div id="saved-sessions-section" class="mb-5 p-3 rounded-2xl bg-[#131627]/80 border border-brand-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-semibold tracking-wider uppercase text-slate-400 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-brand-400">bolt</span>
+                Останні збережені сесії (швидкий вхід):
+              </span>
+              <span class="text-[10px] text-cyan-400 font-mono font-medium">1-Click Sign In</span>
+            </div>
+            <div id="authQuickDemoGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-2"></div>
+          </div>
+
+          <!-- Role Selector Chips (visible on Register) -->
+          <div id="role-section-wrapper" class="mb-5 hidden transition-all duration-300">
+            <label class="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2 px-1">Оберіть вашу роль у системі:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="role-selector-container">
+              <button type="button" data-select-role="LEARNER" class="role-chip text-left cursor-pointer rounded-xl p-3 border border-brand-500/40 bg-brand-500/10 transition-all flex flex-col justify-between gap-1.5 role-card-active">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 rounded-lg bg-brand-500/20 text-brand-300 shrink-0"><span class="material-symbols-outlined text-sm">school</span></div>
+                  <div>
+                    <div class="text-xs font-bold text-white leading-none">Студент</div>
+                    <div class="text-[10px] text-brand-300 font-mono mt-0.5">Learner</div>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">Карти розвитку, ШІ-асистент, проходження вузлів</p>
+              </button>
+              <button type="button" data-select-role="MENTOR" class="role-chip text-left cursor-pointer rounded-xl p-3 border border-slate-800 bg-[#121422]/80 hover:border-slate-700 transition-all flex flex-col justify-between gap-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 shrink-0"><span class="material-symbols-outlined text-sm">psychology</span></div>
+                  <div>
+                    <div class="text-xs font-bold text-white leading-none">Ментор</div>
+                    <div class="text-[10px] text-indigo-300 font-mono mt-0.5">Mentor</div>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">Публікація матеріалів, платні сесії</p>
+              </button>
+              <button type="button" data-select-role="HR" class="role-chip text-left cursor-pointer rounded-xl p-3 border border-slate-800 bg-[#121422]/80 hover:border-slate-700 transition-all flex flex-col justify-between gap-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 shrink-0"><span class="material-symbols-outlined text-sm">corporate_fare</span></div>
+                  <div>
+                    <div class="text-xs font-bold text-white leading-none">HR-менеджер</div>
+                    <div class="text-[10px] text-cyan-300 font-mono mt-0.5">HRManager</div>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">Skill Matrix команд, аналітика, експорт CSV</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Auth Form -->
+          <form id="auth-form" class="space-y-4">
+            <div id="field-fullname" class="hidden">
+              <label class="block text-xs font-medium text-slate-300 mb-1.5" for="input-fullname">Повне ім'я (ПІБ)</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">person</span>
+                <input id="input-fullname" type="text" placeholder="Олександр Коваленко" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
+              </div>
+            </div>
+
+            <div id="field-extra" class="hidden">
+              <label id="input-extra-label" class="block text-xs font-medium text-slate-300 mb-1.5" for="input-extra">Цільова професія</label>
+              <input id="input-extra" type="text" placeholder="Full-Stack Developer" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5" for="input-email">Корпоративна або персональна пошта</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">mail</span>
+                <input id="input-email" type="email" required value="slava@skilltree.ai" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono" />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-medium text-slate-300" for="input-password">Пароль</label>
+                <div class="flex items-center gap-1.5 text-[11px] text-cyan-400 font-mono">
+                  <span class="material-symbols-outlined text-xs">verified_user</span>
+                  <span>Захищене з'єднання</span>
+                </div>
+              </div>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">key</span>
+                <input id="input-password" type="password" required value="demo1234" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono tracking-widest" />
+                <button id="togglePasswordBtn" type="button" aria-label="Показати або приховати пароль" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition cursor-pointer">
+                  <span class="material-symbols-outlined text-base">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 select-none">
+                <input type="checkbox" checked class="w-4 h-4 rounded bg-[#0a0d18] border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer" />
+                <span>Запам'ятати мене на цьому пристрої</span>
+              </label>
+              <button id="forgotPasswordLink" type="button" class="text-brand-400 hover:text-brand-300 underline underline-offset-2 transition">Забули пароль?</button>
+            </div>
+
+            <button id="auth-submit-btn" type="submit" class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-500 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm tracking-wide transition shadow-lg shadow-brand-600/35 hover:shadow-brand-500/50 cursor-pointer">
+              <span class="material-symbols-outlined text-lg">login</span>
+              <span id="submit-btn-text">Увійти в кабінет</span>
+            </button>
+          </form>
+
+          <div class="relative my-4 flex items-center">
+            <div class="flex-grow border-t border-slate-800"></div>
+            <span class="flex-shrink mx-4 text-[11px] font-mono uppercase tracking-wider text-slate-500">або авторизація через</span>
+            <div class="flex-grow border-t border-slate-800"></div>
+          </div>
+
+          <button id="googleOAuthBtn" type="button" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-900/80 hover:bg-slate-800/95 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold transition shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-base text-cyan-400">passkey</span>
+            <span id="google-btn-text">Швидкий вхід як Студент (Demo OAuth)</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30 ml-auto">OAuth 2.0</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center justify-between text-xs text-slate-500 px-2 gap-2">
+        <div class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm text-brand-400">shield</span>
+          <span>Захищене шифрування сесії SHA-256</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/roadmap" data-route="/roadmap" class="hover:text-slate-300 transition">Гостьовий доступ</a>
+          <span>•</span>
+          <span class="font-mono text-slate-400">SkillTree AI v3.2</span>
+        </div>
+      </div>
+    </main>
+
+    <footer class="relative z-10 w-full py-3 text-center text-[11px] text-slate-500">© 2026 SkillTree AI. Платформа адаптивного навчання та сертифікації. Всі права захищено.</footer>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- DASHBOARD SHELL (SCREENS 2, 3, 4, 5, 6)                                -->
+  <!-- ======================================================================= -->
+  <div id="dashboard-shell" class="min-h-screen w-full cyber-grid">
+    <!-- Mobile Drawer Backdrop -->
+    <div id="mobileSidebarBackdrop" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"></div>
+
+    <!-- Left Fixed Cyber Sidebar -->
+    <aside id="dashboard-sidebar" class="fixed left-0 top-0 h-full w-72 bg-[#0d0e17]/95 backdrop-blur-xl border-r border-[#1e2235] z-50 flex flex-col justify-between py-6 px-4 shadow-[4px_0_24px_rgba(0,0,0,0.6)]">
+      <div class="flex flex-col gap-6">
+        <a href="/roadmap" data-route="/roadmap" class="flex items-center gap-3 px-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-container to-tertiary flex items-center justify-center p-0.5 shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+            <div class="w-full h-full bg-[#0d0e17] rounded-[10px] flex items-center justify-center">
+              <span class="material-symbols-outlined text-cyan-300 text-2xl font-bold">account_tree</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-title-lg text-lg tracking-tight font-bold text-white">SkillTree <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-tertiary">AI</span></span>
+            <span class="px-2 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-400 font-display text-[10px] uppercase font-bold tracking-widest shadow-[0_0_8px_rgba(6,182,212,0.3)]">CYBER</span>
+          </div>
+        </a>
+
+        <div class="px-2">
+          <span class="font-display text-[10px] uppercase tracking-widest text-slate-500 px-2">// NAV_PROTOCOLS</span>
+        </div>
+
+        <nav class="flex flex-col gap-1.5" aria-label="Головне меню">
+          <a href="/roadmap" data-route="/roadmap" class="sidebar-nav-link active group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
+            <span class="material-symbols-outlined text-xl text-primary transition-transform group-hover:scale-110">schema</span>
+            <span>Моя карта розвитку</span>
           </a>
-          <button type="button" id="logoutBtn" class="st-btn st-btn-ghost st-btn-sm" title="Вийти з акаунта">Вийти</button>
-        </div>
+          <a href="/mentors" data-route="/mentors" class="sidebar-nav-link group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
+            <span class="material-symbols-outlined text-xl transition-transform group-hover:scale-110">supervisor_account</span>
+            <span>Каталог менторів</span>
+          </a>
+          <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="sidebar-nav-link group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
+            <span class="material-symbols-outlined text-xl transition-transform group-hover:scale-110">school</span>
+            <span>Кабінет ментора</span>
+          </a>
+          <a href="/b2b" data-route="/b2b" class="sidebar-nav-link group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
+            <span class="material-symbols-outlined text-xl transition-transform group-hover:scale-110">grid_view</span>
+            <span>B2B Skill Matrix</span>
+          </a>
+          <a href="/profile" data-route="/profile" class="sidebar-nav-link group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
+            <span class="material-symbols-outlined text-xl transition-transform group-hover:scale-110">badge</span>
+            <span>Вхід / Профілі</span>
+          </a>
+        </nav>
       </div>
-    </div>
-  </header>
 
-  <main class="app-main">
-    <!-- PAGE 1: HOME (/) -->
-    <section id="page-home" class="page-view active" data-page="/">
-      <div id="hero-section" class="page-section hero-section">
-        <div class="container">
-          <div class="hero-grid">
-            <div class="hero-copy">
-              <div class="hero-pill">✦ Платформа персоналізованого ІТ-навчання</div>
-              <h1 class="hero-title">
-                Опануйте нову ІТ-професію за <span class="gradient-text">інтерактивною картою</span> з ШІ-ментором
-              </h1>
-              <p class="hero-subtitle">
-                Чіткий покроковий план без хаосу, вбудовані конспекти й приклади коду, миттєві підказки ШІ за &le; 5 секунд та 1-на-1 сесії з практикуючими експертами.
-              </p>
+      <div class="flex flex-col gap-3 px-2">
+        <a href="/auth" data-route="/auth" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#181b2c] hover:bg-[#22263f] border border-[#2b304c] hover:border-primary/40 text-xs text-slate-200 transition-all">
+          <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-cyan-400">passkey</span>
+            <span class="font-semibold">3D Портал входу</span>
+          </span>
+          <span class="font-mono text-[10px] text-primary">/auth</span>
+        </a>
 
-              <ul class="hero-checklist">
-                <li>✓ Готові маршрути під 8+ ІТ-професій або будь-який ваш запит</li>
-                <li>✓ Контекстний ШІ-асистент прямо всередині кожної теми</li>
-                <li>✓ Прозора матриця навичок команди для HR та TeamLead</li>
-              </ul>
+        <div class="p-3.5 rounded-xl bg-[#141624] border border-[#23273c] flex items-center gap-3 shadow-inner">
+          <div class="w-9 h-9 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shadow-[0_0_10px_rgba(139,92,246,0.3)] shrink-0">
+            <span class="material-symbols-outlined text-lg">psychology</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-display text-xs text-white font-semibold">AI Асистент</span>
+            <span class="font-mono text-[10px] text-emerald-400 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              ONLINE // V3.2
+            </span>
+          </div>
+        </div>
+        <div class="text-center font-display text-[11px] text-slate-500 py-1">© 2026 SkillTree AI • Synthetic Nexus</div>
+      </div>
+    </aside>
 
-              <div class="hero-cta">
-                <a href="/roadmap" data-route="/roadmap" class="st-btn st-btn-primary st-btn-lg">Побудувати свою карту →</a>
-                <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline st-btn-lg">Переглянути менторів</a>
+    <!-- Main Right Shell -->
+    <div class="lg:pl-72 flex flex-col min-h-screen">
+      <!-- Top Fixed Header -->
+      <header id="dashboard-header" class="fixed top-0 left-0 lg:left-72 right-0 h-16 bg-[#0b0d14]/85 backdrop-blur-xl border-b border-[#1e2235] z-40 flex items-center justify-between px-4 lg:px-6 shadow-sm gap-3">
+        <div class="flex items-center gap-3 flex-1 max-w-md">
+          <button id="mobileSidebarBtn" type="button" class="lg:hidden p-2 rounded-xl bg-[#141624] border border-[#23273c] text-slate-200" aria-label="Меню">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <div class="relative flex items-center w-full">
+            <span class="material-symbols-outlined absolute left-3.5 text-lg text-slate-400 pointer-events-none">search</span>
+            <input id="globalSearchInput" type="text" placeholder="Пошук навичок, тем чи менторів..." class="w-full pl-10 pr-4 py-2 bg-[#141624] text-slate-200 placeholder:text-slate-500 rounded-full text-xs outline-none border border-[#23273c] focus:border-primary/60 focus:ring-1 focus:ring-primary/40 transition-all shadow-inner" />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141624] border border-[#23273c] text-white font-display text-xs shadow-[0_0_12px_rgba(139,92,246,0.15)]">
+            <span class="text-amber-400">⭐</span>
+            <span id="headerXpText" class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300">0 XP</span>
+            <span class="text-slate-600">|</span>
+            <span class="text-slate-400">Рівень: <span id="headerLevelText" class="text-slate-200 font-semibold">BEGINNER</span></span>
+          </div>
+
+          <!-- User Profile & Quick Role Switcher Dropdown -->
+          <div class="relative" id="userProfileDropdownContainer">
+            <button id="userProfileMenuBtn" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#141624] border border-[#23273c] text-slate-200 hover:border-primary/50 hover:bg-[#1b1e30] transition-colors cursor-pointer">
+              <span id="headerUserAvatar" class="w-6 h-6 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white text-[10px] font-bold flex items-center justify-center">ГТ</span>
+              <span id="headerUserName" class="font-display text-xs font-semibold hidden sm:inline">Гість (Студент)</span>
+              <span class="material-symbols-outlined text-sm text-slate-400">expand_more</span>
+            </button>
+
+            <div id="userProfileDropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-[#0d0e14]/95 backdrop-blur-2xl rounded-2xl p-4 shadow-[0_12px_36px_rgba(0,0,0,0.8)] ring-1 ring-[#494454] z-50 flex flex-col gap-3">
+              <div class="flex items-center gap-3 bg-[#1a1b22]/80 p-3 rounded-xl">
+                <div id="dropdownAvatarLg" class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white font-bold flex items-center justify-center shrink-0">ВГ</div>
+                <div class="flex flex-col min-w-0">
+                  <span id="dropdownUserName" class="font-bold text-white text-sm truncate">В'ячеслав Гой</span>
+                  <span id="dropdownUserMeta" class="font-display text-[11px] text-primary font-semibold truncate">Студент • BEGINNER</span>
+                </div>
               </div>
 
-              <div class="hero-stats">
-                <div class="hero-stat">
-                  <strong>8+</strong>
-                  <span>ІТ-напрямів</span>
+              <div class="flex flex-col gap-1.5">
+                <span class="font-display text-[10px] uppercase tracking-wider text-slate-400 px-1">Швидке перемикання ролей</span>
+                <div class="grid grid-cols-3 gap-1 bg-[#121319] p-1 rounded-xl border border-[#23273c]">
+                  <button type="button" data-quick-role="LEARNER" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-primary text-[11px] font-semibold transition-all">
+                    <span class="material-symbols-outlined text-base">school</span>
+                    <span>Студент</span>
+                  </button>
+                  <button type="button" data-quick-role="MENTOR" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-cyan-300 text-[11px] font-semibold transition-all">
+                    <span class="material-symbols-outlined text-base">psychology</span>
+                    <span>Ментор</span>
+                  </button>
+                  <button type="button" data-quick-role="HR" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-purple-300 text-[11px] font-semibold transition-all">
+                    <span class="material-symbols-outlined text-base">corporate_fare</span>
+                    <span>HR-Lead</span>
+                  </button>
                 </div>
-                <div class="hero-stat">
-                  <strong id="heroAiSla">180 мс</strong>
-                  <span>відповідь ШІ</span>
+              </div>
+
+              <div class="h-px bg-[#2b304c]"></div>
+
+              <div class="flex flex-col gap-0.5 text-xs">
+                <a href="/profile" data-route="/profile" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-slate-200 hover:bg-[#1e1f26] transition-all">
+                  <span class="material-symbols-outlined text-slate-400 text-lg">account_circle</span>
+                  <span>Профіль та акаунт</span>
+                </a>
+                <button id="dropdownEditProfileBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-slate-200 hover:bg-[#1e1f26] transition-all text-left w-full">
+                  <span class="material-symbols-outlined text-slate-400 text-lg">security</span>
+                  <span>Налаштування та пароль</span>
+                </button>
+                <a href="/auth" data-route="/auth" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-cyan-300 hover:bg-[#1e1f26] transition-all">
+                  <span class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-lg">switch_account</span>
+                    <span>3D Портал входу</span>
+                  </span>
+                  <span class="font-mono text-[10px] bg-[#292930] px-1.5 py-0.5 rounded text-cyan-200">US-04</span>
+                </a>
+              </div>
+
+              <div class="h-px bg-[#2b304c]"></div>
+
+              <button id="headerLogoutBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-rose-400 hover:bg-rose-950/40 transition-all text-xs font-semibold text-left">
+                <span class="material-symbols-outlined text-lg">logout</span>
+                <span>Вийти з акаунту</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Route Views Container -->
+      <main class="relative pt-16 flex-1 w-full">
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 2: MY ROADMAP & 3D CONSTELLATION (/ and /roadmap)          -->
+        <!-- ================================================================= -->
+        <section id="page-roadmap" class="page-view active" data-page="/roadmap">
+          <div class="relative w-full overflow-hidden pointer-events-none">
+            <div class="absolute -top-32 left-1/4 w-[32rem] h-[32rem] bg-primary/15 rounded-full blur-[120px]"></div>
+            <div class="absolute -top-20 right-10 w-96 h-96 bg-tertiary/15 rounded-full blur-[100px]"></div>
+          </div>
+
+          <div class="px-4 sm:px-6 py-6 max-w-[1600px] w-full mx-auto flex flex-col gap-6 relative z-10">
+            <!-- Header Context & Progress -->
+            <div class="flex flex-col lg:flex-row gap-5 items-stretch justify-between">
+              <div class="flex-1 bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary-container to-indigo-600 text-white flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.35)] border border-primary/30 shrink-0">
+                      <span class="material-symbols-outlined text-2xl">terminal</span>
+                    </div>
+                    <div>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <h1 id="treeTitle" class="text-xl text-white font-bold tracking-tight m-0">Full-Stack Developer</h1>
+                        <span id="treeTechBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] uppercase font-bold tracking-wider">UC2 / UC3</span>
+                      </div>
+                      <p class="text-xs text-slate-400 flex flex-wrap items-center gap-1.5 mt-1">
+                        <span>Персоналізований трек розвитку компетенцій</span>
+                        <span class="inline-block w-1 h-1 rounded-full bg-slate-600"></span>
+                        <span id="treeLevelBadge" class="text-cyan-300 font-semibold">BEGINNER</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-2">
+                    <select id="treeSelect" class="bg-[#181b2c] border border-[#2d3246] rounded-full px-3.5 py-1.5 text-xs text-white font-semibold outline-none focus:border-primary" aria-label="Активна карта розвитку"></select>
+                  </div>
                 </div>
-                <div class="hero-stat">
-                  <strong>4.9 ★</strong>
-                  <span>рейтинг менторів</span>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+                  <div id="badgesRow" class="flex flex-wrap items-center gap-2"></div>
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <button id="openAddNodeBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#181b2c] border border-[#282d44] text-slate-200 hover:text-white hover:border-slate-500 hover:bg-[#1e2238] transition-all font-display text-xs cursor-pointer">
+                      <span class="material-symbols-outlined text-sm text-primary">add_circle</span>
+                      <span>Додати вузол</span>
+                    </button>
+                    <button id="openWizardBtn" type="button" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white font-semibold transition-all font-display text-xs shadow-[0_0_18px_rgba(139,92,246,0.45)] border border-primary/40 cursor-pointer">
+                      <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                      <span>Згенерувати нову карту ШІ</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sprint Progress Card -->
+              <div class="w-full lg:w-96 bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex flex-col">
+                    <span class="text-sm text-white font-semibold">Прогрес карти</span>
+                    <span id="treeMeta" class="text-xs text-slate-400">0 з 5 вузлів закрито</span>
+                  </div>
+                  <span id="treePercentBadge" class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-300 to-tertiary">0%</span>
+                </div>
+                <div class="w-full bg-[#181b2c] h-2.5 rounded-full overflow-hidden flex border border-[#252a3f]">
+                  <div id="treeProgressFill" class="bg-gradient-to-r from-brand-500 to-cyan-400 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center justify-between pt-3 mt-2 text-slate-400 font-display text-[11px]">
+                  <span class="flex items-center gap-1 text-emerald-400 font-medium">
+                    <span class="material-symbols-outlined text-xs">check_circle</span>
+                    <span id="countDoneNodes">0 опановано</span>
+                  </span>
+                  <span class="flex items-center gap-1 text-cyan-400 font-medium">
+                    <span class="material-symbols-outlined text-xs">sync</span>
+                    <span id="countInProgressNodes">0 у процесі</span>
+                  </span>
+                  <span class="flex items-center gap-1 text-slate-500 font-medium">
+                    <span class="material-symbols-outlined text-xs">radio_button_unchecked</span>
+                    <span id="countLockedNodes">0 очікують</span>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div class="hero-visual">
-              <div class="hero-preview-card st-card">
-                <div class="hero-preview-top">
+            <!-- Main Split Workspace: Tree Canvas + Selected Node & AI Chat -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <!-- Left 7 Columns: Skill Tree Visualization -->
+              <div class="lg:col-span-7 flex flex-col gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 px-1">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">account_tree</span>
+                    <h2 class="text-base text-white font-bold tracking-tight m-0">Дерево компетенцій</h2>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="bg-[#121422] p-1 rounded-full flex items-center gap-1 border border-[#23273c]">
+                      <button id="view-mode-3d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-display text-xs font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                        <span class="material-symbols-outlined text-sm">view_in_ar</span>
+                        <span>3D Сузір'я</span>
+                      </button>
+                      <button id="view-mode-2d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-400 hover:text-white font-display text-xs font-medium transition-all">
+                        <span class="material-symbols-outlined text-sm">format_list_bulleted</span>
+                        <span>2D Список</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3D Knowledge Constellation Canvas -->
+                <div id="tree-container-3d" class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-slate-700/50 bg-gradient-to-b from-[#090b14] via-[#0d1224] to-[#121128] shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                  <canvas id="constellation-canvas" class="w-full h-full block cursor-grab"></canvas>
+                  <div class="pointer-events-none absolute -top-12 -left-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
+                  <div class="pointer-events-none absolute -bottom-12 -right-12 w-72 h-72 bg-tertiary/20 rounded-full blur-3xl"></div>
+
+                  <!-- Top HUD -->
+                  <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
+                    <div class="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0d0e18]/85 backdrop-blur-md border border-[#262b42] text-white font-display text-xs">
+                      <span class="material-symbols-outlined text-sm text-amber-400 animate-pulse">bolt</span>
+                      <span class="font-semibold text-slate-300">Фокус:</span>
+                      <span id="hudActiveFocusTitle" class="text-cyan-300 font-semibold">—</span>
+                      <span id="hudActiveFocusStatus" class="px-2 py-0.5 rounded-full bg-primary/30 border border-primary/50 text-[10px] font-bold text-purple-200">—</span>
+                    </div>
+                    <div class="pointer-events-auto flex items-center gap-1 bg-[#0d0e18]/85 backdrop-blur-md border border-[#262b42] p-1 rounded-full">
+                      <button id="reset3dViewBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors" title="Скинути ракурс">
+                        <span class="material-symbols-outlined text-xs">restart_alt</span>
+                        <span class="hidden sm:inline">Скинути</span>
+                      </button>
+                      <button id="focus3dNodeBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors" title="Фокус на активний вузол">
+                        <span class="material-symbols-outlined text-xs">filter_center_focus</span>
+                        <span class="hidden sm:inline">Фокус</span>
+                      </button>
+                      <button id="fullscreen3dBtn" type="button" class="p-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-colors" title="На весь екран">
+                        <span class="material-symbols-outlined text-xs">fullscreen</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Hint -->
+                  <div class="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#090b14]/75 backdrop-blur-md border border-[#242940] text-slate-300 text-xs shadow-md whitespace-nowrap">
+                      <span>🖱️ Перетягуйте для обертання • Клік по сфері вибирає вузол</span>
+                    </div>
+                  </div>
+
+                  <!-- Bottom HUD Legend -->
+                  <div class="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2.5 pointer-events-none">
+                    <div class="pointer-events-auto flex flex-wrap items-center gap-3 px-3.5 py-2 rounded-xl bg-[#0d0e18]/90 backdrop-blur-md border border-[#262b42] text-xs text-slate-200">
+                      <span class="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Стани:</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Завершено</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>В процесі</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>Очікує</span>
+                    </div>
+                    <div class="pointer-events-auto hidden md:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0d0e18]/90 backdrop-blur-md border border-[#262b42] text-xs text-slate-300">
+                      <span class="material-symbols-outlined text-sm text-cyan-400">hub</span>
+                      <span id="hudNodesCount">0 вузлів знань</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2D Stepper Rail Container -->
+                <div id="tree-container-2d" class="hidden relative bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-6 flex flex-col gap-5"></div>
+              </div>
+
+              <!-- Right 5 Columns: Active Node Inspector + AI Blocker Chat -->
+              <div class="lg:col-span-5 flex flex-col gap-5">
+                <!-- Selected Node Detail -->
+                <div class="bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col gap-4">
+                  <div class="flex items-center justify-between gap-2">
+                    <span id="activeNodeBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] font-bold uppercase tracking-wider">IN_PROGRESS</span>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/40 text-purple-200 font-display text-xs font-bold">+50 XP</span>
+                      <button id="deleteNodeBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors" title="Видалити вузол (UC10)">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <div>
-                    <span class="mini-label">Поточний трек</span>
-                    <h3 id="heroTrackTitle">Full-Stack Developer</h3>
+                    <h2 id="activeNodeTitle" class="text-lg text-white font-bold tracking-tight m-0">Оберіть вузол на карті</h2>
+                    <p id="activeNodeDesc" class="text-xs text-slate-400 mt-1.5 leading-relaxed"></p>
                   </div>
-                  <div class="ring-wrap" aria-label="Прогрес карти">
-                    <svg class="progress-ring" width="62" height="62" viewBox="0 0 64 64">
-                      <circle class="ring-track" cx="32" cy="32" r="26" fill="none" stroke-width="6"></circle>
-                      <circle id="heroRingFill" class="ring-fill" cx="32" cy="32" r="26" fill="none" stroke-width="6" stroke-dasharray="163.36" stroke-dashoffset="98"></circle>
-                    </svg>
-                    <span id="heroRingText" class="ring-text">40%</span>
+
+                  <div class="flex flex-col gap-2.5 pt-1">
+                    <span class="text-xs uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
+                      <span class="material-symbols-outlined text-sm text-primary">auto_stories</span>
+                      Навчальні матеріали вузла (<span id="materialsCount">0</span>)
+                    </span>
+                    <div id="nodeMaterialsList" class="flex flex-col gap-2"></div>
+                  </div>
+
+                  <div id="nodeActionButtons" class="pt-1 flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- AI Blocker Chat (UC4 / UC11) -->
+                <div class="bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden">
+                  <div class="p-4 bg-[#141624] border-b border-[#202538] flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 text-primary flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                        <span class="material-symbols-outlined text-base">psychology</span>
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-xs text-white font-bold">AI Blocker Chat (UC4)</span>
+                          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        </div>
+                        <span id="aiContextNodeTitle" class="text-[11px] text-slate-400">Контекст: —</span>
+                      </div>
+                    </div>
+                    <div class="px-3 py-1 rounded-full bg-[#181b2c] border border-[#252a3f] text-slate-300 font-display text-[11px] flex items-center gap-1">
+                      <span class="material-symbols-outlined text-xs text-amber-400">bolt</span>
+                      <span id="aiSlaBadge">SLA ≤ 5000 мс</span>
+                    </div>
+                  </div>
+
+                  <div id="chatMessages" class="p-4 flex flex-col gap-3 max-h-[340px] overflow-y-auto"></div>
+
+                  <div class="px-4 py-2 bg-[#10121e] border-t border-[#1e2235] flex items-center justify-between text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-emerald-400">insights</span> KPI корисності ШІ (UC11):</span>
+                    <strong id="aiHelpfulnessKpi" class="text-emerald-400">100%</strong>
+                  </div>
+
+                  <div class="px-4 py-2 bg-[#10121e] border-t border-[#1e2235] flex flex-wrap gap-1.5">
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Поясни простими словами ключову концепцію цієї теми">
+                      <span class="material-symbols-outlined text-xs text-primary">add</span> З чого почати?
+                    </button>
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Наведи практичний приклад коду для цього вузла">
+                      <span class="material-symbols-outlined text-xs text-primary">add</span> Приклад коду
+                    </button>
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Які типові помилки роблять новачки в цій темі?">
+                      <span class="material-symbols-outlined text-xs text-primary">add</span> Типові помилки
+                    </button>
+                  </div>
+
+                  <form id="askAiForm" class="p-3 bg-[#141624] border-t border-[#1e2235] flex items-center gap-2">
+                    <input id="aiQuestionInput" type="text" required placeholder="Поставте запитання по поточній темі..." class="flex-1 bg-[#0d0e17] text-white placeholder:text-slate-500 px-4 py-2.5 rounded-full text-xs outline-none border border-[#23273c] focus:border-primary/60 focus:ring-1 focus:ring-primary/40 transition-all shadow-inner" />
+                    <button type="submit" title="Надіслати" class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 text-white flex items-center justify-center shadow-[0_0_12px_rgba(139,92,246,0.35)] hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer">
+                      <span class="material-symbols-outlined text-base">send</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 3: MENTORS CATALOG & SESSIONS (/mentors)                   -->
+        <!-- ================================================================= -->
+        <section id="page-mentors" class="page-view" data-page="/mentors">
+          <div class="relative w-full overflow-hidden">
+            <div class="absolute -top-32 left-1/4 w-[34rem] h-[34rem] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+            <div class="absolute -top-20 right-10 w-[28rem] h-[28rem] bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div class="relative px-4 sm:px-6 lg:px-10 pt-8 pb-6 flex flex-col gap-6 max-w-7xl mx-auto w-full">
+              <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-purple-200 font-display text-xs">
+                      <span class="material-symbols-outlined text-sm text-purple-300">verified</span>
+                      Перевірені експерти SkillTree (UC6 / UC9)
+                    </span>
+                  </div>
+                  <h1 class="text-3xl lg:text-4xl text-white font-extrabold tracking-tight m-0">Каталог менторів та сесій</h1>
+                  <p class="text-slate-300 max-w-2xl text-sm lg:text-base leading-relaxed">
+                    Обирайте практиків із провідних tech-компаній України для розбору складних вузлів вашого дерева навичок, код-рев'ю та 1-на-1 консультацій.
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="bg-[#141829]/90 border border-purple-500/25 px-4 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-md">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 flex items-center justify-center">
+                      <span class="material-symbols-outlined text-xl">groups</span>
+                    </div>
+                    <div class="flex flex-col">
+                      <span id="mentorsActiveCount" class="text-lg text-white font-bold">0</span>
+                      <span class="text-xs text-slate-400">Активні ментори</span>
+                    </div>
+                  </div>
+                  <div class="bg-[#141829]/90 border border-purple-500/25 px-4 py-3 rounded-2xl flex items-center gap-3 backdrop-blur-md">
+                    <div class="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-300 flex items-center justify-center">
+                      <span class="material-symbols-outlined text-xl">star</span>
+                    </div>
+                    <div class="flex flex-col">
+                      <span id="mentorsAvgRating" class="text-lg text-white font-bold">4.90</span>
+                      <span class="text-xs text-slate-400">Сер. оцінка</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Search & Filter Bar -->
+              <div class="bg-[#121625]/90 border border-purple-500/25 rounded-3xl p-4 lg:p-5 shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                  <div class="relative flex-1 flex items-center">
+                    <span class="material-symbols-outlined absolute left-4 text-xl text-purple-400 pointer-events-none">search</span>
+                    <input id="mentorSearchInput" type="text" placeholder="Пошук ментора за навичкою, стеком або іменем..." class="w-full pl-12 pr-4 py-3 bg-[#0e111d] text-white placeholder:text-slate-500 rounded-2xl text-sm border border-purple-500/30 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition-all" />
+                  </div>
+                  <div class="relative min-w-[230px]">
+                    <select id="sortSelect" class="w-full appearance-none bg-[#0e111d] text-white px-4 py-3 pr-10 rounded-2xl text-sm border border-purple-500/30 outline-none cursor-pointer focus:border-cyan-400">
+                      <option value="rating">За рейтингом (найвищий)</option>
+                      <option value="price_asc">За ціною (доступніші)</option>
+                      <option value="price_desc">За ціною (преміум)</option>
+                      <option value="materials">За к-стю матеріалів</option>
+                    </select>
                   </div>
                 </div>
 
-                <div class="preview-steps">
-                  <div class="preview-step done">
-                    <span class="step-dot">✓</span>
-                    <div>
-                      <strong>1. HTML5, CSS3 та верстка</strong>
-                      <small>Завершено • +50 XP</small>
-                    </div>
-                  </div>
-                  <div class="preview-step done">
-                    <span class="step-dot">✓</span>
-                    <div>
-                      <strong>2. TypeScript та ES2022+</strong>
-                      <small>Завершено • +50 XP</small>
-                    </div>
-                  </div>
-                  <div class="preview-step active">
-                    <span class="step-dot">3</span>
-                    <div>
-                      <strong>3. Backend REST API на Node.js</strong>
-                      <small>У процесі • 2 уроки</small>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="hero-ai-snippet">
-                  <div class="snippet-head">
-                    <span>🤖 ШІ-помічник</span>
-                    <span class="sla-pill">~215 мс</span>
-                  </div>
-                  <p>«PUT повністю перезаписує ресурс, а PATCH оновлює окремі поля — ідеально для зміни статусу вузла.»</p>
+                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                  <button type="button" data-spec="ALL" class="chip-filter active inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Всі спеціалізації</button>
+                  <button type="button" data-spec="Backend" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Backend & TypeScript</button>
+                  <button type="button" data-spec="Data" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Data & Python</button>
+                  <button type="button" data-spec="Cloud" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">DevOps & Cloud</button>
+                  <button type="button" data-spec="Frontend" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Frontend & React</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Bento Features -->
-          <div class="bento-grid">
-            <article class="st-card bento-card">
-              <div class="bento-icon">🗺️</div>
-              <h3>Інтерактивні дерева навичок</h3>
-              <p>Генеруйте покроковий маршрут навчання під ваш рівень (Beginner / Intermediate / Advanced), додавайте власні вузли та читайте готові конспекти.</p>
-            </article>
-            <article class="st-card bento-card">
-              <div class="bento-icon">⚡</div>
-              <h3>Миттєвий ШІ-асистент &le; 5 с</h3>
-              <p>Задавайте питання прямо на сторінці теми — отримуйте приклади коду та оцінюйте якість відповідей для контролю точності &gt; 90%.</p>
-            </article>
-            <article class="st-card bento-card">
-              <div class="bento-icon">📊</div>
-              <h3>Менторство та B2B Skill Matrix</h3>
-              <p>Бронюйте консультації з оплатою й квитанціями, а в командному кабінеті оцінюйте навички співробітників та вивантажуйте CSV.</p>
-            </article>
-          </div>
-
-          <!-- Role Portals (Separate Dedicated Pages per Profile Role) -->
-          <div class="portals-block">
-            <div class="section-intro">
-              <span class="mini-label">Оберіть робочий простір</span>
-              <h2>Окремі сторінки для кожної ролі на платформі</h2>
-              <p>Кожна роль має власний повноцінний кабінет з окремим маршрутом без нескінченного скролу.</p>
-            </div>
-
-            <div class="portals-grid">
-              <a href="/roadmap" data-route="/roadmap" class="st-card portal-card">
-                <div class="portal-top">
-                  <span class="portal-badge portal-badge-learner">Студент / Фахівець</span>
-                  <span class="portal-arrow">→</span>
-                </div>
-                <h3>Карта навичок та ШІ-тьютор</h3>
-                <p>Генерація персональної карти, проходження вузлів із нарахуванням XP і бейджів, вбудовані уроки та чат із ШІ-асистентом.</p>
-                <span class="portal-cta">Відкрити /roadmap</span>
-              </a>
-
-              <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="st-card portal-card">
-                <div class="portal-top">
-                  <span class="portal-badge portal-badge-mentor">Ментор / Експерт</span>
-                  <span class="portal-arrow">→</span>
-                </div>
-                <h3>Кабінет ментора</h3>
-                <p>Публікація навчальних матеріалів у вузли карти розвитку, управління вхідними 1-на-1 бронюваннями та перегляд рейтингу.</p>
-                <span class="portal-cta">Відкрити /mentor-cabinet</span>
-              </a>
-
-              <a href="/b2b" data-route="/b2b" class="st-card portal-card">
-                <div class="portal-top">
-                  <span class="portal-badge portal-badge-hr">HR / TeamLead (B2B)</span>
-                  <span class="portal-arrow">→</span>
-                </div>
-                <h3>Командна аналітика Skill Matrix</h3>
-                <p>Створення команд, призначення індивідуальних карт розвитку працівникам, візуалізація прогалин та експорт звітів у CSV.</p>
-                <span class="portal-cta">Відкрити /b2b</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 2: ROADMAP (/roadmap) -->
-    <section id="page-roadmap" class="page-view" data-page="/roadmap">
-      <div class="page-band">
-        <div class="container">
-          <div class="page-header-row">
+          <div class="px-4 sm:px-6 lg:px-10 pb-16 max-w-7xl mx-auto w-full flex flex-col gap-10">
             <div>
-              <span class="mini-label">Кабінет студента • UC2, UC3, UC4, UC10, UC11</span>
-              <h1>Інтерактивна карта навичок</h1>
-              <p class="page-lead">Обирайте модулі, вивчайте конспекти, ставте запитання контекстному ШІ-помічнику та заробляйте XP.</p>
-            </div>
-            <div class="toolbar-actions">
-              <select id="treeSelect" class="st-input st-select" aria-label="Активна карта розвитку"></select>
-              <button type="button" id="openAddNodeBtn" class="st-btn st-btn-outline">+ Додати вузол</button>
-              <button type="button" id="openWizardBtn" class="st-btn st-btn-primary">✨ Нова ШІ-карта</button>
-            </div>
-          </div>
+              <div class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg text-white font-bold">Доступні ментори</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-display text-[11px] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Онлайн зараз
+                  </span>
+                </div>
+                <span class="text-purple-300 font-display text-xs flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm text-amber-400">bolt</span> Швидке бронювання 1-на-1
+                </span>
+              </div>
 
-          <div class="quick-professions-bar">
-            <span class="quick-label">Швидкі треки:</span>
-            <div id="quickProfessionsRow" class="quick-professions-row"></div>
-          </div>
+              <div id="mentorsDirectoryGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+            </div>
 
-          <div class="workspace-grid">
-            <!-- Left column: SkillTree & Nodes -->
-            <div class="st-card workspace-card">
-              <div class="tree-summary-head">
+            <!-- Booked Student Sessions Section (UC6 / UC9) -->
+            <div class="glass-panel rounded-3xl p-6 flex flex-col gap-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h2 id="treeTitle">Full-Stack Developer</h2>
-                  <p id="treeMeta" class="muted-text">Рівень: BEGINNER • Вузлів: 5</p>
-                </div>
-                <div class="tree-stats-badges">
-                  <span id="learnerPointsBadge" class="st-badge st-badge-accent">0 балів</span>
-                  <span id="treePercentBadge" class="st-badge st-badge-success">0%</span>
+                  <h2 class="text-xl text-white font-bold m-0">🧾 Мої заброньовані сесії та оплати (UC6 / UC9)</h2>
+                  <p class="text-xs text-slate-400 mt-1">Оплачуйте консультації через PaymentAdapter, переглядайте електронні квитанції та оцінюйте менторів.</p>
                 </div>
               </div>
-
-              <div class="progress-track" aria-label="Прогрес дерева навичок">
-                <div id="treeProgressFill" class="progress-fill" style="width: 0%"></div>
-              </div>
-
-              <div id="badgesRow" class="badges-row"></div>
-
-              <div id="nodesList" class="nodes-list"></div>
+              <div id="learnerSessionsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- Right column: Node Inspector & AI Tutor -->
-            <div class="st-card workspace-card inspector-card">
-              <div id="nodeInspectorEmpty" class="empty-state">
-                <div class="empty-icon">🧭</div>
-                <h3>Оберіть вузол ліворуч</h3>
-                <p>Клацніть на будь-яку тему в карті навичок, щоб відкрити матеріали, змінити статус і поставити питання ШІ-тьютору.</p>
+            <!-- Bottom Sync Banner -->
+            <div class="bg-gradient-to-r from-[#141829]/90 via-[#181d36]/90 to-[#141829]/90 border border-purple-500/30 rounded-3xl p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
+              <div class="flex items-start gap-4 z-10">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-700 text-white flex items-center justify-center shrink-0 cyber-glow-purple">
+                  <span class="material-symbols-outlined text-2xl">sync_saved_locally</span>
+                </div>
+                <div>
+                  <h3 class="text-lg text-white font-bold m-0">Синхронізація з вашим SkillTree</h3>
+                  <p class="text-sm text-slate-300 max-w-xl leading-relaxed mt-1">
+                    Обов'язкова оплата активує підтвердження ментора, а після завершення сесії ви можете поставити оцінку 1–5 ★, яка миттєво оновлює рейтинг експерта.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 z-10">
+                <a href="/roadmap" data-route="/roadmap" class="px-5 py-2.5 rounded-full bg-[#1e233d] hover:bg-[#252c4d] border border-purple-500/30 text-white text-sm font-semibold">До карти навичок</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 4: MENTOR CABINET (/mentor-cabinet)                        -->
+        <!-- ================================================================= -->
+        <section id="page-mentor-cabinet" class="page-view" data-page="/mentor-cabinet">
+          <div class="relative w-full px-4 sm:px-6 lg:px-10 py-8 max-w-7xl mx-auto">
+            <!-- Guest / Non-Mentor Notice -->
+            <div id="mentorGuestNotice" class="hidden glass-panel rounded-3xl p-8 text-center max-w-2xl mx-auto my-8">
+              <div class="w-16 h-16 rounded-2xl bg-primary/20 border border-primary/40 text-primary flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-3xl">school</span>
+              </div>
+              <h2 class="text-2xl font-bold text-white mb-2">Потрібна роль «Ментор / Експерт»</h2>
+              <p class="text-sm text-slate-300 mb-6">Щоб публікувати матеріали у вузли карти навичок та підтверджувати вхідні сесії студентів, перемкніть роль на Ментора або увійдіть у свій обліковий запис ментора.</p>
+              <div class="flex flex-wrap justify-center gap-3">
+                <button id="switchToMentorQuickBtn" type="button" class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm cyber-glow-purple cursor-pointer">
+                  Увійти як Ментор в 1 клік
+                </button>
+                <a href="/auth" data-route="/auth" class="px-6 py-3 rounded-xl bg-[#181b2c] border border-[#2b304c] text-slate-200 hover:text-white text-sm font-semibold">
+                  Відкрити 3D Портал входу
+                </a>
+              </div>
+            </div>
+
+            <!-- Active Mentor Workspace -->
+            <div id="mentorCabinetContent" class="flex flex-col gap-8">
+              <!-- Mentor Profile Banner -->
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 lg:p-8 bg-[#141724]/80 backdrop-blur-xl border border-[#2b304c] rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.6)] relative overflow-hidden">
+                <div class="flex items-center gap-5 relative z-10">
+                  <div class="relative">
+                    <div id="mentorBannerAvatar" class="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.35)] ring-2 ring-primary/60">АС</div>
+                    <span class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs ring-2 ring-[#141724]">
+                      <span class="material-symbols-outlined text-[14px]">check</span>
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/40 text-primary font-display text-[11px] tracking-wider uppercase font-bold">Top Rated Mentor</span>
+                      <span class="px-2 py-0.5 rounded-full bg-tertiary/15 border border-tertiary/40 text-tertiary font-display text-[11px] font-semibold">B2B Verified</span>
+                    </div>
+                    <h1 id="mentorBannerName" class="text-2xl text-white font-bold tracking-tight m-0">Андрій Савченко</h1>
+                    <p id="mentorBannerSpec" class="text-sm text-slate-300 flex items-center gap-1.5 m-0">
+                      <span class="material-symbols-outlined text-base text-tertiary">terminal</span>
+                      <span>Full-Stack & TypeScript Architecture</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 relative z-10">
+                  <button id="openModalBtn" type="button" class="group flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white shadow-[0_0_25px_rgba(154,110,255,0.45)] hover:shadow-[0_0_35px_rgba(154,110,255,0.7)] border border-primary/40 transition-all cursor-pointer font-bold text-sm">
+                    <span class="material-symbols-outlined text-lg transition-transform group-hover:rotate-90">add</span>
+                    <span>Опублікувати матеріал</span>
+                  </button>
+                </div>
               </div>
 
-              <div id="nodeInspectorContent" class="hidden">
-                <div class="inspector-head">
+              <!-- Mentor KPIs -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <div class="flex flex-col justify-between p-6 bg-[#151827]/80 backdrop-blur-md rounded-2xl border border-[#2b304c] hover:border-amber-400/50 transition-all">
+                  <div class="flex items-start justify-between">
+                    <span class="font-display text-xs text-slate-400">Середній рейтинг</span>
+                    <div class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-300">
+                      <span class="material-symbols-outlined">star</span>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <div class="flex items-baseline gap-1.5">
+                      <span id="mentorKpiRating" class="text-3xl font-extrabold text-white">4.9</span>
+                      <span class="text-sm text-slate-400 font-mono">/ 5.0</span>
+                    </div>
+                    <span class="mt-1 text-xs text-emerald-400 font-mono block">Динамічний рейтинг</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col justify-between p-6 bg-[#151827]/80 backdrop-blur-md rounded-2xl border border-[#2b304c] hover:border-tertiary/50 transition-all">
+                  <div class="flex items-start justify-between">
+                    <span class="font-display text-xs text-slate-400">Вхідних сесій</span>
+                    <div class="w-10 h-10 rounded-xl bg-tertiary/10 border border-tertiary/30 flex items-center justify-center text-tertiary">
+                      <span class="material-symbols-outlined">video_camera_front</span>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <span id="mentorKpiSessions" class="text-3xl font-extrabold text-white">0</span>
+                    <span class="mt-1 text-xs text-tertiary font-mono block">Керування бронюваннями</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col justify-between p-6 bg-[#151827]/80 backdrop-blur-md rounded-2xl border border-[#2b304c] hover:border-primary/50 transition-all">
+                  <div class="flex items-start justify-between">
+                    <span class="font-display text-xs text-slate-400">Опубліковано матеріалів</span>
+                    <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/40 flex items-center justify-center text-primary">
+                      <span class="material-symbols-outlined">library_books</span>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <span id="mentorKpiMaterials" class="text-3xl font-extrabold text-white">0</span>
+                    <span class="mt-1 text-xs text-primary font-mono block">Модулі у деревах знань</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col justify-between p-6 bg-[#171a2c]/90 backdrop-blur-md rounded-2xl border border-secondary-container/40 hover:border-emerald-400/50 transition-all">
+                  <div class="flex items-start justify-between">
+                    <span class="font-display text-xs text-slate-400">Тариф консультації</span>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+                      <span class="material-symbols-outlined">payments</span>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <span id="mentorKpiRevenue" class="text-3xl font-extrabold text-white">900 ₴</span>
+                    <span class="mt-1 text-xs text-emerald-400 font-mono block">За 1 годину 1-на-1</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dual Column Hub: Incoming Bookings + Materials Stack -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-7 flex flex-col gap-5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                      </div>
+                      <h2 class="text-xl font-bold text-white m-0">Менторські сесії та бронювання</h2>
+                    </div>
+                    <span id="mentorSessionsTotalBadge" class="font-mono text-xs px-3 py-1 rounded-full bg-[#181c2e] border border-[#2e3450] text-slate-300">Усього: 0</span>
+                  </div>
+                  <div id="mentorSessionsList" class="flex flex-col gap-4"></div>
+                </div>
+
+                <div class="lg:col-span-5 flex flex-col gap-5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary">
+                        <span class="material-symbols-outlined text-base">auto_stories</span>
+                      </div>
+                      <h2 class="text-xl font-bold text-white m-0">Матеріали у вузлах</h2>
+                    </div>
+                    <button id="addMaterialShortcutBtn" type="button" class="text-primary hover:text-white font-semibold text-xs flex items-center gap-1 cursor-pointer">
+                      <span class="material-symbols-outlined text-base">add_circle</span> Додати
+                    </button>
+                  </div>
+
+                  <div id="mentorMaterialsList" class="flex flex-col gap-3.5"></div>
+
+                  <div class="p-5 rounded-2xl bg-gradient-to-br from-[#1c1a32] to-[#141624] border border-primary/30 flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shrink-0">
+                      <span class="material-symbols-outlined">lightbulb</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <span class="text-sm text-primary font-bold">Порада ШІ-асистента</span>
+                      <p class="text-xs text-slate-300 leading-relaxed m-0">Публікуйте стислі практичні чеклісти та приклади коду у вузли студентів (UC5), щоб підвищити кількість платних 1-на-1 бронювань.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 5: B2B SKILL MATRIX (/b2b)                                 -->
+        <!-- ================================================================= -->
+        <section id="page-b2b" class="page-view" data-page="/b2b">
+          <div class="p-4 sm:p-6 md:p-8 flex flex-col gap-8 max-w-[1520px] mx-auto w-full">
+            <!-- Top Corporate Action Bar -->
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5 glass-panel p-6 rounded-3xl border border-violet-500/25 relative overflow-hidden">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 relative z-10">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-container to-secondary-container text-white flex items-center justify-center shadow-[0_0_16px_rgba(160,120,255,0.4)] shrink-0">
+                  <span class="material-symbols-outlined text-2xl">groups</span>
+                </div>
+                <div>
+                  <span class="font-display text-[11px] uppercase tracking-wider text-tertiary font-bold">Корпоративний аналітичний модуль</span>
+                  <div class="relative mt-1">
+                    <button id="teamDropdownBtn" type="button" class="flex items-center gap-2.5 px-4 py-2 bg-[#0e111a]/90 border border-violet-500/30 rounded-full text-white hover:border-tertiary/60 transition-all text-sm font-semibold cursor-pointer">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                      <span id="currentTeamLabel">Команда не обрана</span>
+                      <span class="material-symbols-outlined text-base text-slate-400">expand_more</span>
+                    </button>
+                    <div id="teamDropdownMenu" class="hidden absolute left-0 mt-2 w-80 glass-panel-elevated rounded-2xl shadow-[0_16px_36px_rgba(0,0,0,0.85)] z-30 py-2 border border-violet-500/40"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 relative z-10">
+                <button id="previewCsvBtn" type="button" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-variant/60 hover:bg-surface-variant border border-violet-500/30 text-slate-200 hover:text-white text-xs font-semibold transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-base text-cyan-300">visibility</span>
+                  <span>Перегляд CSV</span>
+                </button>
+                <button id="exportCsvBtn" type="button" class="relative flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-variant/80 border border-tertiary/40 hover:border-tertiary text-tertiary text-xs font-semibold transition-all shadow-[0_0_14px_rgba(123,208,255,0.2)] cursor-pointer">
+                  <span class="material-symbols-outlined text-base">download</span>
+                  <span>Експорт звіту у CSV (RFC-4180)</span>
+                </button>
+                <button id="openCreateTeamBtn" type="button" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-variant/60 hover:bg-surface-variant border border-violet-500/30 text-white text-xs font-semibold transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-base text-primary">group_add</span>
+                  <span>+ Команда / Учасник</span>
+                </button>
+                <button id="openAssignModalBtn" type="button" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary-container via-[#8b5cf6] to-tertiary-container text-white text-xs font-semibold shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/20 cursor-pointer">
+                  <span class="material-symbols-outlined text-base">add_task</span>
+                  <span>+ Призначити карту розвитку</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4 KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div class="flex items-start justify-between">
                   <div>
-                    <span id="activeNodeBadge" class="st-badge">NOT_STARTED</span>
-                    <h2 id="activeNodeTitle">Назва теми</h2>
+                    <span class="text-xs text-slate-300 font-medium">Середній прогрес команди</span>
+                    <div class="mt-2">
+                      <span id="b2bAvgProgress" class="text-4xl text-white font-extrabold">0%</span>
+                    </div>
                   </div>
-                  <div id="nodeActionButtons" class="node-action-buttons"></div>
+                  <div class="w-11 h-11 rounded-2xl bg-violet-950/80 border border-violet-500/40 text-tertiary flex items-center justify-center">
+                    <span class="material-symbols-outlined">monitoring</span>
+                  </div>
+                </div>
+                <div class="mt-4 w-full bg-[#0d0e14] rounded-full h-2 overflow-hidden border border-violet-500/20">
+                  <div id="b2bAvgProgressBar" class="bg-gradient-to-r from-primary-container to-tertiary h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs text-slate-300 font-medium">Виявлено Skill Gaps</span>
+                    <div class="flex items-baseline gap-2 mt-2">
+                      <span id="b2bSkillGapsCount" class="text-4xl text-error font-extrabold">0</span>
+                      <span class="text-xs text-slate-400">тем &lt; 50%</span>
+                    </div>
+                  </div>
+                  <div class="w-11 h-11 rounded-2xl bg-red-950/60 border border-error/40 text-error flex items-center justify-center">
+                    <span class="material-symbols-outlined">warning</span>
+                  </div>
+                </div>
+                <div id="b2bSkillGapChips" class="mt-4 flex flex-wrap gap-1.5"></div>
+              </div>
+
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs text-slate-300 font-medium">Пройдено вузлів</span>
+                    <div class="mt-2">
+                      <span id="b2bNodesPassed" class="text-4xl text-white font-extrabold">0</span>
+                    </div>
+                  </div>
+                  <div class="w-11 h-11 rounded-2xl bg-violet-950/70 border border-primary/40 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined">verified</span>
+                  </div>
+                </div>
+                <div class="mt-4 text-xs text-tertiary">Активна динаміка навчання</div>
+              </div>
+
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs text-slate-300 font-medium">Учасників у команді</span>
+                    <div class="mt-2">
+                      <span id="b2bActivePlans" class="text-4xl text-white font-extrabold">0</span>
+                    </div>
+                  </div>
+                  <div class="w-11 h-11 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
+                    <span class="material-symbols-outlined">route</span>
+                  </div>
+                </div>
+                <div class="mt-4 flex items-center gap-2 text-xs text-emerald-300">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Покриття матрицею
+                </div>
+              </div>
+            </div>
+
+            <!-- Skill Matrix Heatmap Table -->
+            <div class="glass-panel rounded-3xl p-6 border border-violet-500/25 flex flex-col gap-5">
+              <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2.5">
+                    <h2 class="text-xl text-white font-bold tracking-tight m-0">Матриця компетенцій та Heatmap</h2>
+                    <span class="px-2.5 py-0.5 rounded-full bg-primary-container/20 border border-primary/40 text-primary font-display text-xs font-semibold">UC7 / UC8</span>
+                  </div>
+                  <p class="text-sm text-slate-400 mt-1 m-0">Прогрес учасників команди, кількість пройдених вузлів, накопичений досвід і виявлені прогалини.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 bg-[#0d0e14]/90 border border-violet-500/20 p-2 rounded-2xl text-xs">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/50 text-emerald-400">✓ Завершено</span>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-950/50 text-cyan-300">◷ В процесі</span>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-950/60 text-error">⚠ Skill Gap</span>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto rounded-2xl bg-[#0d0e14]/80 border border-violet-500/20">
+                <table class="w-full text-left border-collapse min-w-[780px]">
+                  <thead>
+                    <tr class="bg-[#292930]/60 text-slate-300 font-display text-xs uppercase tracking-wider border-b border-violet-500/20">
+                      <th class="py-3.5 px-5">Співробітник</th>
+                      <th class="py-3.5 px-4">Професія / Рівень</th>
+                      <th class="py-3.5 px-4">Карти / Вузли</th>
+                      <th class="py-3.5 px-4">Прогрес</th>
+                      <th class="py-3.5 px-4 text-center">XP</th>
+                      <th class="py-3.5 px-5 text-right">Дії (UC8)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hrMembersTableBody" class="divide-y divide-violet-500/10 text-sm text-slate-200"></tbody>
+                </table>
+              </div>
+
+              <div class="flex items-center gap-2 text-xs text-slate-300">
+                <span class="material-symbols-outlined text-base text-tertiary">auto_awesome</span>
+                <span id="b2bAiInsightText">AI Insight: Аналіз компетенцій команди оновлюється у реальному часі.</span>
+              </div>
+            </div>
+
+            <!-- Strategic Insights Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-violet-950/80 border border-primary/40 text-primary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-base">psychology</span>
+                    </div>
+                    <span class="font-semibold text-white">SkillTree AI Рекомендація</span>
+                  </div>
+                  <p id="b2bRecommendationText" class="text-sm text-slate-300 leading-relaxed m-0">Призначайте цільові карти для усунення прогалин нижче 50% прогресу.</p>
+                </div>
+                <button id="quickAssignRecommendationBtn" type="button" class="w-full py-2.5 px-4 rounded-xl bg-primary-container/20 hover:bg-primary-container/35 border border-primary/40 text-primary font-semibold text-xs transition-all cursor-pointer">
+                  Призначити карту розвитку →
+                </button>
+              </div>
+
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="font-semibold text-white">Баланс компетенцій стеку</span>
+                    <span class="font-display text-[11px] px-2.5 py-0.5 rounded-full bg-violet-950/80 border border-violet-500/40 text-tertiary">Матриця UC7</span>
+                  </div>
+                  <div id="b2bBalanceBars" class="space-y-3"></div>
+                </div>
+              </div>
+
+              <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-cyan-950/60 border border-tertiary/40 text-tertiary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-base">table_chart</span>
+                    </div>
+                    <span class="font-semibold text-white">Аудит відповідності RFC-4180</span>
+                  </div>
+                  <p class="text-xs text-slate-300 leading-relaxed m-0">Експорт формує CSV-файл із UTF-8 BOM для коректного відкриття кирилиці в Excel (ID, ПІБ, Email, Професія, Рівень, Прогрес %, Бали).</p>
+                </div>
+                <button id="downloadCsvSecondaryBtn" type="button" class="w-full py-2.5 px-4 rounded-full bg-[#292930]/80 hover:bg-[#34343b] border border-violet-500/30 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
+                  <span class="material-symbols-outlined text-base text-tertiary">file_download</span>
+                  <span>Завантажити CSV-звіт</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 6: PROFILES, ROLE SWITCHER & SESSIONS (/profile)           -->
+        <!-- ================================================================= -->
+        <section id="page-profile" class="page-view" data-page="/profile">
+          <div class="relative w-full px-4 sm:px-6 lg:px-10 py-8 overflow-hidden max-w-7xl mx-auto">
+            <!-- Header Banner -->
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+              <div class="flex flex-col gap-1.5 max-w-3xl">
+                <div class="flex items-center gap-2">
+                  <span class="font-display text-[11px] uppercase tracking-widest text-tertiary-fixed-dim bg-[#292930] px-2.5 py-0.5 rounded-full">// AUTH_MATRIX_PROTO_04</span>
+                  <span class="text-slate-500">•</span>
+                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">DOM_REQ: US-04 / UC-01</span>
+                </div>
+                <h1 class="text-3xl text-white font-bold tracking-tight mt-1 m-0">
+                  Вхід та управління <span class="text-primary font-extrabold">профілями</span>
+                </h1>
+                <p class="text-sm text-slate-300 max-w-2xl leading-relaxed m-0">
+                  Швидке перемикання між ролями в системі (<span class="text-tertiary font-semibold">Студент</span>, <span class="text-primary font-semibold">Ментор</span>, <span class="text-secondary font-semibold">HR-менеджер</span>), редагування даних профілю та моніторинг активних сесій.
+                </p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                <a id="addProfileBtn" href="/auth" data-route="/auth" class="flex items-center gap-1.5 bg-[#1e1f26] hover:bg-[#292930] text-tertiary px-4 py-2.5 rounded-xl font-display text-xs font-semibold transition-all border border-[#34343b]">
+                  <span class="material-symbols-outlined text-base">person_add</span>
+                  <span>Створити новий акаунт</span>
+                </a>
+                <button id="revokeOtherBtn" type="button" class="flex items-center gap-1.5 bg-[#1e1f26] hover:bg-error-container text-slate-300 hover:text-on-error-container px-4 py-2.5 rounded-xl font-display text-xs font-semibold transition-all border border-[#34343b] cursor-pointer">
+                  <span class="material-symbols-outlined text-base">logout</span>
+                  <span>Завершити інші сесії</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Active Profile Hero Card -->
+            <div class="relative bg-[#1e1f26]/80 backdrop-blur-2xl rounded-2xl p-6 lg:p-8 mb-8 border border-[#34343b] shadow-[0_12px_36px_rgba(0,0,0,0.5)]">
+              <div class="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-80"></div>
+              <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                  <div class="relative shrink-0">
+                    <div id="profileHeroAvatar" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-primary via-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_24px_rgba(208,188,255,0.4)]">ВГ</div>
+                    <div class="absolute bottom-0 right-1 w-6 h-6 rounded-full bg-[#0d0e14] flex items-center justify-center">
+                      <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-1.5">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span id="profileHeroRole" class="font-display text-[11px] uppercase tracking-wider text-primary bg-primary-container/30 px-2.5 py-0.5 rounded-full font-semibold">LEARNER</span>
+                      <span id="profileHeroId" class="font-display text-[11px] text-tertiary bg-[#292930] px-2.5 py-0.5 rounded-full">ID: #1</span>
+                      <span class="flex items-center gap-1 text-cyan-300 font-display text-[11px]">
+                        <span class="material-symbols-outlined text-sm">verified</span> Валідний акаунт
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-baseline gap-2 mt-0.5">
+                      <h2 id="profileHeroName" class="text-2xl text-white font-bold tracking-tight m-0">Гість платформи</h2>
+                      <span id="profileHeroHandle" class="font-mono text-xs text-slate-400"></span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1.5">
+                      <div class="flex items-center gap-2 text-slate-300 text-xs bg-[#1a1b22] px-3 py-1.5 rounded-lg">
+                        <span class="material-symbols-outlined text-primary text-base">account_tree</span>
+                        <span id="profileHeroTrack">Трек: —</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-slate-300 text-xs bg-[#1a1b22] px-3 py-1.5 rounded-lg">
+                        <span class="material-symbols-outlined text-tertiary text-base">hub</span>
+                        <span id="profileHeroNode">Статус: —</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <p id="activeNodeDesc" class="inspector-desc"></p>
-
-                <div class="materials-block">
-                  <div class="block-head">
-                    <h3>📚 Навчальні матеріали</h3>
-                    <span id="materialsCount" class="st-badge">0</span>
+                <div class="flex flex-col sm:flex-row xl:flex-col items-start xl:items-end justify-between gap-4 shrink-0">
+                  <div class="text-left xl:text-right">
+                    <div class="flex items-center xl:justify-end gap-1.5 font-display text-xs text-white">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span id="profileSessionStatusText">Сесія активна</span>
+                    </div>
+                    <span class="text-xs text-slate-400">Автономний веб-контур SkillTree AI</span>
                   </div>
-                  <div id="nodeMaterialsList" class="materials-list"></div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <a id="profileWorkspaceLink" href="/roadmap" data-route="/roadmap" class="flex items-center gap-1.5 bg-primary text-on-primary hover:bg-primary-fixed px-4 py-2.5 rounded-xl font-display text-xs font-bold transition-all shadow-[0_0_16px_rgba(208,188,255,0.3)]">
+                      <span>Перейти в кабінет</span>
+                      <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    </a>
+                    <button id="openEditProfileBtn" type="button" class="p-2.5 bg-[#292930] hover:bg-[#383940] text-white rounded-xl transition-all cursor-pointer" title="Редагувати профіль / Пароль">
+                      <span class="material-symbols-outlined text-lg">tune</span>
+                    </button>
+                    <button id="profileLogoutBtn" type="button" class="p-2.5 bg-[#292930] hover:bg-error-container text-slate-300 hover:text-on-error-container rounded-xl transition-all cursor-pointer" title="Вийти з акаунта">
+                      <span class="material-symbols-outlined text-lg">power_settings_new</span>
+                    </button>
+                  </div>
                 </div>
+              </div>
+            </div>
 
-                <div class="ai-tutor-block">
-                  <div class="block-head">
+            <!-- 3 Role Switcher Cards -->
+            <div class="flex flex-col gap-4 mb-8">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// ROLE_SIMULATION_CONDUIT</span>
+                  <h3 class="text-lg text-white font-semibold m-0">Демо-профілі та швидке перемикання ролей (US-04)</h3>
+                </div>
+                <span class="hidden sm:inline-flex items-center gap-1 font-display text-xs text-tertiary bg-[#1e1f26] px-3 py-1 rounded-full">
+                  <span class="material-symbols-outlined text-sm">touch_app</span> 1 клік авторизації
+                </span>
+              </div>
+              <div id="roleDemoCards" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Inline Auth Gateway + Active Connections Ledger -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+              <div class="lg:col-span-5 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
+                <div class="flex flex-col gap-4">
+                  <div class="flex items-center justify-between">
                     <div>
-                      <h3>🤖 Контекстний ШІ-тьютор</h3>
-                      <small class="muted-text">Відповідає з урахуванням обраного вузла</small>
+                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// AUTH_GATEWAY</span>
+                      <h3 class="text-lg text-white font-semibold m-0">Авторизація іншого профілю</h3>
                     </div>
-                    <span id="aiSlaBadge" class="st-badge st-badge-accent">SLA &le; 5000 мс</span>
+                    <div class="w-8 h-8 rounded-lg bg-[#292930] flex items-center justify-center text-primary">
+                      <span class="material-symbols-outlined text-lg">key</span>
+                    </div>
                   </div>
+                  <p class="text-xs text-slate-300 m-0">Увійдіть у будь-який обліковий запис платформи за поштою та паролем.</p>
 
-                  <div class="quick-prompts">
-                    <button type="button" class="chip-btn" data-prompt="Поясни простими словами ключову концепцію цієї теми">З чого почати?</button>
-                    <button type="button" class="chip-btn" data-prompt="Наведи практичний приклад коду для цього вузла">Наведи приклад коду</button>
-                    <button type="button" class="chip-btn" data-prompt="Які типові помилки роблять новачки в цій темі?">Типові помилки</button>
-                  </div>
-
-                  <div id="chatMessages" class="chat-messages"></div>
-
-                  <form id="askAiForm" class="chat-form">
-                    <input type="text" id="aiQuestionInput" class="st-input" placeholder="Поставте запитання ШІ по поточній темі..." required />
-                    <button type="submit" class="st-btn st-btn-primary">Запитати</button>
+                  <form id="inlineLoginForm" class="flex flex-col gap-3.5">
+                    <div>
+                      <label class="font-display text-[11px] text-slate-400 uppercase tracking-wider block mb-1" for="inlineLoginEmail">Робоча пошта (Email)</label>
+                      <input id="inlineLoginEmail" type="email" required placeholder="slava@skilltree.ai" class="w-full bg-[#1a1b22] text-white text-xs px-3.5 py-2.5 rounded-xl border border-[#2b304c] focus:border-primary outline-none" />
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="font-display text-[11px] text-slate-400 uppercase tracking-wider" for="inlineLoginPassword">Пароль</label>
+                        <button id="inlineResetPwdBtn" type="button" class="text-[11px] text-tertiary hover:underline cursor-pointer">Скинути пароль?</button>
+                      </div>
+                      <input id="inlineLoginPassword" type="password" required placeholder="••••••••" class="w-full bg-[#1a1b22] text-white text-xs px-3.5 py-2.5 rounded-xl border border-[#2b304c] focus:border-primary outline-none" />
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                      <button type="submit" class="flex-1 bg-gradient-to-r from-primary to-primary-container text-on-primary font-display text-xs py-2.5 rounded-xl font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span class="material-symbols-outlined text-base">login</span> Увійти в систему
+                      </button>
+                      <a href="/auth" data-route="/auth" class="px-3.5 py-2.5 bg-[#292930] hover:bg-[#383940] text-white rounded-xl font-display text-xs transition-all">Реєстрація</a>
+                    </div>
                   </form>
                 </div>
               </div>
+
+              <div class="lg:col-span-7 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
+                <div class="flex flex-col gap-4">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// SESSION_SUPERVISION</span>
+                      <h3 class="text-lg text-white font-semibold m-0">Журнал активних підключень</h3>
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#292930] px-3 py-1 rounded-full">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span id="onlineDevicesBadge" class="font-display text-xs text-white">3 сесії активні</span>
+                    </div>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead>
+                        <tr class="bg-[#1a1b22] text-slate-400 font-display uppercase">
+                          <th class="py-2.5 px-3 rounded-l-lg">Клієнт / Браузер</th>
+                          <th class="py-2.5 px-3">Контур</th>
+                          <th class="py-2.5 px-3">Статус</th>
+                          <th class="py-2.5 px-3 rounded-r-lg text-right">Дія</th>
+                        </tr>
+                      </thead>
+                      <tbody id="activeSessionsTableBody" class="divide-y divide-[#2b304c]/50"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- PAGE 3: MENTORS MARKETPLACE (/mentors) -->
-    <section id="page-mentors" class="page-view" data-page="/mentors">
-      <div class="page-band">
-        <div class="container">
-          <div class="page-header-row">
+      </main>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- SLIDE-OVER DRAWER 1: BOOKING & PAYMENT CHECKOUT (Screen 3 - UC6 / UC9)  -->
+  <!-- ======================================================================= -->
+  <div id="bookingDrawerOverlay" class="fixed inset-0 bg-[#060810]/75 backdrop-blur-md z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex justify-end">
+    <div id="bookingDrawer" class="w-full max-w-xl bg-[#0f1220]/95 backdrop-blur-2xl border-l border-purple-500/30 h-full shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-y-auto transform translate-x-full transition-transform duration-300 flex flex-col justify-between relative">
+      <div class="p-6 lg:p-8 flex flex-col gap-5">
+        <div class="flex items-center justify-between pb-3 border-b border-purple-500/20">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="font-display text-xs uppercase tracking-wider text-cyan-400 font-bold">Бронювання сесії (UC6 & UC9 PaymentAdapter)</span>
+          </div>
+          <button id="closeBookingDrawerBtn" type="button" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div>
+          <h2 class="text-xl lg:text-2xl text-white font-bold m-0">Бронювання 1-на-1 консультації</h2>
+          <p class="text-xs text-slate-300 mt-1 m-0">Персональна робота з експертом та резервування оплати через PaymentAdapter.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#141829] border border-purple-500/30 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <div id="drawerMentorAvatar" class="w-12 h-12 rounded-xl bg-purple-950/80 border border-purple-500/50 text-purple-200 flex items-center justify-center font-bold shrink-0">АС</div>
+            <div class="min-w-0">
+              <div id="drawerMentorName" class="text-sm text-white font-semibold truncate">Ментор</div>
+              <div id="drawerMentorRole" class="text-xs text-slate-400 truncate">Спеціалізація</div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span id="drawerMentorPrice" class="text-base text-cyan-300 font-bold block">0 ₴</span>
+            <span class="text-[11px] text-slate-400">/ год</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="text-xs text-slate-300 font-semibold block mb-1" for="bookingTopicInput">Тема консультації / цільовий вузол</label>
+            <input id="bookingTopicInput" type="text" required placeholder="Наприклад: Розбір архітектури REST API та патернів" class="w-full bg-[#15192c] border border-purple-500/30 focus:border-cyan-400 px-3.5 py-2.5 rounded-xl text-sm text-white outline-none" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
             <div>
-              <span class="mini-label">Менторство • UC6, UC9</span>
-              <h1>Експерти та 1-на-1 консультації</h1>
-              <p class="page-lead">Обирайте практикуючого ментора, бронюйте зручний час та оплачуйте консультацію з автоматичною генерацією квитанції.</p>
+              <label class="text-xs text-slate-300 font-semibold block mb-1" for="bookingStartAt">Дата та час</label>
+              <input id="bookingStartAt" type="datetime-local" required class="w-full bg-[#15192c] border border-purple-500/30 focus:border-cyan-400 px-3 py-2 rounded-xl text-xs text-white outline-none" />
             </div>
-            <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="st-btn st-btn-outline">Я ментор → Кабінет ментора</a>
-          </div>
-
-          <div id="mentorsDirectoryGrid" class="mentors-grid"></div>
-
-          <div id="learnerMentorshipGrid" class="two-col mentorship-workspace">
-            <div class="st-card">
-              <h2>📅 Забронювати консультацію (UC6)</h2>
-              <p class="muted-text">Після бронювання ви можете оплатити сесію онлайн та залишити оцінку.</p>
-              <form id="bookSessionForm" class="stack-form">
-                <div class="form-group">
-                  <label for="bookingMentorSelect">Оберіть ментора</label>
-                  <select id="bookingMentorSelect" class="st-input" required></select>
-                </div>
-                <div class="form-group">
-                  <label for="bookingTopic">Тема консультації</label>
-                  <input type="text" id="bookingTopic" class="st-input" placeholder="Наприклад: Code Review архітектури REST API" required />
-                </div>
-                <div class="form-grid-2">
-                  <div class="form-group">
-                    <label for="bookingStartAt">Дата та час початку</label>
-                    <input type="datetime-local" id="bookingStartAt" class="st-input" required />
-                  </div>
-                  <div class="form-group">
-                    <label for="bookingDuration">Тривалість</label>
-                    <select id="bookingDuration" class="st-input">
-                      <option value="30">30 хв</option>
-                      <option value="60" selected>60 хв</option>
-                      <option value="90">90 хв</option>
-                    </select>
-                  </div>
-                </div>
-                <button type="submit" class="st-btn st-btn-primary">Забронювати сесію</button>
-              </form>
-            </div>
-
-            <div class="st-card">
-              <h2>🧾 Мої бронювання та оплати (UC9)</h2>
-              <p class="muted-text">Контролюйте статус оплати, завантажуйте квитанції та оцінюйте менторів.</p>
-              <div id="learnerSessionsList" class="sessions-list"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 4: MENTOR CABINET (/mentor-cabinet) -->
-    <section id="page-mentor-cabinet" class="page-view" data-page="/mentor-cabinet">
-      <div class="page-band">
-        <div class="container">
-          <div class="page-header-row">
             <div>
-              <span class="mini-label">Профіль експерта • UC5, UC6</span>
-              <h1>Кабінет ментора</h1>
-              <p class="page-lead">Публікуйте навчальні матеріали у вузли карти навичок та підтверджуйте бронювання студентів.</p>
-            </div>
-            <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline">← До каталогу менторів</a>
-          </div>
-
-          <div id="mentorGuestNotice" class="st-card notice-card hidden">
-            <div class="notice-icon">🎓</div>
-            <h2>Доступ до кабінету ментора</h2>
-            <p>Щоб публікувати власні уроки у вузли карти навичок та підтверджувати консультації студентів, увійдіть під обліковим записом з роллю <strong>Ментор / Експерт</strong> або зареєструйте новий акаунт ментора.</p>
-            <div class="notice-actions">
-              <button type="button" id="openAuthFromMentorBtn" class="st-btn st-btn-primary">Увійти / Зареєструватися як Ментор</button>
-              <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline">Перейти до бронювання</a>
-            </div>
-          </div>
-
-          <div id="mentorCabinetContent" class="hidden">
-            <div id="mentorCabinetPanel">
-              <div id="mentorProfileSummary" class="mentor-kpi-grid"></div>
-
-              <div class="two-col">
-                <div class="st-card">
-                  <h2>✍️ Опублікувати навчальний матеріал (UC5)</h2>
-                  <p class="muted-text">Додайте конспект, відеорозбір або зовнішнє посилання прямо у вузол студента.</p>
-                  <form id="publishMaterialForm" class="stack-form">
-                    <div class="form-group">
-                      <label for="mentorNodeSelect">Цільовий вузол навички</label>
-                      <select id="mentorNodeSelect" class="st-input" required></select>
-                    </div>
-                    <div class="form-grid-2">
-                      <div class="form-group">
-                        <label for="materialTitle">Назва матеріалу</label>
-                        <input type="text" id="materialTitle" class="st-input" placeholder="Напр.: Гайд по патерну Adapter" required />
-                      </div>
-                      <div class="form-group">
-                        <label for="materialType">Тип контенту</label>
-                        <select id="materialType" class="st-input">
-                          <option value="TEXT">TEXT (Внутрішній урок)</option>
-                          <option value="LINK">LINK (Документація / Стаття)</option>
-                          <option value="VIDEO">VIDEO (Відеолекція)</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="materialUrl">Посилання (необов'язково для TEXT)</label>
-                      <input type="url" id="materialUrl" class="st-input" placeholder="https://..." />
-                    </div>
-                    <div class="form-group">
-                      <label for="materialDesc">Короткий опис</label>
-                      <input type="text" id="materialDesc" class="st-input" placeholder="Чому це важливо для практики" required />
-                    </div>
-                    <div class="form-group">
-                      <label for="materialContent">Повний текст конспекту</label>
-                      <textarea id="materialContent" class="st-input" rows="4" placeholder="Ключові тези, приклади коду та чекліст..."></textarea>
-                    </div>
-                    <button type="submit" class="st-btn st-btn-primary">Опублікувати у вузол</button>
-                  </form>
-                </div>
-
-                <div class="st-card">
-                  <h2>🗓️ Вхідні консультації студентів</h2>
-                  <p class="muted-text">Підтверджуйте заброньовані слоти або керуйте розкладом.</p>
-                  <div id="mentorSessionsList" class="sessions-list"></div>
-                </div>
-              </div>
+              <label class="text-xs text-slate-300 font-semibold block mb-1" for="bookingDuration">Тривалість</label>
+              <select id="bookingDuration" class="w-full bg-[#15192c] border border-purple-500/30 focus:border-cyan-400 px-3 py-2 rounded-xl text-xs text-white outline-none">
+                <option value="30">30 хв</option>
+                <option value="60" selected>60 хв</option>
+                <option value="90">90 хв</option>
+              </select>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- PAGE 5: B2B ANALYTICS (/b2b) -->
-    <section id="page-b2b" class="page-view" data-page="/b2b">
-      <div class="page-band">
-        <div class="container">
-          <div class="page-header-row">
-            <div>
-              <span class="mini-label">B2B Кабінет HR / TeamLead • UC7, UC8, UC12</span>
-              <h1>Матриця навичок команди</h1>
-              <p class="page-lead">Відстежуйте середній рівень володіння навичками в команді, призначайте карти розвитку та вивантажуйте звіти у CSV.</p>
-            </div>
-            <div class="toolbar-actions">
-              <select id="teamSelect" class="st-input st-select" aria-label="Оберіть команду"></select>
-              <button type="button" id="previewCsvBtn" class="st-btn st-btn-outline">Переглянути CSV</button>
-              <button type="button" id="exportCsvBtn" class="st-btn st-btn-primary">⬇ Завантажити CSV</button>
-            </div>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-white font-semibold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base text-cyan-400">credit_card</span> Спосіб оплати
+            </span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-semibold">SSL Захист</span>
           </div>
-
-          <div class="two-col b2b-top-grid">
-            <div class="st-card">
-              <h2>📈 Матриця прогресу за професіями</h2>
-              <p class="muted-text">Середній відсоток виконання індивідуальних карт розвитку у команді.</p>
-              <div id="skillMatrixBars" class="matrix-bars"></div>
-
-              <h3 class="sub-heading">Покриття ключових модулів (вузлів)</h3>
-              <div id="nodeMatrixBars" class="matrix-bars"></div>
-            </div>
-
-            <div class="st-card">
-              <h2>🎯 Керування командою та призначення карт (UC8)</h2>
-
-              <form id="assignTreeForm" class="stack-form">
-                <h3>Призначити карту працівнику</h3>
-                <div class="form-group">
-                  <label for="hrLearnerSelect">Співробітник</label>
-                  <select id="hrLearnerSelect" class="st-input" required></select>
-                </div>
-                <div class="form-grid-2">
-                  <div class="form-group">
-                    <label for="hrAssignProfession">Професія / напрямок</label>
-                    <input type="text" id="hrAssignProfession" class="st-input" list="professionList" placeholder="Напр.: Backend Developer" required />
-                    <datalist id="professionList"></datalist>
-                  </div>
-                  <div class="form-group">
-                    <label for="hrAssignLevel">Цільовий рівень</label>
-                    <select id="hrAssignLevel" class="st-input">
-                      <option value="BEGINNER">BEGINNER</option>
-                      <option value="INTERMEDIATE">INTERMEDIATE</option>
-                      <option value="ADVANCED">ADVANCED</option>
-                    </select>
-                  </div>
-                </div>
-                <button type="submit" class="st-btn st-btn-primary">Призначити карту розвитку</button>
-              </form>
-
-              <hr class="divider" />
-
-              <div class="form-grid-2">
-                <form id="createTeamForm" class="stack-form">
-                  <label for="newTeamName">Створити нову команду</label>
-                  <div class="inline-form-row">
-                    <input type="text" id="newTeamName" class="st-input" placeholder="Назва команди" required />
-                    <button type="submit" class="st-btn st-btn-outline">Створити</button>
-                  </div>
-                </form>
-
-                <form id="addTeamMemberForm" class="stack-form">
-                  <label for="addMemberLearnerSelect">Додати учасника до команди</label>
-                  <div class="inline-form-row">
-                    <select id="addMemberLearnerSelect" class="st-input" required></select>
-                    <button type="submit" class="st-btn st-btn-outline">Додати</button>
-                  </div>
-                </form>
-              </div>
-            </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" data-pay-method="CARD" class="pay-method-btn active p-2.5 rounded-xl bg-purple-950/80 border border-purple-500/50 text-white text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-base">credit_card</span> Картка
+            </button>
+            <button type="button" data-pay-method="APPLE_PAY" class="pay-method-btn p-2.5 rounded-xl bg-[#141829] border border-purple-500/20 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-base">smartphone</span> Apple Pay
+            </button>
+            <button type="button" data-pay-method="IBAN" class="pay-method-btn p-2.5 rounded-xl bg-[#141829] border border-purple-500/20 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-base">account_balance</span> IBAN
+            </button>
           </div>
-
-          <div class="st-card b2b-table-card">
-            <div class="block-head">
-              <h2>👥 Учасники обраної команди</h2>
-              <span class="mini-label">Дані оновлюються в реальному часі</span>
-            </div>
-            <div class="table-wrap">
-              <table class="st-table">
-                <thead>
-                  <tr>
-                    <th>Співробітник</th>
-                    <th>Цільова професія</th>
-                    <th>Рівень</th>
-                    <th>Карти</th>
-                    <th>Вузли</th>
-                    <th>Прогрес</th>
-                    <th>XP</th>
-                  </tr>
-                </thead>
-                <tbody id="hrMembersTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div id="csvPreviewCard" class="st-card hidden">
-            <div class="block-head">
-              <h3>📄 Попередній перегляд CSV-звіту (RFC-4180 + UTF-8 BOM)</h3>
-              <button type="button" id="closeCsvPreviewBtn" class="st-btn st-btn-ghost st-btn-sm">Закрити</button>
-            </div>
-            <pre id="csvPreviewContent" class="csv-pre"></pre>
+          <div class="p-3 rounded-xl bg-[#121629] border border-cyan-500/30 text-xs text-slate-300 leading-relaxed">
+            <strong class="text-white">Обов'язкова оплата (UC9):</strong> ментор зможе підтвердити бронювання лише після успішної оплати.
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- PAGE 6: USER PROFILE (/profile) -->
-    <section id="page-profile" class="page-view" data-page="/profile">
-      <div class="page-band">
-        <div class="container">
-          <div class="page-header-row">
-            <div>
-              <span class="mini-label">Особистий акаунт • UC1</span>
-              <h1>Мій профіль та налаштування</h1>
-              <p class="page-lead">Керуйте особистими даними, спеціалізацією та параметрами безпеки вашого облікового запису.</p>
-            </div>
-            <a href="/" data-route="/" class="st-btn st-btn-outline">← На головну</a>
+      <div class="p-6 bg-[#0c0e1a] border-t border-purple-500/30 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs text-slate-400 block">Всього до сплати:</span>
+            <span id="paymentTotalAmount" class="text-xl text-white font-extrabold">0 ₴</span>
           </div>
-
-          <div id="profileGuestNotice" class="st-card notice-card hidden">
-            <div class="notice-icon">🔐</div>
-            <h2>Ви ще не увійшли в акаунт</h2>
-            <p>Увійдіть або зареєструйте новий профіль (Студент, Ментор або HR), щоб переглядати свою статистику, редагувати дані та керувати безпекою.</p>
-            <div class="notice-actions">
-              <button type="button" id="openAuthFromProfileBtn" class="st-btn st-btn-primary">Увійти / Реєстрація</button>
-              <a href="/roadmap" data-route="/roadmap" class="st-btn st-btn-outline">Продовжити як гість у карті</a>
-            </div>
-          </div>
-
-          <div id="profilePageContent" class="profile-page-grid hidden">
-            <aside class="st-card profile-hero-card">
-              <div class="profile-avatar-lg" id="profilePageAvatar">ВГ</div>
-              <h2 id="profilePageName">Користувач</h2>
-              <span id="profilePageRole" class="st-badge st-badge-accent">LEARNER</span>
-              <p id="profilePageEmail" class="muted-text">user@skilltree.ai</p>
-
-              <div id="profileStatsSummary" class="profile-stats-summary"></div>
-
-              <div class="profile-quick-actions">
-                <a href="/roadmap" data-route="/roadmap" id="profileWorkspaceLink" class="st-btn st-btn-primary">Перейти у робочий кабінет →</a>
-                <button type="button" id="profileLogoutBtn" class="st-btn st-btn-outline">Вийти з акаунта</button>
-              </div>
-            </aside>
-
-            <div class="profile-forms-col">
-              <div class="st-card">
-                <h2>👤 Персональні дані та рольові параметри</h2>
-                <form id="profileForm" class="stack-form">
-                  <div class="form-group">
-                    <label for="profFullName">Повне ім'я (ПІБ)</label>
-                    <input type="text" id="profFullName" class="st-input" required />
-                  </div>
-                  <div id="profRoleFields"></div>
-                  <button type="submit" class="st-btn st-btn-primary">Зберегти зміни профілю</button>
-                </form>
-              </div>
-
-              <div class="st-card">
-                <h2>🔑 Зміна пароля</h2>
-                <p class="muted-text">Оновіть пароль для вашого облікового запису (мінімум 4 символи).</p>
-                <form id="profilePasswordForm" class="stack-form">
-                  <div class="form-grid-2">
-                    <div class="form-group">
-                      <label for="profileNewPassword">Новий пароль</label>
-                      <input type="password" id="profileNewPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
-                    </div>
-                    <div class="form-group">
-                      <label for="profileConfirmPassword">Підтвердьте пароль</label>
-                      <input type="password" id="profileConfirmPassword" class="st-input" minlength="4" placeholder="Повторіть пароль" required />
-                    </div>
-                  </div>
-                  <button type="submit" class="st-btn st-btn-outline">Оновити пароль</button>
-                </form>
-              </div>
-            </div>
-          </div>
+          <span class="text-xs text-emerald-400 flex items-center gap-1 font-semibold">
+            <span class="material-symbols-outlined text-sm">check_circle</span> Чек миттєво
+          </span>
         </div>
+        <button id="confirmPaymentBtn" type="button" class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-brand-500 via-purple-600 to-cyan-500 text-white text-sm font-bold cyber-glow-purple cursor-pointer">
+          <span class="material-symbols-outlined text-lg">lock</span>
+          <span>Забронювати та оплатити</span>
+        </button>
       </div>
-    </section>
-  </main>
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>
-        <strong>SkillTree AI</strong>
-        <p id="footerKpiText" class="muted-text">Платформа інтерактивного ІТ-навчання, ШІ-менторства та B2B-аналітики.</p>
-      </div>
-      <div class="footer-links">
-        <a href="/" data-route="/">Головна</a>
-        <a href="/roadmap" data-route="/roadmap">Карта навичок</a>
-        <a href="/mentors" data-route="/mentors">Ментори</a>
-        <a href="/mentor-cabinet" data-route="/mentor-cabinet">Кабінет ментора</a>
-        <a href="/b2b" data-route="/b2b">Для команд (B2B)</a>
+      <!-- Success Overlay -->
+      <div id="paymentSuccessToast" class="hidden absolute inset-0 bg-[#0c0f1c]/98 backdrop-blur-2xl p-8 flex flex-col items-center justify-center text-center gap-4 z-20">
+        <div class="w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-400/60 text-emerald-300 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+          <span class="material-symbols-outlined text-4xl">check</span>
+        </div>
+        <h3 class="text-xl text-white font-bold m-0">Сесію заброньовано та оплачено!</h3>
+        <p class="text-xs text-slate-300 max-w-sm leading-relaxed m-0">Квитанцію збережено у вашому кабінеті. Ментор може підтвердити проведення консультації.</p>
+        <div id="paymentTxnId" class="p-3 bg-[#141829] border border-purple-500/30 rounded-2xl w-full max-w-xs font-mono text-xs text-cyan-300">TXN</div>
+        <button id="closePaymentSuccessBtn" type="button" class="px-8 py-3 rounded-full bg-gradient-to-r from-brand-500 to-purple-600 text-white text-sm font-semibold cyber-glow-purple cursor-pointer">Повернутися до каталогу</button>
       </div>
     </div>
-  </footer>
+  </div>
 
-  <!-- MODALS -->
-
-  <!-- Modal 1: Generate SkillTree Wizard (UC2) -->
-  <div id="wizardModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="wizardTitle">✨ Генерація персональної карти (UC2)</h2>
-        <button type="button" class="st-modal-close" data-close-modal="wizardModal" aria-label="Закрити">✕</button>
-      </div>
-      <form id="wizardForm" class="stack-form">
-        <div class="form-group">
-          <label for="wizardProfession">Цільова ІТ-професія або тема</label>
-          <input type="text" id="wizardProfession" class="st-input" list="professionList" placeholder="Напр.: Full-Stack Developer, Data Analyst, DevOps..." required />
+  <!-- ======================================================================= -->
+  <!-- SLIDE-OVER DRAWER 2: HR ASSIGN ROADMAP (Screen 5 - UC8)                 -->
+  <!-- ======================================================================= -->
+  <div id="assignModalBackdrop" class="fixed inset-0 bg-[#07080d]/80 backdrop-blur-md z-50 hidden transition-opacity duration-300">
+    <div id="assignModalPanel" class="fixed inset-y-0 right-0 max-w-xl w-full glass-panel-elevated border-l border-violet-500/30 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col justify-between p-6 sm:p-8 transform transition-transform duration-300 translate-x-full">
+      <div class="flex flex-col gap-5 overflow-y-auto">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-container to-secondary-container text-white flex items-center justify-center">
+              <span class="material-symbols-outlined">assignment_ind</span>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white m-0">Призначити карту розвитку</h2>
+              <span class="font-display text-xs text-tertiary">UC8: Індивідуальний план співробітника</span>
+            </div>
+          </div>
+          <button id="closeAssignModalBtn" type="button" class="w-10 h-10 rounded-full hover:bg-[#34343b] text-slate-300 flex items-center justify-center cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <div class="form-group">
-          <label for="wizardLevel">Початковий рівень</label>
-          <select id="wizardLevel" class="st-input">
-            <option value="BEGINNER">BEGINNER (Початківець)</option>
+
+        <form id="assignTreeForm" class="flex flex-col gap-4">
+          <div>
+            <label class="text-xs font-semibold text-white block mb-1.5" for="hrLearnerSelect">Співробітник команди</label>
+            <select id="hrLearnerSelect" required class="w-full px-4 py-3 bg-[#0d0e14]/90 border border-violet-500/30 rounded-2xl text-white text-sm outline-none focus:border-tertiary"></select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-white block mb-1.5" for="roadmapSelect">Цільова професія / шаблон карти</label>
+            <input id="roadmapSelect" list="professionList" required placeholder="Напр.: Backend Developer, DevOps & Cloud Engineer..." class="w-full px-4 py-3 bg-[#0d0e14]/90 border border-violet-500/30 rounded-2xl text-white text-sm outline-none focus:border-tertiary" />
+            <datalist id="professionList"></datalist>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-white block mb-1.5" for="hrAssignLevel">Цільовий рівень</label>
+            <select id="hrAssignLevel" class="w-full px-4 py-3 bg-[#0d0e14]/90 border border-violet-500/30 rounded-2xl text-white text-sm outline-none focus:border-tertiary">
+              <option value="BEGINNER">BEGINNER</option>
+              <option value="INTERMEDIATE">INTERMEDIATE</option>
+              <option value="ADVANCED">ADVANCED</option>
+            </select>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-cyan-950/30 border border-tertiary/25 flex items-center gap-3 text-xs text-slate-200">
+            <span class="material-symbols-outlined text-tertiary">info</span>
+            <span>Працівник миттєво отримає клоновану карту розвитку зі статусами NOT_STARTED у своєму кабінеті.</span>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-violet-500/20">
+            <button id="cancelAssignBtn" type="button" class="px-5 py-2.5 rounded-full hover:bg-[#34343b] text-slate-300 text-xs font-semibold cursor-pointer">Скасувати</button>
+            <button id="submitAssignBtn" type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary-container via-[#8b5cf6] to-tertiary-container text-white text-xs font-semibold shadow-[0_0_20px_rgba(139,92,246,0.5)] flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-base">check</span> Призначити співробітнику
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODALS (Screen 4 Publish Material + Supporting Functional Modals)       -->
+  <!-- ======================================================================= -->
+
+  <!-- Modal: Publish Material (Screen 4 - UC5) -->
+  <div id="addMaterialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-xl bg-[#131625] border border-primary/40 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.25)] overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 bg-[#171b2d] border-b border-[#292f4c]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-primary/20 border border-primary/50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-base">add</span>
+          </div>
+          <span class="text-base text-white font-bold">Опублікувати навчальний матеріал (UC5)</span>
+        </div>
+        <button id="closeModalBtn" type="button" class="p-1.5 rounded-xl text-slate-400 hover:text-white cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="materialForm" class="p-6 flex flex-col gap-4">
+        <div>
+          <label class="text-xs text-slate-300 font-mono block mb-1.5" for="mentorNodeSelect">Вузол графа навичок</label>
+          <select id="mentorNodeSelect" required class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none"></select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialTitle">Назва матеріалу</label>
+          <input id="materialTitle" type="text" required placeholder="Наприклад: Гайд із оптимізації SQL запитів" class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 font-mono block mb-1.5">Тип матеріалу</label>
+          <div class="flex items-center gap-3">
+            <label class="flex-1 cursor-pointer">
+              <input checked class="peer sr-only" name="mat_type" type="radio" value="TEXT" />
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary text-slate-400 text-xs font-semibold">TEXT</div>
+            </label>
+            <label class="flex-1 cursor-pointer">
+              <input class="peer sr-only" name="mat_type" type="radio" value="VIDEO" />
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-cyan-500/20 peer-checked:border-cyan-400 peer-checked:text-cyan-300 text-slate-400 text-xs font-semibold">VIDEO</div>
+            </label>
+            <label class="flex-1 cursor-pointer">
+              <input class="peer sr-only" name="mat_type" type="radio" value="LINK" />
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-secondary/20 peer-checked:border-secondary peer-checked:text-secondary text-slate-400 text-xs font-semibold">LINK</div>
+            </label>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialDesc">Короткий опис</label>
+            <input id="materialDesc" type="text" required placeholder="Що вивчає цей модуль" class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialUrl">URL (необов'язково)</label>
+            <input id="materialUrl" type="url" placeholder="https://..." class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialContent">Конспект / контент матеріалу</label>
+          <textarea id="materialContent" rows="3" placeholder="Вставте ключові тези або приклад коду..." class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none resize-none font-mono"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#252b44]">
+          <button id="cancelModalBtn" type="button" class="px-5 py-2 rounded-xl hover:bg-[#1a1e30] text-sm text-slate-300 cursor-pointer">Скасувати</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm border border-primary/50 cursor-pointer">Опублікувати у вузол</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: AI SkillTree Wizard (UC2) -->
+  <div id="wizardModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">✨ Генерація карти розвитку через ШІ (UC2)</h2>
+        <button type="button" data-close-modal="wizardModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="wizardForm" class="flex flex-col gap-4">
+        <div>
+          <label class="text-xs text-slate-300 block mb-1" for="wizardProfession">Цільова ІТ-професія або стек</label>
+          <input id="wizardProfession" type="text" list="professionList" required placeholder="Напр.: Full-Stack Developer, Data Analyst, DevOps..." class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 block mb-1" for="wizardLevel">Рівень підготовки</label>
+          <select id="wizardLevel" class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none">
+            <option value="BEGINNER">BEGINNER (Початковий)</option>
             <option value="INTERMEDIATE">INTERMEDIATE (Середній)</option>
             <option value="ADVANCED">ADVANCED (Просунутий)</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="wizardGoal">Кар'єрна мета (опційно)</label>
-          <input type="text" id="wizardGoal" class="st-input" placeholder="Напр.: Підготовка до першого комерційного проєкту" />
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="st-btn st-btn-ghost" data-close-modal="wizardModal">Скасувати</button>
-          <button type="submit" class="st-btn st-btn-primary">Згенерувати карту</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal="wizardModal" class="px-4 py-2 rounded-xl text-slate-300 hover:bg-[#1a1e30] text-sm cursor-pointer">Скасувати</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm cursor-pointer">Згенерувати</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal 2: Lesson / Material Reader (UC3) -->
-  <div id="materialModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="materialModalTitle">
-    <div class="st-modal-panel st-modal-lg">
-      <div class="st-modal-head">
+  <!-- Modal: Add Custom SkillNode (UC10) -->
+  <div id="addNodeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">➕ Додати власний вузол (UC10)</h2>
+        <button type="button" data-close-modal="addNodeModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="addNodeForm" class="flex flex-col gap-4">
         <div>
-          <span id="materialModalType" class="st-badge st-badge-accent">TEXT</span>
-          <h2 id="materialModalTitle">Назва матеріалу</h2>
-          <small id="materialModalAuthor" class="muted-text"></small>
+          <label class="text-xs text-slate-300 block mb-1" for="newNodeTitle">Назва навички / вузла</label>
+          <input id="newNodeTitle" type="text" required placeholder="Напр.: Docker Compose & CI/CD" class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
         </div>
-        <button type="button" class="st-modal-close" data-close-modal="materialModal" aria-label="Закрити">✕</button>
-      </div>
-      <p id="materialModalDesc" class="muted-text"></p>
-      <div id="materialModalBody" class="lesson-body"></div>
-      <div class="modal-actions">
-        <a id="materialModalExternal" href="#" target="_blank" rel="noopener noreferrer" class="st-btn st-btn-outline hidden">Відкрити зовнішнє джерело ↗</a>
-        <button type="button" class="st-btn st-btn-primary" data-close-modal="materialModal">Закрити урок</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 3: Payment Checkout (UC9) -->
-  <div id="paymentModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="paymentModalTitle">💳 Оплата менторської сесії (UC9)</h2>
-        <button type="button" class="st-modal-close" data-close-modal="paymentModal" aria-label="Закрити">✕</button>
-      </div>
-      <div id="paymentSessionSummary" class="summary-box"></div>
-      <form id="confirmPaymentForm" class="stack-form">
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label for="paymentMethod">Спосіб оплати</label>
-            <select id="paymentMethod" class="st-input">
-              <option value="CARD">Банківська картка (Visa / Mastercard)</option>
-              <option value="APPLE_PAY">Apple Pay / Google Pay</option>
-              <option value="CORPORATE">Корпоративний рахунок (B2B)</option>
-            </select>
+        <div>
+          <label class="text-xs text-slate-300 block mb-1" for="newNodeDesc">Опис вузла</label>
+          <textarea id="newNodeDesc" rows="2" required placeholder="Що потрібно вивчити на практиці" class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-300 block mb-1" for="newNodeMaterialTitle">Стартовий матеріал (опц.)</label>
+            <input id="newNodeMaterialTitle" type="text" placeholder="Офіційна документація" class="w-full px-3 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-xs outline-none" />
           </div>
-          <div class="form-group">
-            <label>Сума до сплати</label>
-            <div id="paymentAmount" class="price-display">0 ₴</div>
+          <div>
+            <label class="text-xs text-slate-300 block mb-1" for="newNodeMaterialUrl">URL (опц.)</label>
+            <input id="newNodeMaterialUrl" type="url" placeholder="https://..." class="w-full px-3 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-xs outline-none" />
           </div>
         </div>
-        <div class="modal-actions">
-          <button type="button" class="st-btn st-btn-ghost" data-close-modal="paymentModal">Скасувати</button>
-          <button type="submit" class="st-btn st-btn-primary">Підтвердити оплату</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal="addNodeModal" class="px-4 py-2 rounded-xl text-slate-300 hover:bg-[#1a1e30] text-sm cursor-pointer">Скасувати</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm cursor-pointer">Додати вузол</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal 4: Electronic Receipt -->
-  <div id="receiptModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="receiptModalTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="receiptModalTitle">🧾 Електронна квитанція</h2>
-        <button type="button" class="st-modal-close" data-close-modal="receiptModal" aria-label="Закрити">✕</button>
+  <!-- Modal: Lesson / Material Reader (UC3) -->
+  <div id="materialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-start justify-between gap-3 pb-3 mb-3 border-b border-[#292f4c]">
+        <div>
+          <span id="materialModalType" class="px-2.5 py-0.5 rounded-full bg-primary/20 text-primary font-mono text-[11px] font-bold">TEXT</span>
+          <h2 id="materialModalTitle" class="text-lg text-white font-bold mt-1 m-0">Матеріал</h2>
+          <small id="materialModalAuthor" class="text-xs text-slate-400"></small>
+        </div>
+        <button type="button" data-close-modal="materialModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
-      <div id="receiptBody" class="receipt-box"></div>
-      <div class="modal-actions">
-        <button type="button" class="st-btn st-btn-primary" data-close-modal="receiptModal">Готово</button>
+      <p id="materialModalDesc" class="text-xs text-slate-300 mb-3"></p>
+      <div id="materialModalBody" class="p-4 rounded-2xl bg-[#0e101a] border border-[#252a3f] text-sm text-slate-200 whitespace-pre-wrap leading-relaxed mb-4"></div>
+      <div class="flex justify-end gap-2">
+        <a id="materialModalExternal" href="#" target="_blank" rel="noopener noreferrer" class="hidden px-4 py-2 rounded-xl bg-[#181b2c] border border-cyan-500/40 text-cyan-300 text-xs font-semibold">Відкрити посилання ↗</a>
+        <button type="button" data-close-modal="materialModal" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-xs cursor-pointer">Закрити урок</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal 5: Add Custom SkillNode (UC10) -->
-  <div id="addNodeModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="addNodeModalTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="addNodeModalTitle">➕ Додати власний вузол (UC10)</h2>
-        <button type="button" class="st-modal-close" data-close-modal="addNodeModal" aria-label="Закрити">✕</button>
+  <!-- Modal: Create Team / Add Member (Screen 5) -->
+  <div id="createTeamModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)] flex flex-col gap-5">
+      <div class="flex items-center justify-between pb-3 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">👥 Керування командами B2B (UC7)</h2>
+        <button type="button" data-close-modal="createTeamModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
-      <form id="addNodeForm" class="stack-form">
-        <div class="form-group">
-          <label for="newNodeTitle">Назва навички / модуля</label>
-          <input type="text" id="newNodeTitle" class="st-input" placeholder="Напр.: Docker та контейнеризація" required />
-        </div>
-        <div class="form-group">
-          <label for="newNodeDesc">Короткий опис</label>
-          <textarea id="newNodeDesc" class="st-input" rows="2" placeholder="Що саме потрібно вивчити у цьому модулі" required></textarea>
-        </div>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label for="newNodeMaterialTitle">Стартовий матеріал (опційно)</label>
-            <input type="text" id="newNodeMaterialTitle" class="st-input" placeholder="Назва конспекту чи посилання" />
-          </div>
-          <div class="form-group">
-            <label for="newNodeMaterialUrl">URL матеріалу (опційно)</label>
-            <input type="url" id="newNodeMaterialUrl" class="st-input" placeholder="https://..." />
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="st-btn st-btn-ghost" data-close-modal="addNodeModal">Скасувати</button>
-          <button type="submit" class="st-btn st-btn-primary">Додати до карти</button>
+      <form id="createTeamForm" class="flex flex-col gap-3">
+        <label class="text-xs text-slate-300 font-semibold" for="newTeamName">Створити нову команду</label>
+        <div class="flex gap-2">
+          <input id="newTeamName" type="text" required placeholder="Наприклад: Platform Engineering Squad" class="flex-1 px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white text-xs font-bold cursor-pointer">Створити</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Modal 6: Auth Modal (UC1: Login / Register / Reset Password) -->
-  <div id="authModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="authModalTitle">🔐 Обліковий запис SkillTree AI</h2>
-        <button type="button" class="st-modal-close" data-close-modal="authModal" aria-label="Закрити">✕</button>
-      </div>
-
-      <div class="auth-tabs" role="tablist">
-        <button type="button" id="authTabLogin" class="auth-tab active">Вхід</button>
-        <button type="button" id="authTabRegister" class="auth-tab">Реєстрація</button>
-        <button type="button" id="authTabReset" class="auth-tab">Відновити пароль</button>
-      </div>
-
-      <form id="loginForm" class="stack-form">
-        <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" class="st-input" placeholder="slava@skilltree.ai" required />
-        </div>
-        <div class="form-group">
-          <label for="loginPassword">Пароль</label>
-          <input type="password" id="loginPassword" class="st-input" placeholder="••••••••" required />
-        </div>
-        <p class="auth-hint muted-text">Акаунти платформи: студент <code>slava@skilltree.ai</code>, ментор <code>andriy.mentor@skilltree.ai</code>, HR <code>maria.hr@technova.ua</code> (пароль: <code>demo1234</code>).</p>
-        <button type="submit" class="st-btn st-btn-primary">Увійти в кабінет</button>
-      </form>
-
-      <form id="registerForm" class="stack-form hidden">
-        <div class="form-group">
-          <label for="regFullName">Повне ім'я (ПІБ)</label>
-          <input type="text" id="regFullName" class="st-input" placeholder="Іван Коваленко" required />
-        </div>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label for="regEmail">Email</label>
-            <input type="email" id="regEmail" class="st-input" placeholder="ivan@example.com" required />
-          </div>
-          <div class="form-group">
-            <label for="regPassword">Пароль</label>
-            <input type="password" id="regPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="regRole">Роль на платформі</label>
-          <select id="regRole" class="st-input">
-            <option value="LEARNER">Студент / Фахівець</option>
-            <option value="MENTOR">Ментор / Експерт</option>
-            <option value="HR">HR / TeamLead (B2B)</option>
-          </select>
-        </div>
-        <div id="regExtraGroup" class="form-group">
-          <label id="regExtraLabel" for="regExtraInput">Цільова професія</label>
-          <input type="text" id="regExtraInput" class="st-input" placeholder="Напр.: Full-Stack Developer" />
-        </div>
-        <button type="submit" class="st-btn st-btn-primary">Створити акаунт</button>
-      </form>
-
-      <form id="resetPasswordForm" class="stack-form hidden">
-        <div class="form-group">
-          <label for="resetEmail">Email акаунта</label>
-          <input type="email" id="resetEmail" class="st-input" placeholder="user@skilltree.ai" required />
-        </div>
-        <div class="form-group">
-          <label for="resetNewPassword">Новий пароль</label>
-          <input type="password" id="resetNewPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
-        </div>
-        <button type="submit" class="st-btn st-btn-primary">Скинути пароль</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 7: AI Settings Modal -->
-  <div id="aiSettingsModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiSettingsTitle">
-    <div class="st-modal-panel">
-      <div class="st-modal-head">
-        <h2 id="aiSettingsTitle">⚙️ Параметри ШІ-асистента</h2>
-        <button type="button" class="st-modal-close" data-close-modal="aiSettingsModal" aria-label="Закрити">✕</button>
-      </div>
-      <form id="aiSettingsForm" class="stack-form">
-        <p class="muted-text">За замовчуванням використовується вбудований швидкий рушій знань (SLA &le; 5 c). Ви також можете зберегти власний Gemini API key локально у браузері.</p>
-        <div class="form-group">
-          <label for="aiApiKeyInput">Gemini API Key (опційно, зберігається лише локально)</label>
-          <input type="password" id="aiApiKeyInput" class="st-input" placeholder="AIza..." />
-        </div>
-        <div class="form-group">
-          <label for="aiModelSelect">Режим моделі</label>
-          <select id="aiModelSelect" class="st-input">
-            <option value="builtin">Вбудований контекстний рушій SkillTree AI</option>
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (якщо вказано ключ)</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button type="button" id="clearAiKeyBtn" class="st-btn st-btn-ghost">Скинути ключ</button>
-          <button type="submit" class="st-btn st-btn-primary">Зберегти</button>
+      <div class="h-px bg-[#292f4c]"></div>
+      <form id="addTeamMemberForm" class="flex flex-col gap-3">
+        <label class="text-xs text-slate-300 font-semibold" for="addMemberLearnerSelect">Додати співробітника до активної команди</label>
+        <div class="flex gap-2">
+          <select id="addMemberLearnerSelect" required class="flex-1 px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none"></select>
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-[#1e2238] border border-cyan-500/40 text-cyan-300 text-xs font-bold cursor-pointer">Додати</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="st-toast hidden" role="status" aria-live="polite"></div>
+  <!-- Modal: Edit Profile & Security Password (Screen 6) -->
+  <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)] flex flex-col gap-5">
+      <div class="flex items-center justify-between pb-3 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">⚙️ Налаштування профілю та безпеки</h2>
+        <button type="button" data-close-modal="editProfileModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="profileForm" class="flex flex-col gap-3">
+        <div>
+          <label class="text-xs text-slate-300 block mb-1" for="profFullName">Повне ім'я (ПІБ)</label>
+          <input id="profFullName" type="text" required class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        </div>
+        <div id="profRoleFields" class="flex flex-col gap-3"></div>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white text-xs font-bold cursor-pointer">Зберегти дані профілю</button>
+      </form>
+      <div class="h-px bg-[#292f4c]"></div>
+      <form id="profilePasswordForm" class="flex flex-col gap-3">
+        <span class="text-xs font-bold text-white">Зміна пароля поточного акаунта (UC1)</span>
+        <div class="grid grid-cols-2 gap-3">
+          <input id="profileNewPassword" type="password" minlength="4" required placeholder="Новий пароль" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+          <input id="profileConfirmPassword" type="password" minlength="4" required placeholder="Підтвердження" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        </div>
+        <button type="submit" class="px-5 py-2 rounded-xl bg-[#181b2c] border border-cyan-500/40 text-cyan-300 text-xs font-bold cursor-pointer">Оновити пароль</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Reset Password (from Auth Screen) -->
+  <div id="resetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-md bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">🔑 Скидання пароля (UC1)</h2>
+        <button type="button" data-close-modal="resetPasswordModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <form id="resetPasswordForm" class="flex flex-col gap-3">
+        <input id="resetEmail" type="email" required placeholder="Email акаунта" class="px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        <input id="resetNewPassword" type="password" minlength="4" required placeholder="Новий пароль (мін. 4 символи)" class="px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white text-xs font-bold cursor-pointer">Оновити пароль</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Receipt Viewer (UC9) -->
+  <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-md bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">🧾 Електронна квитанція (UC9)</h2>
+        <button type="button" data-close-modal="receiptModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div id="receiptBody" class="p-4 rounded-2xl bg-[#0e101a] border border-[#2b314e] text-xs text-slate-200 leading-relaxed space-y-1.5 mb-4"></div>
+      <div class="flex justify-end">
+        <button type="button" data-close-modal="receiptModal" class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white text-xs font-bold cursor-pointer">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: CSV Preview (UC12) -->
+  <div id="csvPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
+    <div class="relative w-full max-w-3xl bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
+        <h2 class="text-lg text-white font-bold m-0">📄 Попередній перегляд CSV-звіту (RFC-4180)</h2>
+        <button type="button" data-close-modal="csvPreviewModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <pre id="csvPreviewContent" class="p-4 rounded-2xl bg-[#0e101a] border border-[#2b314e] text-xs text-cyan-200 font-mono overflow-x-auto max-h-96"></pre>
+    </div>
+  </div>
+
+  <!-- Cyber Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-[100] glass-panel-elevated border border-emerald-400/50 text-white px-5 py-3 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.8)] flex items-center gap-3 hidden">
+    <span id="toastIcon" class="material-symbols-outlined text-emerald-400">check_circle</span>
+    <span id="toastMessage" class="font-display text-xs font-semibold">Готово</span>
+  </div>
 
   <script src="/app.js"></script>
 </body>
