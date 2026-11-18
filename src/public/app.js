@@ -218,28 +218,28 @@ function renderKpis() {
     const learner = getActiveLearner();
     const tree = getActiveTree(learner);
     kpiRow.innerHTML = `
-      <div class="kpi-pill"><span class="kpi-pill-label">Прогрес карти</span><strong>${tree ? tree.progress : 0}%</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Досвід студента</span><strong>${learner ? learner.points : 0} XP</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Корисність ШІ</span><strong>${kpi.aiHelpfulnessPct}%</strong></div>
+      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Прогрес карти</span><strong>${tree ? tree.progress : 0}%</strong></div>
+      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Досвід студента</span><strong>${learner ? learner.points : 0} XP</strong></div>
+      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
+      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Корисність ШІ</span><strong>${kpi.aiHelpfulnessPct}%</strong></div>
     `;
   } else if (user.role === 'MENTOR') {
     const mentor = getActiveMentor();
     const mySessions = sessions.filter((s) => s.mentorId === mentor.id);
     kpiRow.innerHTML = `
-      <div class="kpi-pill"><span class="kpi-pill-label">Рейтинг ментора</span><strong>★ ${mentor.rating}</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Ставка</span><strong>${mentor.hourlyRate} ₴/год</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Сесій у черзі</span><strong>${mySessions.length}</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Публікацій</span><strong>${mentor.publishedMaterialsCount ?? 0}</strong></div>
+      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Рейтинг ментора</span><strong>★ ${mentor.rating}</strong></div>
+      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Ставка</span><strong>${mentor.hourlyRate} ₴/год</strong></div>
+      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Сесій у черзі</span><strong>${mySessions.length}</strong></div>
+      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Публікацій</span><strong>${mentor.publishedMaterialsCount ?? 0}</strong></div>
     `;
   } else {
     const activeTeam = teams.find((t) => t.id === state.selectedTeamId) || teams[0];
     const avgProgress = activeTeam?.detailedMatrix?.teamAverageProgress ?? 0;
     kpiRow.innerHTML = `
-      <div class="kpi-pill"><span class="kpi-pill-label">Команд</span><strong>${teams.length}</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Співробітників</span><strong>${learners.length}</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Середній прогрес</span><strong>${avgProgress}%</strong></div>
-      <div class="kpi-pill"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
+      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Команд</span><strong>${teams.length}</strong></div>
+      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Співробітників</span><strong>${learners.length}</strong></div>
+      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Середній прогрес</span><strong>${avgProgress}%</strong></div>
+      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
     `;
   }
 }
@@ -298,8 +298,8 @@ function renderLearnerTreeView() {
   const activeNode = getActiveNode(tree);
   $('nodesList').innerHTML = tree.nodes
     .map(
-      (node) => `
-      <div class="timeline-item ${activeNode?.id === node.id ? 'selected' : ''}" data-node-id="${node.id}">
+      (node, idx) => `
+      <div class="timeline-item ${activeNode?.id === node.id ? 'selected' : ''}" data-node-id="${node.id}" style="--stagger-i:${idx}">
         <div class="timeline-left">
           <span class="node-circle ${node.status}">${node.status === 'DONE' ? '✓' : node.orderNumber}</span>
           <div>
@@ -355,10 +355,10 @@ function renderNodeStudyPanel(node) {
     materialsEl.innerHTML = '<div class="muted">Матеріалів поки немає. Ментор може додати урок до цього вузла.</div>';
   } else {
     materialsEl.innerHTML = node.materials
-      .map((m) => {
+      .map((m, idx) => {
         const hasValidUrl = m.url && /^https?:\/\//i.test(m.url);
         return `
-        <div class="material-card">
+        <div class="material-card" style="--stagger-i:${idx}">
           <div class="material-meta">
             <span class="muted" style="font-size:0.75rem;">${LABELS.materialType[m.type] || m.type}</span>
             <strong>${esc(m.title)}</strong>
@@ -411,8 +411,8 @@ function renderCreateWizard() {
   const currentProf = $('genProfession').value.trim();
   $('professionCardsGrid').innerHTML = professions
     .map(
-      (p) => `
-      <button type="button" class="preset-card ${p.toLowerCase() === currentProf.toLowerCase() ? 'selected' : ''}" data-preset-prof="${esc(p)}">
+      (p, idx) => `
+      <button type="button" class="preset-card ${p.toLowerCase() === currentProf.toLowerCase() ? 'selected' : ''}" data-preset-prof="${esc(p)}" style="--stagger-i:${idx}">
         <strong>${esc(p)}</strong>
         <span>Готовий трек навичок + уроки</span>
       </button>
@@ -428,8 +428,8 @@ function renderMentorsView() {
 
   $('mentorsDirectoryGrid').innerHTML = mentors
     .map(
-      (m) => `
-      <div class="mentor-card">
+      (m, idx) => `
+      <div class="mentor-card" style="--stagger-i:${idx}">
         <div class="mentor-card-top">
           <div class="avatar-circle">${getInitials(m.fullName)}</div>
           <div>
@@ -1084,20 +1084,44 @@ function setupEventListeners() {
     const tree = getActiveTree(learner);
     const node = getActiveNode(tree);
     if (!node) return;
+    const questionText = $('aiQuestionInput').value.trim();
+    if (!questionText) return;
+
+    const chatEl = $('chatMessages');
+    if (node.messages.length === 0) {
+      chatEl.innerHTML = '';
+    }
+    const typingTurn = document.createElement('div');
+    typingTurn.className = 'chat-turn';
+    typingTurn.innerHTML = `
+      <div class="bubble-user">${esc(questionText)}</div>
+      <div class="bubble-ai typing-bubble">
+        <span>ШІ-асистент аналізує запит</span>
+        <span class="typing-dots" aria-hidden="true">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </span>
+      </div>
+    `;
+    chatEl.appendChild(typingTurn);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    $('aiQuestionInput').value = '';
+
     try {
       const customKey = localStorage.getItem('skilltree_api_key') || '';
       const res = await api(`/api/trees/${tree.id}/nodes/${node.id}/chat`, {
         method: 'POST',
         body: JSON.stringify({
-          question: $('aiQuestionInput').value,
+          question: questionText,
           apiKey: customKey || undefined,
         }),
       });
-      $('aiQuestionInput').value = '';
       syncSelectionsFromData(res.state);
       renderAll();
       showToast(`ШІ відповів за ${res.message.responseTimeMs} мс`);
     } catch (err) {
+      typingTurn.remove();
       showToast(err.message, true);
     }
   });
