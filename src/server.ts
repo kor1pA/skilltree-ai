@@ -84,9 +84,23 @@ export function createAppServer(store: DataStore): Server {
             sendError(res, 401, 'Невірний email або пароль.');
             return;
           }
+          for (const u of store.getAllUsers()) {
+            if (u.id !== user.id) u.logout();
+          }
           store.currentUserId = user.id;
           store.saveToDisk();
           sendJson(res, 200, { user: user.toJSON(), state: store.getSnapshot() });
+          return;
+        }
+
+        // UC1: Logout
+        if (method === 'POST' && pathname === '/api/auth/logout') {
+          for (const u of store.getAllUsers()) {
+            u.logout();
+          }
+          store.currentUserId = 0;
+          store.saveToDisk();
+          sendJson(res, 200, { currentUser: null, state: store.getSnapshot() });
           return;
         }
 
@@ -165,20 +179,39 @@ export function createAppServer(store: DataStore): Server {
           return;
         }
 
-        // UC1: Quick switch user
-        if (method === 'POST' && pathname === '/api/auth/switch-user') {
-          const body = await readJsonBody(req);
-          const userId = Number(body.userId);
-          const user = store.findUserById(userId);
+        // Update current user's own profile
+        if (method === 'PUT' && pathname === '/api/profile') {
+          const user = store.findUserById(store.currentUserId);
           if (!user) {
-            sendError(res, 404, 'Користувача не знайдено.');
+            sendError(res, 401, 'Необхідно увійти в систему.');
             return;
           }
-          for (const u of store.getAllUsers()) {
-            u.logout();
+          const body = await readJsonBody(req);
+          if (typeof body.fullName === 'string' && body.fullName.trim()) {
+            user.fullName = body.fullName.trim();
           }
-          user.isLoggedIn = true;
-          store.currentUserId = user.id;
+          if (user instanceof Learner) {
+            if (typeof body.targetProfession === 'string' && body.targetProfession.trim()) {
+              user.targetProfession = body.targetProfession.trim();
+            }
+            if (Object.values(SkillLevel).includes(body.level)) {
+              user.level = body.level as SkillLevel;
+            }
+          } else if (user instanceof Mentor) {
+            if (typeof body.specialization === 'string' && body.specialization.trim()) {
+              user.specialization = body.specialization.trim();
+            }
+            if (typeof body.bio === 'string' && body.bio.trim()) {
+              user.bio = body.bio.trim();
+            }
+            if (body.hourlyRate !== undefined && Number(body.hourlyRate) > 0) {
+              user.hourlyRate = Number(body.hourlyRate);
+            }
+          } else if (user instanceof HRManager) {
+            if (typeof body.company === 'string' && body.company.trim()) {
+              user.company = body.company.trim();
+            }
+          }
           store.saveToDisk();
           sendJson(res, 200, { user: user.toJSON(), state: store.getSnapshot() });
           return;

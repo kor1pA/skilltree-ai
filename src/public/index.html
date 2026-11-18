@@ -7,13 +7,117 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="layout">
+  <!-- AUTH SCREEN (Shown when unauthenticated) -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-container">
+      <div class="auth-hero">
+        <div class="sidebar-brand">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="24" height="24" fill="none">
+              <circle cx="16" cy="6" r="4" fill="currentColor" />
+              <circle cx="7.5" cy="23" r="4" fill="#22c55e" />
+              <circle cx="24.5" cy="23" r="4" fill="#a855f7" />
+              <path d="M16 10V15M16 15L7.5 19M16 15L24.5 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <span class="brand-title">SkillTree AI</span>
+            <span class="brand-sub">Платформа професійного розвитку</span>
+          </div>
+        </div>
+
+        <h1 class="auth-hero-title">Структуроване навчання з ШІ-асистентом та менторами</h1>
+        <p class="auth-hero-desc">
+          Побудуйте персональну карту навичок під вашу цільову професію, отримуйте миттєві відповіді на складні питання, бронюйте консультації з експертами або керуйте матрицею компетенцій команди.
+        </p>
+
+        <ul class="auth-features">
+          <li>🗺️ Інтерактивні дерева навичок із вбудованими уроками</li>
+          <li>🤖 Контекстний ШІ-помічник у кожній темі (відповідь ≤ 5 сек)</li>
+          <li>🧑‍🏫 Персональні менторські сесії, оплати й відгуки</li>
+          <li>📊 B2B Skill Matrix та експорт звітів у CSV для HR</li>
+        </ul>
+
+        <div style="margin-top: auto;">
+          <button id="authThemeToggleBtn" type="button" class="btn btn-ghost btn-sm">☀️ Світла тема</button>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" data-auth-tab="login">Вхід</button>
+          <button type="button" class="auth-tab" data-auth-tab="register">Реєстрація</button>
+          <button type="button" class="auth-tab" data-auth-tab="reset">Відновлення пароля</button>
+        </div>
+
+        <form id="loginForm" class="stack-form auth-pane active" data-auth-pane="login">
+          <h2>Увійти в акаунт</h2>
+          <p class="muted">Введіть email та пароль вашого облікового запису.</p>
+          <label class="field-stack">
+            <span>Електронна пошта</span>
+            <input id="loginEmail" type="email" placeholder="name@example.com" required />
+          </label>
+          <label class="field-stack">
+            <span>Пароль</span>
+            <input id="loginPassword" type="password" placeholder="Введіть пароль" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg full-width">Увійти</button>
+        </form>
+
+        <form id="registerForm" class="stack-form auth-pane" data-auth-pane="register">
+          <h2>Створити обліковий запис</h2>
+          <label class="field-stack">
+            <span>Повне ім’я (ПІБ)</span>
+            <input id="regName" type="text" placeholder="Іван Петренко" required />
+          </label>
+          <label class="field-stack">
+            <span>Електронна пошта</span>
+            <input id="regEmail" type="email" placeholder="ivan@example.com" required />
+          </label>
+          <label class="field-stack">
+            <span>Пароль (щонайменше 4 символи)</span>
+            <input id="regPassword" type="password" placeholder="••••" required />
+          </label>
+          <label class="field-stack">
+            <span>Ваша роль</span>
+            <select id="regRole">
+              <option value="LEARNER">Студент / фахівець</option>
+              <option value="MENTOR">Ментор / експерт</option>
+              <option value="HR">HR-менеджер / TeamLead</option>
+            </select>
+          </label>
+          <label class="field-stack">
+            <span id="regExtraLabel">Цільова професія</span>
+            <input id="regExtra" type="text" placeholder="Full-Stack Developer" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg full-width">Зареєструватися</button>
+        </form>
+
+        <form id="resetPasswordForm" class="stack-form auth-pane" data-auth-pane="reset">
+          <h2>Відновлення пароля</h2>
+          <p class="muted">Вкажіть ваш email та задайте новий пароль (від 4 символів).</p>
+          <label class="field-stack">
+            <span>Електронна пошта</span>
+            <input id="resetEmail" type="email" placeholder="name@example.com" required />
+          </label>
+          <label class="field-stack">
+            <span>Новий пароль</span>
+            <input id="resetNewPassword" type="password" placeholder="••••" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg full-width">Змінити пароль</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION LAYOUT (Shown only when authenticated) -->
+  <div id="appLayout" class="layout hidden">
     <!-- Left Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="brand-logo" aria-hidden="true">
           <svg viewBox="0 0 32 32" width="24" height="24" fill="none">
-            <circle cx="16" cy="6" r="4" fill="currentColor" class="logo-accent" />
+            <circle cx="16" cy="6" r="4" fill="currentColor" />
             <circle cx="7.5" cy="23" r="4" fill="#22c55e" />
             <circle cx="24.5" cy="23" r="4" fill="#a855f7" />
             <path d="M16 10V15M16 15L7.5 19M16 15L24.5 19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
@@ -25,43 +129,39 @@
         </div>
       </div>
 
-      <!-- Active User Profile Card -->
+      <!-- Authenticated User Profile Card (No switcher stubs!) -->
       <div class="profile-card">
         <div class="profile-head">
-          <div id="sidebarAvatar" class="avatar-circle">ВГ</div>
+          <div id="sidebarAvatar" class="avatar-circle">—</div>
           <div class="profile-info">
             <strong id="sidebarUserName">—</strong>
-            <span id="sidebarUserRole" class="role-pill">Студент</span>
+            <span id="sidebarUserEmail" class="muted" style="font-size:0.75rem;">—</span>
+            <span id="sidebarUserRole" class="role-pill">—</span>
           </div>
         </div>
 
-        <div class="profile-switcher">
-          <label for="userSelect">Швидке перемикання профілю:</label>
-          <select id="userSelect"></select>
-        </div>
-
-        <div class="profile-actions">
-          <button id="openAuthBtn" type="button" class="btn btn-secondary btn-sm">🔐 Вхід / Акаунт</button>
-          <button id="resetDemoBtn" type="button" class="btn btn-ghost btn-sm" title="Скинути до початкових демо-даних">↺ Скинути</button>
+        <div class="profile-actions-2col">
+          <button id="openProfileBtn" type="button" class="btn btn-secondary btn-sm">⚙️ Профіль</button>
+          <button id="logoutBtn" type="button" class="btn btn-danger btn-sm">🚪 Вийти</button>
         </div>
       </div>
 
-      <!-- Sidebar Navigation -->
+      <!-- Strict Role-Based Sidebar Navigation -->
       <nav class="sidebar-nav" aria-label="Основна навігація">
-        <div class="nav-group">
-          <span class="nav-group-label">Навчання (Студент)</span>
-          <button type="button" class="nav-item active" data-view="learner-tree">🗺️ Моя карта розвитку</button>
+        <div id="navGroupLearner" class="nav-group hidden">
+          <span class="nav-group-label">Навчання</span>
+          <button type="button" class="nav-item active" data-view="learner-tree">🗺️ Мої карти розвитку</button>
           <button type="button" class="nav-item" data-view="learner-create">✨ Створити нову карту</button>
           <button type="button" class="nav-item" data-view="learner-mentors">🧑‍🏫 Ментори та сесії</button>
         </div>
 
-        <div class="nav-group">
-          <span class="nav-group-label">Експертиза (Ментор)</span>
-          <button type="button" class="nav-item" data-view="mentor-dashboard">📚 Кабінет ментора</button>
+        <div id="navGroupMentor" class="nav-group hidden">
+          <span class="nav-group-label">Менторство</span>
+          <button type="button" class="nav-item" data-view="mentor-dashboard">📚 Матеріали та сесії</button>
         </div>
 
-        <div class="nav-group">
-          <span class="nav-group-label">Аналітика (B2B HR)</span>
+        <div id="navGroupHr" class="nav-group hidden">
+          <span class="nav-group-label">Управління командами</span>
           <button type="button" class="nav-item" data-view="hr-dashboard">📊 B2B Skill Matrix</button>
         </div>
       </nav>
@@ -69,49 +169,28 @@
       <!-- Sidebar Footer -->
       <div class="sidebar-footer">
         <button id="themeToggleBtn" type="button" class="btn btn-ghost btn-sm full-width">☀️ Світла тема</button>
-        <button id="openAiSettingsBtn" type="button" class="btn btn-ghost btn-sm full-width">🤖 Ключ LLM API</button>
+        <button id="openAiSettingsBtn" type="button" class="btn btn-ghost btn-sm full-width">🤖 Налаштування ШІ</button>
       </div>
     </aside>
 
     <!-- Main Workspace -->
     <div class="main-area">
-      <!-- Top Header & KPI -->
+      <!-- Top Header & Role-Aware KPI -->
       <header class="workspace-header">
         <div>
-          <h1 id="pageTitle">Моя карта розвитку</h1>
+          <h1 id="pageTitle">Мої карти розвитку</h1>
           <p id="pageSubtitle" class="muted">Вивчайте навички покроково, читайте матеріали та вирішуйте блокери з ШІ.</p>
         </div>
 
-        <div class="kpi-row">
-          <div class="kpi-pill">
-            <span class="kpi-pill-label">Прогрес карти</span>
-            <strong id="kpiTreeProgress">0%</strong>
-          </div>
-          <div class="kpi-pill">
-            <span class="kpi-pill-label">Досвід студента</span>
-            <strong id="kpiPoints">0 XP</strong>
-          </div>
-          <div class="kpi-pill">
-            <span class="kpi-pill-label">Швидкість ШІ</span>
-            <strong id="kpiAiSla">0 мс</strong>
-          </div>
-          <div class="kpi-pill">
-            <span class="kpi-pill-label">Корисність ШІ</span>
-            <strong id="kpiAiHelpful">100%</strong>
-          </div>
-        </div>
+        <div id="kpiRow" class="kpi-row"></div>
       </header>
 
       <!-- VIEW 1: LEARNER ROADMAP & STUDY -->
-      <section id="view-learner-tree" class="view-panel active">
+      <section id="view-learner-tree" class="view-panel">
         <div class="toolbar-card card">
           <div class="toolbar-left">
             <label class="field-inline">
-              <span>Студент:</span>
-              <select id="learnerSelect"></select>
-            </label>
-            <label class="field-inline">
-              <span>Активна карта:</span>
+              <span>Активна карта розвитку:</span>
               <select id="treeSelect"></select>
             </label>
           </div>
@@ -157,7 +236,6 @@
 
               <p id="activeNodeDesc" class="study-desc"></p>
 
-              <!-- Materials -->
               <div class="sub-section">
                 <div class="sub-head">
                   <h3>📚 Навчальні матеріали</h3>
@@ -166,7 +244,6 @@
                 <div id="nodeMaterialsList" class="materials-grid"></div>
               </div>
 
-              <!-- AI Assistant Chat -->
               <div class="sub-section chat-section">
                 <div class="sub-head">
                   <h3>🤖 ШІ-помічник по цій навичці</h3>
@@ -274,22 +351,16 @@
         </div>
       </section>
 
-      <!-- VIEW 4: MENTOR WORKSPACE -->
+      <!-- VIEW 4: MENTOR WORKSPACE (Own account only) -->
       <section id="view-mentor-dashboard" class="view-panel">
         <div class="card toolbar-card">
-          <div class="toolbar-left">
-            <label class="field-inline">
-              <span>Профіль ментора:</span>
-              <select id="mentorSelect"></select>
-            </label>
-          </div>
           <div id="mentorProfileSummary" class="mentor-stats-row"></div>
         </div>
 
         <div class="two-col">
           <div class="card">
             <h2>📝 Опублікувати навчальний матеріал / урок</h2>
-            <p class="muted">Додайте авторський конспект, відеорозбір чи документацію до будь-якої навички.</p>
+            <p class="muted">Додайте авторський конспект, відеорозбір чи документацію до обраної навички.</p>
             <form id="publishMaterialForm" class="stack-form">
               <label class="field-stack">
                 <span>Цільова навичка (вузол карти)</span>
@@ -428,7 +499,7 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <!-- Modal: Lesson Reader (Zero Dead-End Stubs!) -->
+  <!-- Modal: Lesson Reader -->
   <div id="materialModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
     <div class="modal-card modal-lg">
       <div class="card-head">
@@ -461,16 +532,16 @@
       <form id="checkoutForm" class="stack-form">
         <label class="field-stack">
           <span>Номер картки</span>
-          <input id="payCardNumber" type="text" maxlength="19" value="4441 1144 8821 0042" required />
+          <input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" required />
         </label>
         <div class="form-grid-2">
           <label class="field-stack">
             <span>Термін дії</span>
-            <input id="payCardExp" type="text" maxlength="5" value="08/28" required />
+            <input id="payCardExp" type="text" maxlength="5" placeholder="MM/YY" required />
           </label>
           <label class="field-stack">
             <span>CVV</span>
-            <input id="payCardCvv" type="password" maxlength="3" value="421" required />
+            <input id="payCardCvv" type="password" maxlength="3" placeholder="•••" required />
           </label>
         </div>
         <button type="submit" class="btn btn-primary full-width">💳 Сплатити та підтвердити</button>
@@ -524,71 +595,20 @@
     </div>
   </div>
 
-  <!-- Modal: Auth (Login, Register, Reset Password) -->
-  <div id="authModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-md">
+  <!-- Modal: Own Profile Edit -->
+  <div id="profileModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-sm">
       <div class="card-head">
-        <h2>🔐 Обліковий запис SkillTree AI</h2>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="authModal">✕</button>
+        <h2>⚙️ Налаштування профілю</h2>
+        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="profileModal">✕</button>
       </div>
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" data-auth-tab="login">Вхід</button>
-        <button type="button" class="auth-tab" data-auth-tab="register">Реєстрація</button>
-        <button type="button" class="auth-tab" data-auth-tab="reset">Відновлення пароля</button>
-      </div>
-
-      <form id="loginForm" class="stack-form auth-pane active" data-auth-pane="login">
-        <p class="muted">Пароль за замовчуванням для демо-акаунтів: <code>demo1234</code></p>
+      <form id="profileForm" class="stack-form">
         <label class="field-stack">
-          <span>Email</span>
-          <input id="loginEmail" type="email" value="slava@skilltree.ai" required />
+          <span>Повне ім’я (ПІБ)</span>
+          <input id="profFullName" type="text" required />
         </label>
-        <label class="field-stack">
-          <span>Пароль</span>
-          <input id="loginPassword" type="password" value="demo1234" required />
-        </label>
-        <button type="submit" class="btn btn-primary">Увійти в акаунт</button>
-      </form>
-
-      <form id="registerForm" class="stack-form auth-pane" data-auth-pane="register">
-        <label class="field-stack">
-          <span>ПІБ</span>
-          <input id="regName" type="text" placeholder="Іван Петренко" required />
-        </label>
-        <label class="field-stack">
-          <span>Email</span>
-          <input id="regEmail" type="email" placeholder="ivan@example.com" required />
-        </label>
-        <label class="field-stack">
-          <span>Пароль (від 4 символів)</span>
-          <input id="regPassword" type="password" placeholder="••••" required />
-        </label>
-        <label class="field-stack">
-          <span>Роль на платформі</span>
-          <select id="regRole">
-            <option value="LEARNER">Студент / фахівець</option>
-            <option value="MENTOR">Ментор / експерт</option>
-            <option value="HR">HR-менеджер / TeamLead</option>
-          </select>
-        </label>
-        <label class="field-stack">
-          <span>Цільова професія / Спеціалізація / Компанія</span>
-          <input id="regExtra" type="text" placeholder="Full-Stack Developer" />
-        </label>
-        <button type="submit" class="btn btn-primary">Створити акаунт</button>
-      </form>
-
-      <form id="resetPasswordForm" class="stack-form auth-pane" data-auth-pane="reset">
-        <p class="muted">Вкажіть email облікового запису та новий пароль (мін. 4 символи).</p>
-        <label class="field-stack">
-          <span>Email</span>
-          <input id="resetEmail" type="email" placeholder="slava@skilltree.ai" required />
-        </label>
-        <label class="field-stack">
-          <span>Новий пароль</span>
-          <input id="resetNewPassword" type="password" placeholder="••••" required />
-        </label>
-        <button type="submit" class="btn btn-primary">Оновити пароль</button>
+        <div id="profRoleFields" class="stack-form"></div>
+        <button type="submit" class="btn btn-primary">Зберегти зміни</button>
       </form>
     </div>
   </div>
@@ -600,7 +620,7 @@
         <h2>🤖 Налаштування ШІ-провайдера</h2>
         <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="aiSettingsModal">✕</button>
       </div>
-      <p class="muted">За замовчуванням працює вбудований швидкий інтелектуальний асистент (бюджет $0). За бажання ви можете вказати власний ключ Google Gemini (<code>AIza...</code>) або OpenAI (<code>sk-...</code>).</p>
+      <p class="muted">За замовчуванням працює вбудований швидкий інтелектуальний асистент. За бажання вкажіть власний ключ Google Gemini (<code>AIza...</code>) або OpenAI (<code>sk-...</code>).</p>
       <form id="aiSettingsForm" class="stack-form" style="margin-top: 0.75rem;">
         <label class="field-stack">
           <span>API ключ (зберігається лише у вашому браузері)</span>

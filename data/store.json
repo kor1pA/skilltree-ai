@@ -1,15 +1,15 @@
 {
-  "seedVersion": 2,
+  "seedVersion": 3,
   "nextId": 1037,
-  "currentUserId": 1,
+  "currentUserId": 0,
   "learners": [
     {
       "id": 1,
       "fullName": "Вячеслав Гой",
       "email": "slava@skilltree.ai",
       "role": "LEARNER",
-      "createdAt": "2026-11-18T10:02:36.596Z",
-      "isLoggedIn": true,
+      "createdAt": "2026-11-18T10:08:36.717Z",
+      "isLoggedIn": false,
       "targetProfession": "Full-Stack Developer",
       "level": "BEGINNER",
       "points": 100,
@@ -23,7 +23,7 @@
           "targetProfession": "Full-Stack Developer",
           "level": "BEGINNER",
           "learnerId": 1,
-          "createdAt": "2026-11-18T10:02:36.596Z",
+          "createdAt": "2026-11-18T10:08:36.717Z",
           "progress": 40,
           "nodes": [
             {
@@ -38,7 +38,7 @@
                   "title": "MDN: Повний довідник CSS Grid та Flexbox",
                   "type": "LINK",
                   "url": "https://developer.mozilla.org/uk/docs/Web/CSS/CSS_grid_layout",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Офіційна документація з інтерактивними прикладами побудови адаптивних сіток.",
                   "content": "### Коли використовувати Flexbox, а коли CSS Grid?\n\n• Flexbox ідеальний для одновимірних рядків чи колонок (навігація, кнопки в ряд, вирівнювання іконки з текстом).\n• CSS Grid створений для двовимірних макетів (сітка карток, дашборди, sidebar + main).\n\n```css\n.dashboard-grid {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 1.5rem;\n}\n@media (max-width: 900px) {\n  .dashboard-grid { grid-template-columns: 1fr; }\n}\n```\n\n### Чекліст якості верстки:\n1. Використовуйте семантичні теги: <header>, <aside>, <main>, <section>.\n2. Завжди задавайте box-sizing: border-box.\n3. Забезпечте контраст тексту щонайменше 4.5:1."
                 },
@@ -47,7 +47,7 @@
                   "title": "Конспект: Семантична верстка та доступність (a11y)",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Внутрішній урок із правилами побудови доступного інтерфейсу.",
                   "content": "### Навіщо потрібна семантика?\nСемантичні теги дозволяють скрінрідерам, пошуковим системам і браузерним інструментам розуміти структуру сторінки без зайвих класів.\n\n• Один <h1> на головну тему сторінки, далі логічна ієрархія <h2> → <h3>.\n• Для дій використовуйте <button type=\"button\">, для переходів — <a href=\"...\">.\n• Кожен <input> повинен мати пов'язаний <label for=\"...\"> або aria-label.\n• Додавайте :focus-visible стилі для навігації з клавіатури."
                 }
@@ -66,7 +66,7 @@
                   "title": "TypeScript Handbook: Основи типів, класів та enum",
                   "type": "LINK",
                   "url": "https://www.typescriptlang.org/docs/handbook/intro.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Офіційний посібник із суворої типізації та об’єктно-орієнтованого підходу.",
                   "content": "### Чому TypeScript критичний у бізнес-логіці?\nСтрогі типи й перелічення (enum) дозволяють ловити помилки на етапі написання коду.\n\n```ts\nenum NodeStatus {\n  NOT_STARTED = 'NOT_STARTED',\n  IN_PROGRESS = 'IN_PROGRESS',\n  DONE = 'DONE',\n}\n\nfunction updateStatus(node: { status: NodeStatus }, next: NodeStatus) {\n  node.status = next;\n}\n```\n\n### Порада з асинхронності:\nЗавжди огортайте мережеві виклики fetch() у try/catch та перевіряйте response.ok, бо fetch не кидає виняток на HTTP 400/500."
                 },
@@ -75,7 +75,7 @@
                   "title": "Відеорозбір: Event Loop та async/await на практиці",
                   "type": "VIDEO",
                   "url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Класична візуалізація стеку викликів, черги мікрозадач і асинхронних запитів.",
                   "content": "### Ключові висновки з відео:\n1. Синхронний код виконується у Call Stack до повного очищення.\n2. Promise.then / async-await потрапляють у Microtask Queue і виконуються одразу після поточного стеку.\n3. setTimeout / мережеві колбеки чекають у Task (Macrotask) Queue.\n4. Для паралельного завантаження кількох незалежних API використовуйте await Promise.all([api1(), api2()])."
                 }
@@ -94,7 +94,7 @@
                   "title": "Урок: Специфікація REST API (GET, POST, PATCH, DELETE)",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Практичні правила найменування ресурсів і коректні HTTP статус-коди.",
                   "content": "### Стандарти REST API у проєкті:\n• GET /api/trees — читання ресурсу (200 OK).\n• POST /api/trees/generate — створення нового ресурсу (201 Created).\n• PATCH /api/trees/:id/nodes/:nodeId/status — часткове оновлення поля status (200 OK).\n• DELETE /api/trees/:id/nodes/:nodeId — видалення (200 OK або 400 Bad Request, якщо порушено інваріант композиції 1 : 1..*).\n\n```ts\nif (!title.trim()) {\n  return sendError(res, 400, 'Назва не може бути порожньою');\n}\n```\n\n### Головне правило архітектури:\nHTTP-обробники лише парсять запит і викликають методи доменних класів. Вся бізнес-логіка (наприклад, заборона підтвердження неоплаченої сесії) живе у домені!"
                 },
@@ -103,7 +103,7 @@
                   "title": "Node.js Documentation: HTTP Server & Routing",
                   "type": "LINK",
                   "url": "https://nodejs.org/api/http.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Документація вбудованого модуля node:http.",
                   "content": "### Як працює node:http без зайвих залежностей?\n1. createServer(async (req, res) => { ... }) приймає потік запиту.\n2. URL розбирається через new URL(req.url, 'http://localhost').\n3. Тіло POST/PATCH запиту зчитується асинхронним ітератором for await (const chunk of req).\n4. Відповідь відправляється через res.writeHead(status, headers) + res.end(JSON.stringify(data))."
                 }
@@ -117,7 +117,7 @@
                   "answer": "PUT повністю замінює ресурс, а PATCH виконує часткове оновлення окремих полів (наприклад, зміну статусу вузла SkillNode на DONE). Для оновлення прогресу краще використовувати PATCH.",
                   "responseTimeMs": 215,
                   "isHelpful": true,
-                  "createdAt": "2026-11-18T10:02:36.596Z"
+                  "createdAt": "2026-11-18T10:08:36.717Z"
                 }
               ]
             },
@@ -133,7 +133,7 @@
                   "title": "Урок: Проєктування моделей даних та зв’язків (UML → Сховище)",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Як переносити композицію та агрегацію з UML-діаграми в реальну модель збереження.",
                   "content": "### Композиція vs Агрегація у коді:\n• Композиція (Learner — SkillTree — SkillNode): дочірні об'єкти не існують без батьківського. При видаленні карти зникають і її вузли, а видалити останній вузол карти заборонено (кратність 1 : 1..*).\n• Агрегація (Team — Learner): студент може належати до кількох команд або не належати до жодної; видалення команди не видаляє студента.\n\n### Практика цілісності:\nЗавжди відновлюйте екземпляри класів (new Learner(), new SkillTree()) при зчитуванні з JSON/БД, щоб методи класів залишалися доступними."
                 }
@@ -152,7 +152,7 @@
                   "title": "Урок: Піраміда тестування (Unit + API Integration)",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Як писати швидкі тести на node:test і фіксувати баги регресійними тестами.",
                   "content": "### Стратегія тестування SkillTree AI:\n1. Доменні Unit-тести (tests/domain.test.ts): перевіряють бізнес-методи класів без HTTP.\n2. Регресійні тести: фіксують знайдені помилки (наприклад, спроба двічі отримати +50 балів або підтвердити неоплачену сесію).\n3. Інтеграційні HTTP-тести (tests/api.test.ts): підіймають сервер на порту 0 і тестують реальні запити fetch.\n\n```bash\nnpm test\n```"
                 },
@@ -161,7 +161,7 @@
                   "title": "Node.js Official Test Runner Guide",
                   "type": "LINK",
                   "url": "https://nodejs.org/api/test.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Вбудований тест-раннер Node.js з describe/it/assert.",
                   "content": "### Основні функції node:test:\n• describe('Набір тестів', () => { ... })\n• it('Сценарій', async () => { ... })\n• assert.equal(), assert.throws(), assert.ok() із node:assert/strict."
                 }
@@ -177,7 +177,7 @@
       "fullName": "Олена Ковальчук",
       "email": "olena@skilltree.ai",
       "role": "LEARNER",
-      "createdAt": "2026-11-18T10:02:36.596Z",
+      "createdAt": "2026-11-18T10:08:36.717Z",
       "isLoggedIn": false,
       "targetProfession": "Data Analyst / AI Engineer",
       "level": "INTERMEDIATE",
@@ -193,7 +193,7 @@
           "targetProfession": "Data Analyst / AI Engineer",
           "level": "INTERMEDIATE",
           "learnerId": 2,
-          "createdAt": "2026-11-18T10:02:36.596Z",
+          "createdAt": "2026-11-18T10:08:36.717Z",
           "progress": 75,
           "nodes": [
             {
@@ -208,7 +208,7 @@
                   "title": "Python Data Structures Guide",
                   "type": "LINK",
                   "url": "https://docs.python.org/3/tutorial/datastructures.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Офіційна документація Python щодо структур даних.",
                   "content": "### Вибір структури даних у Python:\n• list — упорядкована колекція для ітерації.\n• dict / set — миттєвий пошук за ключем за O(1).\n• Використовуйте типізацію (typing) для зрозумілості аналітичних пайплайнів."
                 }
@@ -227,7 +227,7 @@
                   "title": "Урок: Віконні функції в SQL на реальних кейсах",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Обчислення накопичувальних сум, рейтингів та когортного аналізу.",
                   "content": "### Приклад віконної функції:\n```sql\nSELECT user_id, skill_name, progress,\n       AVG(progress) OVER (PARTITION BY team_id) AS team_avg\nFROM skill_matrix;\n```\nВіконні функції дозволяють рахувати агрегати без втрати деталізації рядків."
                 }
@@ -246,7 +246,7 @@
                   "title": "Pandas 10-minute quickstart",
                   "type": "LINK",
                   "url": "https://pandas.pydata.org/docs/user_guide/10min.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Базові операції фільтрації, групування та агрегації DataFrame.",
                   "content": "### Перші 3 команди при відкритті будь-якого датасету:\n1. df.info() — типи та пропуски.\n2. df.describe() — розподіли й аномалії.\n3. df.isna().sum() — точна кількість NaN у кожній колонці."
                 }
@@ -265,7 +265,7 @@
                   "title": "Урок: Архітектура контекстного AI-асистента з SLA ≤ 5s",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Використання контексту поточного вузла, таймаутів і fallback-стратегії.",
                   "content": "### Формула якісної відповіді ШІ у вузлі:\n1. Передайте у системний промпт назву вузла, цільову професію та прикріплені матеріали.\n2. Обмежте час очікування мережевого API (AbortController на 4.2 с).\n3. Збирайте зворотний зв'язок користувачів («Корисно / Некорисно») для контролю > 90% якості."
                 }
@@ -281,7 +281,7 @@
       "fullName": "Дмитро Мельник",
       "email": "dmytro@skilltree.ai",
       "role": "LEARNER",
-      "createdAt": "2026-11-18T10:02:36.596Z",
+      "createdAt": "2026-11-18T10:08:36.717Z",
       "isLoggedIn": false,
       "targetProfession": "QA Automation Engineer",
       "level": "BEGINNER",
@@ -296,7 +296,7 @@
           "targetProfession": "QA Automation Engineer",
           "level": "BEGINNER",
           "learnerId": 3,
-          "createdAt": "2026-11-18T10:02:36.596Z",
+          "createdAt": "2026-11-18T10:08:36.717Z",
           "progress": 25,
           "nodes": [
             {
@@ -311,7 +311,7 @@
                   "title": "Урок: Шпаргалка з технік тест-дизайну",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Граничні значення (Boundary Value Analysis) та негативні сценарії.",
                   "content": "### Застосування граничних значень у SkillTree AI:\n• Оцінка ментора: тестуємо 0 (помилка), 1 (мін), 5 (макс), 6 (помилка).\n• Видалення вузла: карта з 2 вузлами (видаляє), карта з 1 вузлом (повертає false).\n• Прогрес: 0/4 = 0%, 2/4 = 50%, 4/4 = 100%."
                 }
@@ -330,7 +330,7 @@
                   "title": "Node.js Test Runner & Assertions",
                   "type": "LINK",
                   "url": "https://nodejs.org/api/test.html",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Створення швидких автотестів без зайвих залежностей.",
                   "content": "### Золоті правила API-тестів:\n1. Кожен тест ізольований (використовує окремий in-memory store).\n2. Перевіряйте не лише статус-код (200/400), але й структуру тіла відповіді."
                 }
@@ -349,7 +349,7 @@
                   "title": "Playwright Best Practices",
                   "type": "LINK",
                   "url": "https://playwright.dev/docs/best-practices",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Стійкі локатори та тестування критичних користувацьких шляхів.",
                   "content": "### Вибір локаторів у E2E:\nВикористовуйте семантичні ролі (getByRole, getByLabel) замість крихких XPath або CSS-класів оформлення."
                 }
@@ -368,7 +368,7 @@
                   "title": "Урок: Шаблон ефективного баг-репорту",
                   "type": "TEXT",
                   "url": "",
-                  "publishedAt": "2026-11-18T10:02:36.596Z",
+                  "publishedAt": "2026-11-18T10:08:36.717Z",
                   "description": "Кроки відтворення, фактичний результат, очікуваний результат і докази.",
                   "content": "### Обов’язкові поля баг-репорту:\n1. Заголовок (Що + Де + За яких умов).\n2. Кроки відтворення (1, 2, 3).\n3. Фактичний vs Очікуваний результат.\n4. Регресійний автотест після виправлення."
                 }
@@ -386,7 +386,7 @@
       "fullName": "Андрій Савченко",
       "email": "andriy.mentor@skilltree.ai",
       "role": "MENTOR",
-      "createdAt": "2026-11-18T10:02:36.596Z",
+      "createdAt": "2026-11-18T10:08:36.717Z",
       "isLoggedIn": false,
       "bio": "Senior Full-Stack Architect із 8-річним досвідом у Node.js, TypeScript та високонавантажених системах.",
       "hourlyRate": 900,
@@ -399,7 +399,7 @@
       "fullName": "Ірина Бондаренко",
       "email": "iryna.mentor@skilltree.ai",
       "role": "MENTOR",
-      "createdAt": "2026-11-18T10:02:36.596Z",
+      "createdAt": "2026-11-18T10:08:36.717Z",
       "isLoggedIn": false,
       "bio": "Lead Data / AI Engineer. Допомагаю опанувати SQL, Python та інтеграцію LLM API у продакшн.",
       "hourlyRate": 1100,
@@ -414,7 +414,7 @@
       "fullName": "Марія Ткаченко",
       "email": "maria.hr@technova.ua",
       "role": "HR",
-      "createdAt": "2026-11-18T10:02:36.596Z",
+      "createdAt": "2026-11-18T10:08:36.717Z",
       "isLoggedIn": false,
       "company": "TechNova Ukraine",
       "teamIds": [
@@ -436,7 +436,7 @@
       "learnerId": 2,
       "mentorId": 4,
       "topic": "Код-рев’ю архітектури REST API",
-      "startAt": "2026-11-15T10:02:36.596Z",
+      "startAt": "2026-11-15T10:08:36.717Z",
       "durationMin": 60,
       "price": 900,
       "status": "DONE",
@@ -449,7 +449,7 @@
       "learnerId": 1,
       "mentorId": 4,
       "topic": "Розбір типізації та патерну Adapter у TypeScript",
-      "startAt": "2026-11-20T10:02:36.596Z",
+      "startAt": "2026-11-20T10:08:36.717Z",
       "durationMin": 60,
       "price": 900,
       "status": "BOOKED",
@@ -477,7 +477,7 @@
       "amount": 900,
       "currency": "UAH",
       "status": "PAID",
-      "processedAt": "2026-11-15T10:02:36.596Z"
+      "processedAt": "2026-11-15T10:08:36.717Z"
     }
   ]
 }

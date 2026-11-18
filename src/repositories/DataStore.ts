@@ -20,7 +20,7 @@ import {
 import { AIServiceAdapter } from '../adapters/AIServiceAdapter.ts';
 import { PaymentAdapter, type PaymentReceipt } from '../adapters/PaymentAdapter.ts';
 
-const CURRENT_SEED_VERSION = 2;
+const CURRENT_SEED_VERSION = 3;
 
 interface PersistedState {
   seedVersion?: number;
@@ -167,7 +167,8 @@ export class DataStore {
   }
 
   getSnapshot() {
-    const currentUser = this.findUserById(this.currentUserId) ?? this.learners[0];
+    const currentUser =
+      this.currentUserId > 0 ? (this.findUserById(this.currentUserId) ?? null) : null;
     return {
       currentUser: currentUser ? currentUser.toJSON() : null,
       users: this.getAllUsers().map((u) => u.toJSON()),
@@ -329,7 +330,6 @@ export class DataStore {
       points: 100,
       badges: ['Перший крок'],
     });
-    learner1.isLoggedIn = true;
 
     const learner2 = new Learner({
       id: 2,
@@ -483,6 +483,6 @@ export class DataStore {
         processedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
       },
     ];
-    this.currentUserId = learner1.id;
+    this.currentUserId = 0;
   }
 }
