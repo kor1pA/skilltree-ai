@@ -12,6 +12,7 @@ import { SkillNode } from './SkillNode.ts';
 import { SkillTree } from './SkillTree.ts';
 import { MentorSession } from './MentorSession.ts';
 import { Team } from './Team.ts';
+import { SkillMatrixService } from '../services/SkillMatrixService.ts';
 
 export type UserRole = 'LEARNER' | 'MENTOR' | 'HR';
 
@@ -412,20 +413,9 @@ export class HRManager extends User {
 
   exportReport(team: Team, format = 'CSV'): string {
     if (format.toUpperCase() !== 'CSV') {
-      return JSON.stringify(team.toJSON(), null, 2);
+      return JSON.stringify(team.getDetailedMatrix(), null, 2);
     }
-    const header = 'ID,ПІБ,Email,Професія,Прогрес %,Бали';
-    const rows = team.members.map((member) => {
-      const avgProgress =
-        member.skillTrees.length > 0
-          ? (
-              member.skillTrees.reduce((sum, t) => sum + t.calculateProgress(), 0) /
-              member.skillTrees.length
-            ).toFixed(1)
-          : '0.0';
-      return `${member.id},${member.fullName},${member.email},${member.targetProfession},${avgProgress},${member.points}`;
-    });
-    return [header, ...rows].join('\n');
+    return SkillMatrixService.exportCsv(team);
   }
 
   toJSON() {

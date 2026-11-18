@@ -1,4 +1,5 @@
 import type { Learner } from './User.ts';
+import { SkillMatrixService, type SkillMatrixReport } from '../services/SkillMatrixService.ts';
 
 export interface TeamParams {
   id: number;
@@ -34,24 +35,11 @@ export class Team {
    * Повертає середній рівень прогресу по кожній цільовій навичці/професії команди.
    */
   getSkillMatrix(): Record<string, number> {
-    const sums: Record<string, { total: number; count: number }> = {};
+    return SkillMatrixService.calculateProfessionAverages(this);
+  }
 
-    for (const member of this.members) {
-      for (const tree of member.skillTrees) {
-        const key = tree.targetProfession;
-        if (!sums[key]) {
-          sums[key] = { total: 0, count: 0 };
-        }
-        sums[key].total += tree.calculateProgress();
-        sums[key].count += 1;
-      }
-    }
-
-    const matrix: Record<string, number> = {};
-    for (const [skill, data] of Object.entries(sums)) {
-      matrix[skill] = Number((data.total / data.count).toFixed(1));
-    }
-    return matrix;
+  getDetailedMatrix(): SkillMatrixReport {
+    return SkillMatrixService.buildDetailedReport(this);
   }
 
   toJSON() {
@@ -61,6 +49,7 @@ export class Team {
       hrManagerId: this.hrManagerId,
       memberIds: this.members.map((m) => m.id),
       skillMatrix: this.getSkillMatrix(),
+      detailedMatrix: this.getDetailedMatrix(),
     };
   }
 }
