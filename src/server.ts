@@ -248,8 +248,9 @@ export function createAppServer(store: DataStore): Server {
                 type: (Object.values(MaterialType).includes(body.materialType)
                   ? body.materialType
                   : MaterialType.TEXT) as MaterialType,
-                url: String(body.materialUrl ?? '#custom-material').trim(),
+                url: String(body.materialUrl ?? '').trim(),
                 description: String(body.description ?? ''),
+                content: String(body.materialContent ?? body.description ?? ''),
               })
             );
           }
@@ -348,12 +349,30 @@ export function createAppServer(store: DataStore): Server {
             return;
           }
 
-          const message = found.owner.askAssistant(nodeId, question, (node, q) =>
-            store.aiAdapter.generateAssistantAnswer(node, found.tree, q)
+          const targetNode = found.tree.nodes.find((n) => n.id === nodeId);
+          if (!targetNode) {
+            sendError(res, 404, 'Вузол карти не знайдено.');
+            return;
+          }
+
+          const generated = await store.aiAdapter.generateAssistantAnswerAsync(
+            targetNode,
+            found.tree,
+            question,
+            typeof body.apiKey === 'string' ? body.apiKey.trim() : undefined
           );
+
+          const message = found.owner.askAssistant(nodeId, question, () => ({
+            answer: generated.answer,
+            responseTimeMs: generated.responseTimeMs,
+          }));
           message.id = store.nextId();
           store.saveToDisk();
-          sendJson(res, 201, { message: message.toJSON(), state: store.getSnapshot() });
+          sendJson(res, 201, {
+            message: message.toJSON(),
+            source: generated.source,
+            state: store.getSnapshot(),
+          });
           return;
         }
 
@@ -391,7 +410,7 @@ export function createAppServer(store: DataStore): Server {
             return;
           }
           const title = String(body.title ?? '').trim();
-          const url = String(body.url ?? '#material').trim();
+          const url = String(body.url ?? '').trim();
           if (!title) {
             sendError(res, 400, 'Вкажіть назву навчального матеріалу.');
             return;
@@ -405,7 +424,8 @@ export function createAppServer(store: DataStore): Server {
             title,
             url,
             type,
-            String(body.description ?? '')
+            String(body.description ?? ''),
+            String(body.content ?? body.description ?? '')
           );
           material.id = store.nextId();
           store.saveToDisk();

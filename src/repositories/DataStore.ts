@@ -20,7 +20,10 @@ import {
 import { AIServiceAdapter } from '../adapters/AIServiceAdapter.ts';
 import { PaymentAdapter, type PaymentReceipt } from '../adapters/PaymentAdapter.ts';
 
+const CURRENT_SEED_VERSION = 2;
+
 interface PersistedState {
+  seedVersion?: number;
   nextId: number;
   currentUserId: number;
   learners: ReturnType<Learner['toJSON']>[];
@@ -192,6 +195,7 @@ export class DataStore {
     }
 
     const state: PersistedState = {
+      seedVersion: CURRENT_SEED_VERSION,
       nextId: this.nextIdCounter,
       currentUserId: this.currentUserId,
       learners: this.learners.map((l) => l.toJSON()),
@@ -215,6 +219,9 @@ export class DataStore {
     if (!this.storagePath) return;
     const raw = readFileSync(this.storagePath, 'utf-8');
     const data = JSON.parse(raw) as PersistedState;
+    if ((data.seedVersion ?? 1) < CURRENT_SEED_VERSION) {
+      throw new Error('Stale seed version, migrating to v2');
+    }
     this.nextIdCounter = data.nextId;
     this.currentUserId = data.currentUserId;
     this.receipts = data.receipts ?? [];

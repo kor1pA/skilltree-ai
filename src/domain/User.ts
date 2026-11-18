@@ -142,9 +142,11 @@ export class Learner extends User {
               materials: [
                 new LearningMaterial({
                   id: Date.now() + 2,
-                  title: `Вступ до ${profession}`,
+                  title: `Вступний конспект: ${profession}`,
                   type: MaterialType.TEXT,
-                  url: '#intro',
+                  url: '',
+                  description: `Ключові поняття та початкові кроки опанування напряму ${profession}.`,
+                  content: `1. Ознайомтеся з базовою термінологією напряму «${profession}».\n2. Створіть робоче середовище та виконайте перше практичне завдання.\n3. Використовуйте ШІ-асистента праворуч для розбору складних питань.`,
                 }),
               ],
             }),
@@ -301,7 +303,8 @@ export class Mentor extends User {
     title: string,
     url: string,
     type: MaterialType = MaterialType.LINK,
-    description?: string
+    description?: string,
+    content?: string
   ): LearningMaterial {
     const material = new LearningMaterial({
       id: Date.now() + Math.floor(Math.random() * 1000),
@@ -310,6 +313,7 @@ export class Mentor extends User {
       url,
       authorId: this.id,
       description,
+      content,
     });
     node.addMaterial(material);
     this.publishedMaterials.push(material);
@@ -403,6 +407,7 @@ export class HRManager extends User {
                   url: m.url,
                   authorId: m.authorId,
                   description: m.description,
+                  content: m.content,
                 })
             ),
           })

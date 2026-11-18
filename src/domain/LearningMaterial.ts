@@ -8,6 +8,7 @@ export interface LearningMaterialParams {
   publishedAt?: Date | string;
   authorId?: number;
   description?: string;
+  content?: string;
 }
 
 /**
@@ -21,6 +22,7 @@ export class LearningMaterial {
   publishedAt: Date;
   authorId?: number;
   description?: string;
+  content?: string;
 
   constructor(params: LearningMaterialParams) {
     this.id = params.id;
@@ -30,6 +32,7 @@ export class LearningMaterial {
     this.publishedAt = params.publishedAt ? new Date(params.publishedAt) : new Date();
     this.authorId = params.authorId;
     this.description = params.description;
+    this.content = params.content;
   }
 
   toJSON() {
@@ -41,6 +44,7 @@ export class LearningMaterial {
       publishedAt: this.publishedAt.toISOString(),
       authorId: this.authorId,
       description: this.description,
+      content: this.content,
     };
   }
 }
