@@ -60,8 +60,17 @@ export class MentorSession {
   }
 
   leaveFeedback(rating: number, feedback: string): void {
+    if (this.status === SessionStatus.CANCELLED) {
+      throw new Error('Неможливо залишити відгук для скасованої сесії.');
+    }
+    if (this.paymentStatus !== PaymentStatus.PAID) {
+      throw new Error('Залишити відгук можна лише після оплати сесії.');
+    }
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      throw new Error('Оцінка менторської сесії має бути цілим числом від 1 до 5.');
+    }
     this.rating = rating;
-    this.feedback = feedback;
+    this.feedback = feedback.trim();
     this.status = SessionStatus.DONE;
   }
 

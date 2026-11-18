@@ -1,5 +1,11 @@
 import { createHash } from 'node:crypto';
-import { MaterialType, NodeStatus, SkillLevel } from './enums.ts';
+import {
+  MaterialType,
+  NodeStatus,
+  PaymentStatus,
+  SessionStatus,
+  SkillLevel,
+} from './enums.ts';
 import { LearningMaterial } from './LearningMaterial.ts';
 import { ChatMessage } from './ChatMessage.ts';
 import { SkillNode } from './SkillNode.ts';
@@ -206,7 +212,7 @@ export class Learner extends User {
   }
 
   /**
-   * Завершує вузол карти та нараховує бали (UC3).
+   * Завершує вузол карти та нараховує бали лише при першому переході у DONE (UC3).
    */
   completeNode(treeId: number, nodeId: number): number {
     const tree = this.skillTrees.find((t) => t.id === treeId);
@@ -218,9 +224,32 @@ export class Learner extends User {
       throw new Error(`Вузол з ID ${nodeId} не знайдено.`);
     }
 
+    if (node.status === NodeStatus.DONE) {
+      return this.points;
+    }
+
     node.complete();
     this.addPoints(50);
+    this.awardMilestoneBadges(tree);
     return this.points;
+  }
+
+  private awardMilestoneBadges(tree: SkillTree): void {
+    const grant = (badge: string) => {
+      if (!this.badges.includes(badge)) {
+        this.badges.push(badge);
+      }
+    };
+
+    if (this.points >= 50) {
+      grant('Перший крок');
+    }
+    if (this.points >= 150) {
+      grant('Активний дослідник');
+    }
+    if (tree.calculateProgress() === 100) {
+      grant('Майстер дерева');
+    }
   }
 
   toJSON() {
@@ -287,7 +316,15 @@ export class Mentor extends User {
   }
 
   confirmSession(session: MentorSession): void {
-    session.status = 'CONFIRMED' as any;
+    if (session.status === SessionStatus.CANCELLED) {
+      throw new Error('Неможливо підтвердити скасовану сесію.');
+    }
+    if (session.paymentStatus !== PaymentStatus.PAID) {
+      throw new Error(
+        'Неможливо підтвердити неоплачену сесію: оплата є обов’язковою (UC6 → «include» UC9).'
+      );
+    }
+    session.status = SessionStatus.CONFIRMED;
   }
 
   recalculateRating(): number {
