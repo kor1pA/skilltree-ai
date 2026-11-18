@@ -1,0 +1,457 @@
+{
+  "nextId": 1036,
+  "currentUserId": 1,
+  "learners": [
+    {
+      "id": 1,
+      "fullName": "Вячеслав Гой",
+      "email": "slava@skilltree.ai",
+      "role": "LEARNER",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": true,
+      "targetProfession": "Full-Stack Developer",
+      "level": "BEGINNER",
+      "points": 100,
+      "badges": [
+        "Перший крок"
+      ],
+      "skillTrees": [
+        {
+          "id": 1014,
+          "title": "Full-Stack Developer (BEGINNER)",
+          "targetProfession": "Full-Stack Developer",
+          "level": "BEGINNER",
+          "learnerId": 1,
+          "createdAt": "2026-11-18T08:38:12.907Z",
+          "progress": 40,
+          "nodes": [
+            {
+              "id": 1001,
+              "title": "HTML5, CSS3 та адаптивна верстка",
+              "orderNumber": 1,
+              "status": "DONE",
+              "description": "[Базовий рівень] Семантична розмітка, Flexbox, CSS Grid, принципи доступності (a11y) та Responsive Design.",
+              "materials": [
+                {
+                  "id": 1002,
+                  "title": "MDN: Повний довідник CSS Grid та Flexbox",
+                  "type": "LINK",
+                  "url": "https://developer.mozilla.org/uk/docs/Web/CSS/CSS_grid_layout",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Офіційна документація з інтерактивними прикладами сіток."
+                },
+                {
+                  "id": 1003,
+                  "title": "Чекліст семантичної верстки сторінки",
+                  "type": "TEXT",
+                  "url": "#html-semantic-checklist",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Використовуйте header, main, nav, article та правильну ієрархію заголовків h1-h3."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1004,
+              "title": "TypeScript та сучасний JavaScript (ES2022+)",
+              "orderNumber": 2,
+              "status": "DONE",
+              "description": "[Базовий рівень] Типізація, інтерфейси, асинхронність (Promise/async-await), робота з масивами та DOM.",
+              "materials": [
+                {
+                  "id": 1005,
+                  "title": "TypeScript Handbook: Основи типів та класів",
+                  "type": "LINK",
+                  "url": "https://www.typescriptlang.org/docs/handbook/intro.html",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Посібник з інтерфейсів, enum, generic-типів та ООП."
+                },
+                {
+                  "id": 1006,
+                  "title": "Відеорозбір: Event Loop та async/await на практиці",
+                  "type": "VIDEO",
+                  "url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Як працює стек викликів, черга мікрозадач і асинхронні запити."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1007,
+              "title": "Backend REST API на Node.js",
+              "orderNumber": 3,
+              "status": "IN_PROGRESS",
+              "description": "[Базовий рівень] Проєктування маршрутів HTTP, статус-коди, валідація вхідних даних та архітектура шарів.",
+              "materials": [
+                {
+                  "id": 1008,
+                  "title": "Специфікація REST API: методи GET, POST, PATCH, DELETE",
+                  "type": "TEXT",
+                  "url": "#rest-api-spec",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Практичні правила найменування ресурсів і повернення кодів 200, 201, 400, 404."
+                },
+                {
+                  "id": 1009,
+                  "title": "Node.js Official Documentation: HTTP & Testing",
+                  "type": "LINK",
+                  "url": "https://nodejs.org/api/http.html",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Робота з вбудованим HTTP-сервером та потоками."
+                }
+              ],
+              "messages": [
+                {
+                  "id": 1015,
+                  "nodeId": 1007,
+                  "learnerId": 1,
+                  "question": "Чим відрізняється PATCH від PUT у REST API?",
+                  "answer": "PUT повністю замінює ресурс, а PATCH виконує часткове оновлення окремих полів (наприклад, зміну статусу вузла SkillNode на DONE). Для оновлення прогресу краще використовувати PATCH.",
+                  "responseTimeMs": 215,
+                  "isHelpful": true,
+                  "createdAt": "2026-11-18T08:38:12.907Z"
+                }
+              ]
+            },
+            {
+              "id": 1010,
+              "title": "Бази даних та збереження стану",
+              "orderNumber": 4,
+              "status": "NOT_STARTED",
+              "description": "[Базовий рівень] Моделювання зв’язків 1:N та M:N, SQL/NoSQL підходи, індекси та цілісність даних.",
+              "materials": [
+                {
+                  "id": 1011,
+                  "title": "Проєктування реляційних і документних моделей даних",
+                  "type": "TEXT",
+                  "url": "#db-modeling",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Порівняння композиції, агрегації та нормалізації таблиць."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1012,
+              "title": "Автоматизоване тестування та Git CI/CD",
+              "orderNumber": 5,
+              "status": "NOT_STARTED",
+              "description": "[Базовий рівень] Unit-тести, інтеграційне тестування API, регресійні тести та code review.",
+              "materials": [
+                {
+                  "id": 1013,
+                  "title": "Піраміда тестування: Unit vs Integration",
+                  "type": "TEXT",
+                  "url": "#testing-pyramid",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Як поєднувати швидкі доменні тести та перевірку HTTP-ендпоінтів."
+                }
+              ],
+              "messages": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "fullName": "Олена Ковальчук",
+      "email": "olena@skilltree.ai",
+      "role": "LEARNER",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": false,
+      "targetProfession": "Data Analyst / AI Engineer",
+      "level": "INTERMEDIATE",
+      "points": 150,
+      "badges": [
+        "Перший крок",
+        "Активний дослідник"
+      ],
+      "skillTrees": [
+        {
+          "id": 1024,
+          "title": "Data Analyst / AI Engineer (INTERMEDIATE)",
+          "targetProfession": "Data Analyst / AI Engineer",
+          "level": "INTERMEDIATE",
+          "learnerId": 2,
+          "createdAt": "2026-11-18T08:38:12.908Z",
+          "progress": 75,
+          "nodes": [
+            {
+              "id": 1016,
+              "title": "Основи Python та структури даних",
+              "orderNumber": 1,
+              "status": "DONE",
+              "description": "[Впевнений практик] Списки, словники, comprehensions, типізація та обробка файлів CSV/JSON.",
+              "materials": [
+                {
+                  "id": 1017,
+                  "title": "Python Data Structures Guide",
+                  "type": "LINK",
+                  "url": "https://docs.python.org/3/tutorial/datastructures.html",
+                  "publishedAt": "2026-11-18T08:38:12.907Z",
+                  "description": "Офіційна документація Python щодо структур даних."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1018,
+              "title": "SQL та аналітичні запити",
+              "orderNumber": 2,
+              "status": "DONE",
+              "description": "[Впевнений практик] JOIN, агрегації GROUP BY, віконні функції (ROW_NUMBER, RANK) та підзапити.",
+              "materials": [
+                {
+                  "id": 1019,
+                  "title": "Віконні функції в SQL на реальних кейсах",
+                  "type": "TEXT",
+                  "url": "#sql-windows",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Обчислення накопичувальних сум і когортного аналізу."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1020,
+              "title": "Аналіз даних у Pandas та візуалізація",
+              "orderNumber": 3,
+              "status": "DONE",
+              "description": "[Впевнений практик] Очищення даних, обробка пропусків, побудова метрик KPI та дашбордів.",
+              "materials": [
+                {
+                  "id": 1021,
+                  "title": "Pandas 10-minute quickstart",
+                  "type": "LINK",
+                  "url": "https://pandas.pydata.org/docs/user_guide/10min.html",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Базові операції фільтрації та групування DataFrame."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1022,
+              "title": "Промпт-інжиніринг та інтеграція LLM API",
+              "orderNumber": 4,
+              "status": "NOT_STARTED",
+              "description": "[Впевнений практик] Системні промпти, контроль затримки (SLA), оцінка якості відповідей та RAG.",
+              "materials": [
+                {
+                  "id": 1023,
+                  "title": "Архітектура контекстного AI-асистента з SLA <= 5s",
+                  "type": "TEXT",
+                  "url": "#ai-sla-guide",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Використання контексту поточного вузла, таймаутів і fallback-стратегії."
+                }
+              ],
+              "messages": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "fullName": "Дмитро Мельник",
+      "email": "dmytro@skilltree.ai",
+      "role": "LEARNER",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": false,
+      "targetProfession": "QA Automation Engineer",
+      "level": "BEGINNER",
+      "points": 50,
+      "badges": [
+        "Перший крок"
+      ],
+      "skillTrees": [
+        {
+          "id": 1033,
+          "title": "QA Automation Engineer (BEGINNER)",
+          "targetProfession": "QA Automation Engineer",
+          "level": "BEGINNER",
+          "learnerId": 3,
+          "createdAt": "2026-11-18T08:38:12.908Z",
+          "progress": 25,
+          "nodes": [
+            {
+              "id": 1025,
+              "title": "Теорія тестування та тест-дизайн",
+              "orderNumber": 1,
+              "status": "DONE",
+              "description": "[Базовий рівень] Техніки еквівалентного розбиття, граничних значень, таблиці рішень і тест-плани.",
+              "materials": [
+                {
+                  "id": 1026,
+                  "title": "Шпаргалка з технік тест-дизайну",
+                  "type": "TEXT",
+                  "url": "#test-design",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Граничні значення (Boundary Value Analysis) та негативні сценарії."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1027,
+              "title": "Автоматизація API-тестів",
+              "orderNumber": 2,
+              "status": "IN_PROGRESS",
+              "description": "[Базовий рівень] Перевірка REST API, валідація JSON-схем, статус-кодів і контрактів.",
+              "materials": [
+                {
+                  "id": 1028,
+                  "title": "Node.js Test Runner & Assertions",
+                  "type": "LINK",
+                  "url": "https://nodejs.org/api/test.html",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Створення швидких автотестів без зайвих залежностей."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1029,
+              "title": "E2E-тестування вебзастосунків",
+              "orderNumber": 3,
+              "status": "NOT_STARTED",
+              "description": "[Базовий рівень] Сценарії користувача, селектори, стабільні очікування без sleep().",
+              "materials": [
+                {
+                  "id": 1030,
+                  "title": "Playwright Best Practices",
+                  "type": "LINK",
+                  "url": "https://playwright.dev/docs/best-practices",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Стійкі локатори та тестування критичних користувацьких шляхів."
+                }
+              ],
+              "messages": []
+            },
+            {
+              "id": 1031,
+              "title": "CI/CD та звітність про дефекти",
+              "orderNumber": 4,
+              "status": "NOT_STARTED",
+              "description": "[Базовий рівень] Баг-репорти, регресійні прогони в GitHub Actions, аналіз покриття.",
+              "materials": [
+                {
+                  "id": 1032,
+                  "title": "Шаблон ефективного баг-репорту",
+                  "type": "TEXT",
+                  "url": "#bug-report-template",
+                  "publishedAt": "2026-11-18T08:38:12.908Z",
+                  "description": "Кроки відтворення, фактичний результат, очікуваний результат і логи."
+                }
+              ],
+              "messages": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "mentors": [
+    {
+      "id": 4,
+      "fullName": "Андрій Савченко",
+      "email": "andriy.mentor@skilltree.ai",
+      "role": "MENTOR",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": false,
+      "bio": "Senior Full-Stack Architect із 8-річним досвідом у Node.js, TypeScript та високонавантажених системах.",
+      "hourlyRate": 900,
+      "rating": 4.9,
+      "specialization": "Full-Stack & TypeScript",
+      "publishedMaterialsCount": 0
+    },
+    {
+      "id": 5,
+      "fullName": "Ірина Бондаренко",
+      "email": "iryna.mentor@skilltree.ai",
+      "role": "MENTOR",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": false,
+      "bio": "Lead Data / AI Engineer. Допомагаю опанувати SQL, Python та інтеграцію LLM API у продакшн.",
+      "hourlyRate": 1100,
+      "rating": 5,
+      "specialization": "Data Science & LLM",
+      "publishedMaterialsCount": 0
+    }
+  ],
+  "hrManagers": [
+    {
+      "id": 6,
+      "fullName": "Марія Ткаченко",
+      "email": "maria.hr@technova.ua",
+      "role": "HR",
+      "createdAt": "2026-11-18T08:38:12.907Z",
+      "isLoggedIn": false,
+      "company": "TechNova Ukraine",
+      "teamIds": [
+        1036
+      ]
+    }
+  ],
+  "passwords": {
+    "1": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d",
+    "2": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d",
+    "3": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d",
+    "4": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d",
+    "5": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d",
+    "6": "0ead2060b65992dca4769af601a1b3a35ef38cfad2c2c465bb160ea764157c5d"
+  },
+  "sessions": [
+    {
+      "id": 1034,
+      "learnerId": 2,
+      "mentorId": 4,
+      "topic": "Код-рев’ю архітектури REST API",
+      "startAt": "2026-11-15T08:38:12.908Z",
+      "durationMin": 60,
+      "price": 900,
+      "status": "DONE",
+      "paymentStatus": "PAID",
+      "rating": 5,
+      "feedback": "Дуже структуроване пояснення шарів архітектури та тестування."
+    },
+    {
+      "id": 1035,
+      "learnerId": 1,
+      "mentorId": 4,
+      "topic": "Розбір типізації та патерну Adapter у TypeScript",
+      "startAt": "2026-11-20T08:38:12.908Z",
+      "durationMin": 60,
+      "price": 900,
+      "status": "BOOKED",
+      "paymentStatus": "PENDING",
+      "rating": null,
+      "feedback": null
+    }
+  ],
+  "teams": [
+    {
+      "id": 1036,
+      "name": "Product Engineering Team",
+      "hrManagerId": 6,
+      "memberIds": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "receipts": [
+    {
+      "transactionId": "TXN-1034-SEED",
+      "sessionId": 1034,
+      "amount": 900,
+      "currency": "UAH",
+      "status": "PAID",
+      "processedAt": "2026-11-15T08:38:12.908Z"
+    }
+  ]
+}
