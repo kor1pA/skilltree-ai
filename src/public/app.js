@@ -1,14 +1,38 @@
+'use strict';
+
+const ROUTES = {
+  '/': 'page-home',
+  '/roadmap': 'page-roadmap',
+  '/mentors': 'page-mentors',
+  '/mentor-cabinet': 'page-mentor-cabinet',
+  '/b2b': 'page-b2b',
+  '/profile': 'page-profile',
+};
+
+const ROUTE_TITLES = {
+  '/': 'SkillTree AI — Персоналізовані карти розвитку та ШІ-навчання',
+  '/roadmap': 'Карта навичок та ШІ-тьютор — SkillTree AI',
+  '/mentors': 'Ментори та 1-на-1 консультації — SkillTree AI',
+  '/mentor-cabinet': 'Кабінет ментора — SkillTree AI',
+  '/b2b': 'B2B Матриця навичок команди — SkillTree AI',
+  '/profile': 'Мій профіль — SkillTree AI',
+};
+
 const state = {
   data: null,
+  currentRoute: '/',
   selectedTreeId: null,
   selectedNodeId: null,
   selectedTeamId: null,
-  checkoutSessionId: null,
+  paymentSessionId: null,
+  authMode: 'login',
 };
 
-const $ = (id) => document.getElementById(id);
+function $(id) {
+  return document.getElementById(id);
+}
 
-function esc(value) {
+function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -17,1088 +41,1283 @@ function esc(value) {
     .replace(/'/g, '&#39;');
 }
 
-const LABELS = {
-  nodeStatus: {
-    NOT_STARTED: 'Не розпочато',
-    IN_PROGRESS: 'У процесі',
-    DONE: 'Завершено',
-  },
-  skillLevel: {
-    BEGINNER: 'Початковий',
-    INTERMEDIATE: 'Середній',
-    ADVANCED: 'Просунутий',
-  },
-  sessionStatus: {
-    BOOKED: 'Заброньовано',
-    CONFIRMED: 'Підтверджено',
-    DONE: 'Завершено',
-    CANCELLED: 'Скасовано',
-  },
-  paymentStatus: {
-    PENDING: 'Очікує оплати',
-    PAID: 'Оплачено',
-    REFUNDED: 'Кошти повернено',
-  },
-  materialType: {
-    TEXT: '📖 Урок / Конспект',
-    LINK: '🔗 Документація',
-    VIDEO: '🎬 Відеоурок',
-  },
-};
-
-function getInitials(name) {
-  return String(name || 'ST')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() || '')
-    .join('');
-}
-
-function formatRichText(raw) {
-  const parts = String(raw ?? '').split(/```(\w*)\n?([\s\S]*?)```/g);
-  let html = '';
-  for (let i = 0; i < parts.length; i += 3) {
-    const textPart = parts[i] || '';
-    const formatted = esc(textPart)
-      .replace(/^### (.+)$/gm, '<strong style="font-size:1rem;display:block;margin:0.4rem 0 0.2rem;">$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>');
-    html += formatted;
-    if (i + 2 < parts.length) {
-      const code = parts[i + 2] || '';
-      html += `<pre><code>${esc(code.trim())}</code></pre>`;
-    }
-  }
-  return html;
-}
-
 function showToast(message, isError = false) {
   const toast = $('toast');
+  if (!toast) return;
   toast.textContent = message;
-  toast.classList.toggle('error', isError);
-  toast.classList.remove('hidden');
+  toast.classList.remove('hidden', 'error');
+  if (isError) {
+    toast.classList.add('error');
+  }
   clearTimeout(showToast._timer);
   showToast._timer = setTimeout(() => {
     toast.classList.add('hidden');
-  }, 4200);
+  }, 3600);
 }
 
 async function api(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
+  const config = {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options,
+  };
+  const response = await fetch(url, config);
+  const contentType = response.headers.get('content-type') || '';
+  const payload = contentType.includes('application/json')
+    ? await response.json()
+    : await response.text();
+
+  if (!response.ok) {
+    const errMsg =
+      typeof payload === 'object' && payload !== null && payload.error
+        ? payload.error
+        : `Помилка HTTP ${response.status}`;
+    throw new Error(errMsg);
+  }
+  return payload;
+}
+
+function normalizeRoute(path) {
+  if (!path || path === '/') return '/';
+  const cleaned = path.replace(/\/+$/, '');
+  return ROUTES[cleaned] ? cleaned : '/';
+}
+
+function navigateTo(path, push = true) {
+  const target = normalizeRoute(path);
+  state.currentRoute = target;
+
+  if (push && window.location.pathname !== target) {
+    window.history.pushState({ route: target }, '', target);
+  }
+
+  document.querySelectorAll('.page-view').forEach((section) => {
+    const isActive = section.id === ROUTES[target];
+    section.classList.toggle('active', isActive);
   });
-  const contentType = res.headers.get('content-type') || '';
-  if (contentType.includes('application/json')) {
-    const json = await res.json();
-    if (!res.ok) {
-      throw new Error(json.error || 'Помилка виконання запиту.');
-    }
-    return json;
-  }
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(text || 'Помилка виконання запиту.');
-  }
-  return text;
+
+  document.querySelectorAll('.nav-link[data-route]').forEach((link) => {
+    const isCurrent = normalizeRoute(link.getAttribute('data-route')) === target;
+    link.classList.toggle('active', isCurrent);
+  });
+
+  document.title = ROUTE_TITLES[target] || ROUTE_TITLES['/'];
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-function getCurrentUser() {
-  return state.data?.currentUser || null;
+function getInitials(fullName) {
+  const parts = String(fullName || 'SK').trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+  }
+  return String(fullName || 'SK').slice(0, 2).toUpperCase();
 }
 
-// Rule of 3 Clicks: visitors can immediately explore and interact with the workspace;
-// if signed in as a specific Learner, operates on their own account.
 function getActiveLearner() {
-  if (!state.data?.learners?.length) return null;
-  const current = getCurrentUser();
-  if (current?.role === 'LEARNER') {
-    return state.data.learners.find((l) => l.id === current.id) || current;
+  const learners = state.data?.learners || [];
+  const current = state.data?.currentUser;
+  if (current && current.role === 'LEARNER') {
+    const matched = learners.find((l) => l.id === current.id);
+    if (matched) return matched;
   }
-  return state.data.learners[0];
-}
-
-function getActiveMentor() {
-  const current = getCurrentUser();
-  if (!current || current.role !== 'MENTOR') return null;
-  return state.data.mentors.find((m) => m.id === current.id) || current;
+  return learners[0] || null;
 }
 
 function getActiveTree(learner) {
-  if (!learner?.skillTrees?.length) return null;
-  return learner.skillTrees.find((t) => t.id === state.selectedTreeId) || learner.skillTrees[0];
+  if (!learner || !Array.isArray(learner.skillTrees) || learner.skillTrees.length === 0) {
+    return null;
+  }
+  const found = learner.skillTrees.find((t) => t.id === state.selectedTreeId);
+  if (found) return found;
+  state.selectedTreeId = learner.skillTrees[0].id;
+  return learner.skillTrees[0];
 }
 
 function getActiveNode(tree) {
-  if (!tree?.nodes?.length) return null;
-  return tree.nodes.find((n) => n.id === state.selectedNodeId) || tree.nodes[0];
+  if (!tree || !Array.isArray(tree.nodes) || tree.nodes.length === 0) {
+    state.selectedNodeId = null;
+    return null;
+  }
+  const found = tree.nodes.find((n) => n.id === state.selectedNodeId);
+  if (found) return found;
+  const fallback = tree.nodes.find((n) => n.status === 'IN_PROGRESS') || tree.nodes[0];
+  state.selectedNodeId = fallback.id;
+  return fallback;
 }
 
-function syncSelectionsFromData(data) {
-  state.data = data;
-  const learner = getActiveLearner();
-  if (learner) {
-    if (!learner.skillTrees.some((t) => t.id === state.selectedTreeId)) {
-      state.selectedTreeId = learner.skillTrees[0]?.id ?? null;
-    }
-    const tree = getActiveTree(learner);
-    if (tree && !tree.nodes.some((n) => n.id === state.selectedNodeId)) {
-      state.selectedNodeId = tree.nodes[0]?.id ?? null;
-    }
-  }
-  if (!state.selectedTeamId && data.teams[0]) {
-    state.selectedTeamId = data.teams[0].id;
+function getRoleLabel(role) {
+  if (role === 'MENTOR') return 'Ментор / Експерт';
+  if (role === 'HR') return 'HR / TeamLead (B2B)';
+  return 'Студент / Фахівець';
+}
+
+function getStatusBadgeClass(status) {
+  if (status === 'DONE' || status === 'PAID' || status === 'CONFIRMED') return 'st-badge-success';
+  if (status === 'IN_PROGRESS' || status === 'BOOKED') return 'st-badge-accent';
+  if (status === 'PENDING') return 'st-badge-warning';
+  if (status === 'CANCELLED' || status === 'REFUNDED') return 'st-badge-danger';
+  return '';
+}
+
+function openModal(id) {
+  const modal = $(id);
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeModal(id) {
+  const modal = $(id);
+  if (modal) modal.classList.add('hidden');
+}
+
+function applyTheme(theme) {
+  const normalized = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', normalized);
+  localStorage.setItem('skilltree_theme', normalized);
+  const btn = $('themeToggleBtn');
+  if (btn) {
+    btn.textContent = normalized === 'dark' ? '☀️' : '🌙';
   }
 }
 
-function renderNavbarAndHero() {
-  const user = getCurrentUser();
-  const { kpi, professions } = state.data;
+function setAuthTab(mode) {
+  state.authMode = mode;
+  $('authTabLogin')?.classList.toggle('active', mode === 'login');
+  $('authTabRegister')?.classList.toggle('active', mode === 'register');
+  $('authTabReset')?.classList.toggle('active', mode === 'reset');
 
-  if (user) {
-    $('openAuthBtn').classList.add('hidden');
-    $('userMenu').classList.remove('hidden');
-    $('navAvatar').textContent = getInitials(user.fullName);
-    $('navUserName').textContent = user.fullName;
+  $('loginForm')?.classList.toggle('hidden', mode !== 'login');
+  $('registerForm')?.classList.toggle('hidden', mode !== 'register');
+  $('resetPasswordForm')?.classList.toggle('hidden', mode !== 'reset');
+}
+
+function syncRegisterRoleField() {
+  const role = $('regRole')?.value || 'LEARNER';
+  const label = $('regExtraLabel');
+  const input = $('regExtraInput');
+  if (!label || !input) return;
+
+  if (role === 'MENTOR') {
+    label.textContent = 'Спеціалізація ментора';
+    input.placeholder = 'Напр.: Senior Backend & Architecture';
+  } else if (role === 'HR') {
+    label.textContent = 'Назва компанії';
+    input.placeholder = 'Напр.: TechNova Ukraine';
   } else {
-    $('openAuthBtn').classList.remove('hidden');
-    $('userMenu').classList.add('hidden');
-  }
-
-  $('professionList').innerHTML = (professions || [])
-    .map((p) => `<option value="${esc(p)}"></option>`)
-    .join('');
-
-  $('heroAiSla').textContent = kpi.avgAiResponseMs > 0 ? `${kpi.avgAiResponseMs} мс` : '≤ 0.3 с';
-  $('footerKpiText').textContent = `ШІ SLA: ${kpi.avgAiResponseMs} мс • Корисність: ${kpi.aiHelpfulnessPct}%`;
-
-  const learner = getActiveLearner();
-  const tree = getActiveTree(learner);
-  if (tree) {
-    $('heroTrackTitle').textContent = tree.targetProfession;
-    const pct = tree.progress || 0;
-    const circumference = 150.8;
-    const offset = circumference - (pct / 100) * circumference;
-    $('heroRingFill').style.strokeDashoffset = String(offset);
-    $('heroRingText').textContent = `${pct}%`;
+    label.textContent = 'Цільова професія';
+    input.placeholder = 'Напр.: Full-Stack Developer';
   }
 }
 
-function renderRoadmapSection() {
-  const { professions } = state.data;
-  const learner = getActiveLearner();
-  if (!learner) return;
-
-  const tree = getActiveTree(learner);
-  const currentProf = tree?.targetProfession || '';
-
-  $('quickProfessionsRow').innerHTML = (professions || [])
-    .map(
-      (p) =>
-        `<button type="button" class="preset-pill ${p.toLowerCase() === currentProf.toLowerCase() ? 'active' : ''}" data-quick-prof="${esc(p)}">${esc(p)}</button>`
-    )
-    .join('');
-
-  $('treeSelect').innerHTML = learner.skillTrees
-    .map(
-      (t) =>
-        `<option value="${t.id}" ${t.id === state.selectedTreeId ? 'selected' : ''}>${esc(t.targetProfession)} (${LABELS.skillLevel[t.level] || t.level}) — ${t.progress}%</option>`
-    )
-    .join('');
-
-  $('learnerPointsBadge').textContent = `${learner.points} XP`;
-  $('badgesRow').innerHTML =
-    learner.badges.length > 0
-      ? learner.badges.map((b) => `<span class="badge-chip">🏆 ${esc(b)}</span>`).join('')
-      : '<span class="muted">Завершіть першу навичку, щоб отримати бейдж!</span>';
-
-  if (!tree) return;
-
-  $('treeTitle').textContent = tree.targetProfession;
-  $('treeMeta').textContent = `Рівень: ${LABELS.skillLevel[tree.level] || tree.level} • Вузлів: ${tree.nodes.length}`;
-  $('treePercentBadge').textContent = `${tree.progress}%`;
-  $('treeProgressFill').style.width = `${tree.progress}%`;
-
-  const activeNode = getActiveNode(tree);
-  $('nodesList').innerHTML = tree.nodes
-    .map(
-      (node, idx) => `
-      <div class="timeline-item ${activeNode?.id === node.id ? 'selected' : ''}" data-node-id="${node.id}" style="--stagger-i:${idx}">
-        <div class="timeline-left">
-          <span class="node-circle ${node.status}">${node.status === 'DONE' ? '✓' : node.orderNumber}</span>
-          <div>
-            <span class="timeline-title">${esc(node.title)}</span>
-            <span class="timeline-sub">${node.materials.length} матеріал(ів) • ${node.messages.length} запитань ШІ</span>
-          </div>
-        </div>
-        <div class="timeline-right">
-          <span class="status-pill ${node.status}">${LABELS.nodeStatus[node.status] || node.status}</span>
-          <button type="button" class="btn btn-danger btn-sm delete-node-btn" data-delete-node="${node.id}" title="Видалити навичку">✕</button>
-        </div>
-      </div>
-    `
-    )
-    .join('');
-
-  renderNodeStudyPanel(activeNode);
-}
-
-function renderNodeStudyPanel(node) {
-  if (!node) {
-    $('nodeInspectorEmpty').classList.remove('hidden');
-    $('nodeInspectorContent').classList.add('hidden');
-    return;
-  }
-
-  $('nodeInspectorEmpty').classList.add('hidden');
-  $('nodeInspectorContent').classList.remove('hidden');
-
-  const badge = $('activeNodeBadge');
-  badge.textContent = LABELS.nodeStatus[node.status] || node.status;
-  badge.className = `status-pill ${node.status}`;
-
-  $('activeNodeTitle').textContent = `${node.orderNumber}. ${node.title}`;
-  $('activeNodeDesc').textContent = node.description || 'Опис відсутній.';
-
-  const actionsEl = $('nodeActionButtons');
-  if (node.status === 'DONE') {
-    actionsEl.innerHTML = '<span class="status-pill DONE">✓ Навичку засвоєно (+50 XP)</span>';
-  } else if (node.status === 'IN_PROGRESS') {
-    actionsEl.innerHTML =
-      '<button type="button" id="completeNodeBtn" class="btn btn-success btn-sm">✓ Завершити навичку (+50 XP)</button>';
-  } else {
-    actionsEl.innerHTML = `
-      <button type="button" id="startNodeBtn" class="btn btn-secondary btn-sm">▶ Почати вивчення</button>
-      <button type="button" id="completeNodeBtn" class="btn btn-success btn-sm">✓ Завершити (+50 XP)</button>
-    `;
-  }
-
-  $('materialsCount').textContent = `${node.materials.length} матеріал(ів)`;
-  const materialsEl = $('nodeMaterialsList');
-  if (node.materials.length === 0) {
-    materialsEl.innerHTML = '<div class="muted">Матеріалів поки немає. Ментор може додати урок до цього вузла.</div>';
-  } else {
-    materialsEl.innerHTML = node.materials
-      .map((m, idx) => {
-        const hasValidUrl = m.url && /^https?:\/\//i.test(m.url);
-        return `
-        <div class="material-card" style="--stagger-i:${idx}">
-          <div class="material-meta">
-            <span class="muted" style="font-size:0.75rem;">${LABELS.materialType[m.type] || m.type}</span>
-            <strong>${esc(m.title)}</strong>
-            ${m.description ? `<span class="muted">${esc(m.description)}</span>` : ''}
-          </div>
-          <div class="material-actions">
-            <button type="button" class="btn btn-primary btn-sm open-lesson-btn" data-material-id="${m.id}">📖 Читати урок</button>
-            ${
-              hasValidUrl
-                ? `<a href="${esc(m.url)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Джерело ↗</a>`
-                : ''
-            }
-          </div>
-        </div>
-      `;
-      })
-      .join('');
-  }
-
-  const chatEl = $('chatMessages');
-  if (node.messages.length === 0) {
-    chatEl.innerHTML =
-      '<div class="muted">Історія діалогу порожня. Натисніть швидку підказку вище або запитайте будь-що по темі!</div>';
-  } else {
-    chatEl.innerHTML = node.messages
-      .map(
-        (msg) => `
-      <div class="chat-turn">
-        <div class="bubble-user">${esc(msg.question)}</div>
-        <div class="bubble-ai">
-          <div class="bubble-ai-body">${formatRichText(msg.answer)}</div>
-          <div class="bubble-footer">
-            <span>⏱ Час відповіді: ${msg.responseTimeMs} мс</span>
-            <div class="rate-group">
-              <button type="button" class="rate-btn ${msg.isHelpful === true ? 'active-good' : ''}" data-rate-msg="${msg.id}" data-helpful="true">👍 Корисно</button>
-              <button type="button" class="rate-btn ${msg.isHelpful === false ? 'active-bad' : ''}" data-rate-msg="${msg.id}" data-helpful="false">👎 Некорисно</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `
-      )
-      .join('');
-    chatEl.scrollTop = chatEl.scrollHeight;
-  }
-}
-
-function renderMentorsSection() {
-  const { mentors, learners, sessions, receipts } = state.data;
-  const learner = getActiveLearner();
-  const mentorUser = getActiveMentor();
-
-  $('mentorsDirectoryGrid').innerHTML = mentors
-    .map(
-      (m, idx) => `
-      <div class="mentor-card" style="--stagger-i:${idx}">
-        <div class="mentor-card-top">
-          <div class="avatar-circle">${getInitials(m.fullName)}</div>
-          <div>
-            <strong>${esc(m.fullName)}</strong>
-            <div class="muted">${esc(m.specialization)} • ★ ${m.rating} • <strong>${m.hourlyRate} ₴/год</strong></div>
-          </div>
-        </div>
-        <p class="muted">${esc(m.bio)}</p>
-        <button type="button" class="btn btn-secondary btn-sm select-mentor-book-btn" data-mentor-id="${m.id}">Забронювати консультацію</button>
-      </div>
-    `
-    )
-    .join('');
-
-  $('bookingMentorSelect').innerHTML = mentors
-    .map(
-      (m) =>
-        `<option value="${m.id}">${esc(m.fullName)} — ${esc(m.specialization)} (${m.hourlyRate} ₴/год, ★ ${m.rating})</option>`
-    )
-    .join('');
-
-  // Show mentor self-cabinet if logged in as MENTOR
-  if (mentorUser) {
-    $('mentorCabinetPanel').classList.remove('hidden');
-    $('mentorProfileSummary').innerHTML = `
-      <span><strong>Ментор:</strong> ${esc(mentorUser.fullName)}</span>
-      <span><strong>Спеціалізація:</strong> ${esc(mentorUser.specialization)}</span>
-      <span><strong>Рейтинг:</strong> ★ ${mentorUser.rating}</span>
-    `;
-
-    const nodeOptions = [];
-    for (const l of learners) {
-      for (const t of l.skillTrees) {
-        for (const n of t.nodes) {
-          nodeOptions.push(
-            `<option value="${n.id}">${esc(l.fullName)} → ${esc(t.targetProfession)} → ${n.orderNumber}. ${esc(n.title)}</option>`
-          );
-        }
-      }
-    }
-    $('mentorNodeSelect').innerHTML = nodeOptions.join('');
-
-    const mentorSessions = sessions.filter((s) => s.mentorId === mentorUser.id);
-    const mEl = $('mentorSessionsList');
-    mEl.innerHTML =
-      mentorSessions.length === 0
-        ? '<div class="muted">Немає вхідних бронювань.</div>'
-        : mentorSessions
-            .map((s) => {
-              const l = learners.find((x) => x.id === s.learnerId);
-              const dateStr = new Date(s.startAt).toLocaleString('uk-UA');
-              return `
-                <div class="session-item">
-                  <div class="session-item-top">
-                    <div>
-                      <strong>${esc(s.topic)}</strong>
-                      <div class="muted">Студент: ${esc(l?.fullName ?? s.learnerId)} • ${esc(dateStr)} • ${s.price} ₴</div>
-                    </div>
-                    <div style="display:flex;gap:0.35rem;">
-                      <span class="status-pill ${s.status}">${LABELS.sessionStatus[s.status] || s.status}</span>
-                      <span class="status-pill ${s.paymentStatus}">${LABELS.paymentStatus[s.paymentStatus] || s.paymentStatus}</span>
-                    </div>
-                  </div>
-                  ${
-                    s.status === 'BOOKED'
-                      ? `<div class="session-item-actions"><button type="button" class="btn btn-primary btn-sm confirm-session-btn" data-session-id="${s.id}">✓ Підтвердити сесію</button></div>`
-                      : ''
-                  }
-                </div>
-              `;
-            })
-            .join('');
-  } else {
-    $('mentorCabinetPanel').classList.add('hidden');
-  }
-
-  // Learner sessions list
-  const learnerSessions = learner ? sessions.filter((s) => s.learnerId === learner.id) : [];
-  const el = $('learnerSessionsList');
-  if (learnerSessions.length === 0) {
-    el.innerHTML = '<div class="muted">Поки що немає заброньованих сесій.</div>';
-    return;
-  }
-
-  el.innerHTML = learnerSessions
-    .map((s) => {
-      const mentor = mentors.find((m) => m.id === s.mentorId);
-      const receipt = receipts.find((r) => r.sessionId === s.id);
-      const dateStr = new Date(s.startAt).toLocaleString('uk-UA');
-      const canPay = s.paymentStatus === 'PENDING' && s.status !== 'CANCELLED';
-      const canFeedback = s.paymentStatus === 'PAID' && s.status !== 'CANCELLED' && s.rating === null;
-      const canCancel = s.status !== 'CANCELLED' && s.status !== 'DONE';
-
-      return `
-        <div class="session-item">
-          <div class="session-item-top">
-            <div>
-              <strong>${esc(s.topic)}</strong>
-              <div class="muted">Ментор: ${esc(mentor?.fullName ?? s.mentorId)} • ${esc(dateStr)} • ${s.durationMin} хв • <strong>${s.price} ₴</strong></div>
-            </div>
-            <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
-              <span class="status-pill ${s.status}">${LABELS.sessionStatus[s.status] || s.status}</span>
-              <span class="status-pill ${s.paymentStatus}">${LABELS.paymentStatus[s.paymentStatus] || s.paymentStatus}</span>
-            </div>
-          </div>
-          ${s.rating !== null ? `<div class="muted">Ваш відгук: ★ ${s.rating}/5 — «${esc(s.feedback)}»</div>` : ''}
-          <div class="session-item-actions">
-            ${canPay ? `<button type="button" class="btn btn-primary btn-sm open-checkout-btn" data-session-id="${s.id}">💳 Оплатити сесію</button>` : ''}
-            ${receipt ? `<button type="button" class="btn btn-secondary btn-sm view-receipt-btn" data-session-id="${s.id}">🧾 Квитанція</button>` : ''}
-            ${canCancel ? `<button type="button" class="btn btn-danger btn-sm cancel-session-btn" data-session-id="${s.id}">Скасувати</button>` : ''}
-            ${
-              canFeedback
-                ? `
-              <form class="inline-form feedback-form" data-session-id="${s.id}" style="width:100%;margin-top:0.35rem;">
-                <select name="rating" style="max-width:90px;">
-                  <option value="5">★ 5</option>
-                  <option value="4">★ 4</option>
-                  <option value="3">★ 3</option>
-                  <option value="2">★ 2</option>
-                  <option value="1">★ 1</option>
-                </select>
-                <input name="feedback" type="text" placeholder="Залиште враження від консультації..." required />
-                <button type="submit" class="btn btn-success btn-sm">Надіслати відгук</button>
-              </form>
-            `
-                : ''
-            }
-          </div>
-        </div>
-      `;
-    })
-    .join('');
-}
-
-function renderB2bSection() {
-  const { teams, learners } = state.data;
-
-  $('teamSelect').innerHTML = teams
-    .map(
-      (t) =>
-        `<option value="${t.id}" ${t.id === state.selectedTeamId ? 'selected' : ''}>${esc(t.name)}</option>`
-    )
-    .join('');
-
-  $('hrLearnerSelect').innerHTML = learners
-    .map((l) => `<option value="${l.id}">${esc(l.fullName)} (${esc(l.targetProfession)})</option>`)
-    .join('');
-  $('addMemberLearnerSelect').innerHTML = learners
-    .map((l) => `<option value="${l.id}">${esc(l.fullName)}</option>`)
-    .join('');
-
-  const team = teams.find((t) => t.id === state.selectedTeamId) || teams[0];
-  if (!team) return;
-
-  const matrix = team.detailedMatrix;
-  const profEntries = Object.entries(matrix.professionAverages || {});
-  $('skillMatrixBars').innerHTML =
-    profEntries.length === 0
-      ? '<div class="muted">Немає даних для побудови матриці.</div>'
-      : profEntries
-          .map(
-            ([prof, pct]) => `
-        <div>
-          <div class="matrix-item-head"><strong>${esc(prof)}</strong><span>${pct}%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-        </div>
-      `
-          )
-          .join('');
-
-  const nodeEntries = Object.entries(matrix.skillNodeAverages || {}).slice(0, 8);
-  $('nodeMatrixBars').innerHTML = nodeEntries
-    .map(
-      ([skill, pct]) => `
-      <div>
-        <div class="matrix-item-head"><span>${esc(skill)}</span><span>${pct}%</span></div>
-        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-      </div>
-    `
-    )
-    .join('');
-
-  $('hrMembersTableBody').innerHTML = (matrix.members || [])
-    .map(
-      (m) => `
-      <tr>
-        <td>${m.learnerId}</td>
-        <td><strong>${esc(m.fullName)}</strong></td>
-        <td>${esc(m.email)}</td>
-        <td>${esc(m.targetProfession)}</td>
-        <td><span class="status-pill">${esc(LABELS.skillLevel[m.level] || m.level)}</span></td>
-        <td>${m.treesCount}</td>
-        <td>${m.doneNodes}/${m.totalNodes}</td>
-        <td><strong>${m.progressPct}%</strong></td>
-        <td>${m.points} XP</td>
-      </tr>
-    `
-    )
-    .join('');
+async function loadState() {
+  state.data = await api('/api/state');
+  renderAll();
 }
 
 function renderAll() {
   if (!state.data) return;
   renderNavbarAndHero();
-  renderRoadmapSection();
-  renderMentorsSection();
-  renderB2bSection();
+  renderRoadmapPage();
+  renderMentorsPage();
+  renderMentorCabinetPage();
+  renderB2bPage();
+  renderProfilePage();
 }
 
-async function refreshState() {
-  const data = await api('/api/state');
-  syncSelectionsFromData(data);
-  renderAll();
+function renderNavbarAndHero() {
+  const user = state.data.currentUser;
+  const openAuthBtn = $('openAuthBtn');
+  const userMenu = $('userMenu');
+  const navProfileLink = $('navProfileLink');
+
+  if (user) {
+    openAuthBtn?.classList.add('hidden');
+    userMenu?.classList.remove('hidden');
+    navProfileLink?.classList.remove('hidden');
+    if ($('navAvatar')) $('navAvatar').textContent = getInitials(user.fullName);
+    if ($('navUserName')) $('navUserName').textContent = user.fullName;
+  } else {
+    openAuthBtn?.classList.remove('hidden');
+    userMenu?.classList.add('hidden');
+    navProfileLink?.classList.add('hidden');
+  }
+
+  const learner = getActiveLearner();
+  const tree = learner?.skillTrees?.[0] || null;
+  const progress = tree ? Number(tree.progress || 0) : 0;
+
+  if ($('heroTrackTitle') && tree) {
+    $('heroTrackTitle').textContent = tree.targetProfession || tree.title;
+  }
+  if ($('heroRingText')) {
+    $('heroRingText').textContent = `${Math.round(progress)}%`;
+  }
+  if ($('heroRingFill')) {
+    const circumference = 163.36;
+    const offset = circumference * (1 - Math.max(0, Math.min(100, progress)) / 100);
+    $('heroRingFill').setAttribute('stroke-dashoffset', offset.toFixed(2));
+  }
+
+  const avgMs = state.data.kpi?.avgAiResponseMs ?? 180;
+  const helpfulPct = state.data.kpi?.aiHelpfulnessPct ?? 100;
+  if ($('heroAiSla')) {
+    $('heroAiSla').textContent = `${avgMs} мс`;
+  }
+  if ($('footerKpiText')) {
+    $('footerKpiText').textContent = `Середня відповідь ШІ: ${avgMs} мс • Корисність порад: ${helpfulPct}% • Студентів: ${state.data.learners.length}`;
+  }
 }
 
-function openMaterialModal(materialId) {
+function renderRoadmapPage() {
+  const learner = getActiveLearner();
+  const treeSelect = $('treeSelect');
+  const quickRow = $('quickProfessionsRow');
+
+  if (quickRow) {
+    const professions = (state.data.professions || []).slice(0, 6);
+    quickRow.innerHTML = professions
+      .map(
+        (prof) =>
+          `<button type="button" class="quick-chip" data-quick-profession="${escapeHtml(prof)}">${escapeHtml(prof)}</button>`
+      )
+      .join('');
+  }
+
+  if (!learner) return;
+
+  const trees = learner.skillTrees || [];
+  if (treeSelect) {
+    treeSelect.innerHTML = trees
+      .map(
+        (t) =>
+          `<option value="${t.id}">${escapeHtml(t.targetProfession)} (${escapeHtml(t.level)}) — ${Math.round(t.progress)}%</option>`
+      )
+      .join('');
+    const activeTree = getActiveTree(learner);
+    if (activeTree) treeSelect.value = String(activeTree.id);
+  }
+
+  const tree = getActiveTree(learner);
+  if (!tree) {
+    if ($('treeTitle')) $('treeTitle').textContent = 'Карту ще не створено';
+    if ($('nodesList')) $('nodesList').innerHTML = '<p class="muted-text">Натисніть «✨ Нова ШІ-карта», щоб згенерувати маршрут.</p>';
+    $('nodeInspectorEmpty')?.classList.remove('hidden');
+    $('nodeInspectorContent')?.classList.add('hidden');
+    return;
+  }
+
+  if ($('treeTitle')) $('treeTitle').textContent = tree.title || tree.targetProfession;
+  if ($('treeMeta')) {
+    $('treeMeta').textContent = `Студент: ${learner.fullName} • Рівень: ${tree.level} • Вузлів: ${tree.nodes.length}`;
+  }
+  if ($('learnerPointsBadge')) $('learnerPointsBadge').textContent = `${learner.points} XP`;
+  if ($('treePercentBadge')) $('treePercentBadge').textContent = `${Math.round(tree.progress)}%`;
+  if ($('treeProgressFill')) $('treeProgressFill').style.width = `${tree.progress}%`;
+
+  if ($('badgesRow')) {
+    $('badgesRow').innerHTML = (learner.badges || []).length
+      ? learner.badges.map((b) => `<span class="st-badge st-badge-warning">🏆 ${escapeHtml(b)}</span>`).join('')
+      : '<span class="muted-text">Завершіть перший вузол, щоб отримати бейджі.</span>';
+  }
+
+  const activeNode = getActiveNode(tree);
+
+  if ($('nodesList')) {
+    $('nodesList').innerHTML = tree.nodes
+      .map((node) => {
+        const isSelected = activeNode && activeNode.id === node.id;
+        return `
+          <div class="node-item ${isSelected ? 'active' : ''}" data-node-id="${node.id}" role="button" tabindex="0">
+            <div class="node-item-main">
+              <strong>${node.orderNumber}. ${escapeHtml(node.title)}</strong>
+              <small>${node.materials.length} матеріал(ів) • ${node.messages.length} повідомлень ШІ</small>
+            </div>
+            <div class="node-item-right">
+              <span class="st-badge ${getStatusBadgeClass(node.status)}">${escapeHtml(node.status)}</span>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  renderNodeInspector(tree, activeNode);
+}
+
+function renderNodeInspector(tree, node) {
+  if (!node) {
+    $('nodeInspectorEmpty')?.classList.remove('hidden');
+    $('nodeInspectorContent')?.classList.add('hidden');
+    return;
+  }
+
+  $('nodeInspectorEmpty')?.classList.add('hidden');
+  $('nodeInspectorContent')?.classList.remove('hidden');
+
+  if ($('activeNodeBadge')) {
+    $('activeNodeBadge').textContent = node.status;
+    $('activeNodeBadge').className = `st-badge ${getStatusBadgeClass(node.status)}`;
+  }
+  if ($('activeNodeTitle')) $('activeNodeTitle').textContent = `${node.orderNumber}. ${node.title}`;
+  if ($('activeNodeDesc')) $('activeNodeDesc').textContent = node.description || 'Опис теми відсутній.';
+
+  if ($('nodeActionButtons')) {
+    const canRemove = tree.nodes.length > 1;
+    $('nodeActionButtons').innerHTML = `
+      ${
+        node.status === 'NOT_STARTED'
+          ? `<button type="button" class="st-btn st-btn-outline st-btn-sm" data-node-status="IN_PROGRESS">▶ Розпочати</button>`
+          : ''
+      }
+      ${
+        node.status !== 'DONE'
+          ? `<button type="button" class="st-btn st-btn-primary st-btn-sm" data-node-status="DONE">✓ Завершити (+50 XP)</button>`
+          : `<span class="st-badge st-badge-success">✓ Виконано</span>`
+      }
+      <button type="button" class="st-btn st-btn-danger st-btn-sm" id="deleteNodeBtn" ${canRemove ? '' : 'disabled title="Останній вузол карти видалити не можна"'}>🗑 Видалити</button>
+    `;
+  }
+
+  const materials = node.materials || [];
+  if ($('materialsCount')) $('materialsCount').textContent = String(materials.length);
+  if ($('nodeMaterialsList')) {
+    $('nodeMaterialsList').innerHTML = materials.length
+      ? materials
+          .map(
+            (m) => `
+          <div class="material-item">
+            <div class="material-item-info">
+              <span class="st-badge st-badge-accent">${escapeHtml(m.type)}</span>
+              <strong>${escapeHtml(m.title)}</strong>
+              <small>${escapeHtml(m.description || 'Навчальний матеріал модуля')}</small>
+            </div>
+            <button type="button" class="st-btn st-btn-outline st-btn-sm" data-open-material="${m.id}">Читати урок</button>
+          </div>
+        `
+          )
+          .join('')
+      : '<p class="muted-text">У цьому вузлі ще немає матеріалів. Ментор або ви можете додати їх.</p>';
+  }
+
+  const messages = node.messages || [];
+  if ($('chatMessages')) {
+    $('chatMessages').innerHTML = messages.length
+      ? messages
+          .map(
+            (msg) => `
+          <div class="chat-entry">
+            <div class="chat-q">${escapeHtml(msg.question)}</div>
+            <div class="chat-a">
+              <div>${escapeHtml(msg.answer)}</div>
+              <div class="chat-meta">
+                <span>⚡ Відповідь за ${msg.responseTimeMs} мс</span>
+                <div class="chat-rate-btns">
+                  <button type="button" class="st-btn st-btn-ghost st-btn-sm ${msg.isHelpful === true ? 'st-badge-success' : ''}" data-rate-msg="${msg.id}" data-helpful="true">👍 ${msg.isHelpful === true ? 'Корисно' : ''}</button>
+                  <button type="button" class="st-btn st-btn-ghost st-btn-sm ${msg.isHelpful === false ? 'st-badge-danger' : ''}" data-rate-msg="${msg.id}" data-helpful="false">👎</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+          )
+          .join('')
+      : '<p class="muted-text">Історія діалогу порожня. Поставте перше запитання ШІ-тьютору нижче.</p>';
+  }
+
+  const avgMs = state.data.kpi?.avgAiResponseMs ?? 180;
+  if ($('aiSlaBadge')) {
+    $('aiSlaBadge').textContent = `Сер. ${avgMs} мс (SLA ≤ 5000 мс)`;
+  }
+}
+
+function openMaterialReader(materialId) {
   const learner = getActiveLearner();
   const tree = getActiveTree(learner);
   const node = getActiveNode(tree);
-  const material = node?.materials.find((m) => m.id === materialId);
+  const material = node?.materials?.find((m) => m.id === materialId);
   if (!material) return;
 
-  $('modalMaterialType').textContent = LABELS.materialType[material.type] || material.type;
-  $('modalMaterialTitle').textContent = material.title;
-  $('modalMaterialDesc').textContent = material.description || '';
-
-  const bodyText =
-    material.content && material.content.trim()
-      ? material.content
-      : `Матеріал «${material.title}» прикріплений до навички «${node.title}».\n\n${material.description || 'Скористайтеся ШІ-асистентом для детального розбору.'}`;
-  $('modalMaterialBody').innerHTML = formatRichText(bodyText);
-
-  const extBtn = $('modalMaterialExternalLink');
-  if (material.url && /^https?:\/\//i.test(material.url)) {
-    extBtn.href = material.url;
-    extBtn.classList.remove('hidden');
-  } else {
-    extBtn.classList.add('hidden');
+  const author = (state.data.users || []).find((u) => u.id === material.authorId);
+  if ($('materialModalType')) $('materialModalType').textContent = material.type;
+  if ($('materialModalTitle')) $('materialModalTitle').textContent = material.title;
+  if ($('materialModalAuthor')) {
+    $('materialModalAuthor').textContent = author ? `Автор: ${author.fullName}` : 'Вбудована бібліотека SkillTree AI';
+  }
+  if ($('materialModalDesc')) $('materialModalDesc').textContent = material.description || '';
+  if ($('materialModalBody')) {
+    $('materialModalBody').textContent =
+      material.content ||
+      `Цей ресурс (${material.type}) підготовлено для поглибленого вивчення теми «${node.title}».`;
   }
 
-  $('materialModal').classList.remove('hidden');
+  const extBtn = $('materialModalExternal');
+  if (extBtn) {
+    if (material.url) {
+      extBtn.href = material.url;
+      extBtn.classList.remove('hidden');
+    } else {
+      extBtn.classList.add('hidden');
+    }
+  }
+
+  openModal('materialModal');
 }
 
-function openCheckoutModal(sessionId) {
-  const session = state.data.sessions.find((s) => s.id === sessionId);
-  const mentor = state.data.mentors.find((m) => m.id === session?.mentorId);
-  if (!session) return;
-  state.checkoutSessionId = sessionId;
+function renderMentorsPage() {
+  const mentors = state.data.mentors || [];
+  const learners = state.data.learners || [];
+  const learner = getActiveLearner();
 
-  $('checkoutSummary').innerHTML = `
-    <div><strong>Послуга:</strong> ${esc(session.topic)}</div>
-    <div><strong>Ментор:</strong> ${esc(mentor?.fullName || session.mentorId)}</div>
-    <div><strong>Тривалість:</strong> ${session.durationMin} хвилин</div>
-    <div><strong>Сума до сплати:</strong> <span style="color:var(--primary);font-weight:700;">${session.price} UAH</span></div>
-  `;
-  $('paymentModal').classList.remove('hidden');
+  if ($('mentorsDirectoryGrid')) {
+    $('mentorsDirectoryGrid').innerHTML = mentors
+      .map(
+        (m) => `
+        <article class="st-card mentor-card">
+          <div class="mentor-card-head">
+            <div>
+              <span class="st-badge st-badge-accent">Верифікований ментор</span>
+              <h3>${escapeHtml(m.fullName)}</h3>
+            </div>
+            <span class="st-badge st-badge-warning">★ ${Number(m.rating || 5).toFixed(1)}</span>
+          </div>
+          <p class="muted-text"><strong>${escapeHtml(m.specialization)}</strong></p>
+          <p class="mentor-card-bio">${escapeHtml(m.bio)}</p>
+          <div class="mentor-card-foot">
+            <strong>${m.hourlyRate} ₴ / год</strong>
+            <button type="button" class="st-btn st-btn-outline st-btn-sm" data-select-mentor="${m.id}">Обрати ментора</button>
+          </div>
+        </article>
+      `
+      )
+      .join('');
+  }
+
+  const mentorSelect = $('bookingMentorSelect');
+  if (mentorSelect) {
+    const prev = mentorSelect.value;
+    mentorSelect.innerHTML = mentors
+      .map((m) => `<option value="${m.id}">${escapeHtml(m.fullName)} — ${escapeHtml(m.specialization)} (${m.hourlyRate} ₴/год)</option>`)
+      .join('');
+    if (prev && mentors.some((m) => String(m.id) === prev)) {
+      mentorSelect.value = prev;
+    }
+  }
+
+  const startInput = $('bookingStartAt');
+  if (startInput && !startInput.value) {
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    tomorrow.setHours(11, 0, 0, 0);
+    startInput.value = tomorrow.toISOString().slice(0, 16);
+  }
+
+  const sessionsList = $('learnerSessionsList');
+  if (!sessionsList || !learner) return;
+
+  const sessions = (state.data.sessions || []).filter((s) => s.learnerId === learner.id);
+  const receipts = state.data.receipts || [];
+
+  sessionsList.innerHTML = sessions.length
+    ? sessions
+        .map((s) => {
+          const mentor = mentors.find((m) => m.id === s.mentorId);
+          const hasReceipt = receipts.some((r) => r.sessionId === s.id);
+          const dateLabel = new Date(s.startAt).toLocaleString('uk-UA');
+          return `
+            <div class="session-card">
+              <div class="session-card-head">
+                <div>
+                  <strong>${escapeHtml(s.topic)}</strong>
+                  <div class="muted-text">Ментор: ${escapeHtml(mentor?.fullName || `#${s.mentorId}`)} • ${dateLabel} • ${s.durationMin} хв • ${s.price} ₴</div>
+                </div>
+                <div class="session-card-badges">
+                  <span class="st-badge ${getStatusBadgeClass(s.status)}">${escapeHtml(s.status)}</span>
+                  <span class="st-badge ${getStatusBadgeClass(s.paymentStatus)}">${escapeHtml(s.paymentStatus)}</span>
+                </div>
+              </div>
+              ${
+                s.rating
+                  ? `<div class="muted-text">Ваша оцінка: ★ ${s.rating}/5 ${s.feedback ? `— «${escapeHtml(s.feedback)}»` : ''}</div>`
+                  : ''
+              }
+              <div class="session-card-actions">
+                ${
+                  s.status !== 'CANCELLED' && s.paymentStatus === 'PENDING'
+                    ? `<button type="button" class="st-btn st-btn-primary st-btn-sm" data-open-pay="${s.id}">💳 Оплатити ${s.price} ₴</button>`
+                    : ''
+                }
+                ${
+                  hasReceipt || s.paymentStatus === 'PAID'
+                    ? `<button type="button" class="st-btn st-btn-outline st-btn-sm" data-view-receipt="${s.id}">🧾 Квитанція</button>`
+                    : ''
+                }
+                ${
+                  s.paymentStatus === 'PAID' && s.status !== 'DONE' && s.status !== 'CANCELLED'
+                    ? `
+                      <form class="inline-form-row" data-feedback-form="${s.id}">
+                        <select name="rating" class="st-input" style="width:auto">
+                          <option value="5">5 ★</option>
+                          <option value="4">4 ★</option>
+                          <option value="3">3 ★</option>
+                          <option value="2">2 ★</option>
+                          <option value="1">1 ★</option>
+                        </select>
+                        <input name="comment" type="text" class="st-input" placeholder="Короткий відгук..." required />
+                        <button type="submit" class="st-btn st-btn-outline st-btn-sm">Оцінити</button>
+                      </form>
+                    `
+                    : ''
+                }
+                ${
+                  s.status !== 'DONE' && s.status !== 'CANCELLED'
+                    ? `<button type="button" class="st-btn st-btn-danger st-btn-sm" data-cancel-session="${s.id}">Скасувати</button>`
+                    : ''
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join('')
+    : `<p class="muted-text">У студента ${escapeHtml(learner.fullName)} поки що немає заброньованих сесій.</p>`;
+
+  if (learners.length === 0) {
+    sessionsList.innerHTML = '<p class="muted-text">Немає активних студентів.</p>';
+  }
 }
 
-function openReceiptModal(sessionId) {
-  const receipt = state.data.receipts.find((r) => r.sessionId === sessionId);
-  const session = state.data.sessions.find((s) => s.id === sessionId);
-  if (!receipt || !session) return;
+function renderMentorCabinetPage() {
+  const user = state.data.currentUser;
+  const notice = $('mentorGuestNotice');
+  const content = $('mentorCabinetContent');
 
-  $('receiptDetails').innerHTML = `
-    <div><strong>Номер транзакції:</strong> <code>${esc(receipt.transactionId)}</code></div>
-    <div><strong>Призначення:</strong> ${esc(session.topic)}</div>
-    <div><strong>Сума:</strong> ${receipt.amount} ${esc(receipt.currency)}</div>
-    <div><strong>Статус платежу:</strong> ${LABELS.paymentStatus[receipt.status] || receipt.status}</div>
-    <div><strong>Дата оплати:</strong> ${esc(new Date(receipt.processedAt).toLocaleString('uk-UA'))}</div>
-  `;
-  $('receiptModal').classList.remove('hidden');
+  if (!user || user.role !== 'MENTOR') {
+    notice?.classList.remove('hidden');
+    content?.classList.add('hidden');
+    return;
+  }
+
+  notice?.classList.add('hidden');
+  content?.classList.remove('hidden');
+
+  const mentor = (state.data.mentors || []).find((m) => m.id === user.id) || user;
+  const sessions = (state.data.sessions || []).filter((s) => s.mentorId === mentor.id);
+  const confirmedCount = sessions.filter((s) => s.status === 'CONFIRMED' || s.status === 'DONE').length;
+
+  if ($('mentorProfileSummary')) {
+    $('mentorProfileSummary').innerHTML = `
+      <div class="st-card kpi-mini-card">
+        <span>Спеціалізація</span>
+        <strong>${escapeHtml(mentor.specialization || 'ІТ-ментор')}</strong>
+      </div>
+      <div class="st-card kpi-mini-card">
+        <span>Рейтинг ментора</span>
+        <strong>★ ${Number(mentor.rating || 5).toFixed(2)}</strong>
+      </div>
+      <div class="st-card kpi-mini-card">
+        <span>Вартість сесії</span>
+        <strong>${mentor.hourlyRate ?? 800} ₴ / год</strong>
+      </div>
+      <div class="st-card kpi-mini-card">
+        <span>Сесій / Матеріалів</span>
+        <strong>${confirmedCount} / ${mentor.publishedMaterialsCount ?? 0}</strong>
+      </div>
+    `;
+  }
+
+  const nodeSelect = $('mentorNodeSelect');
+  if (nodeSelect) {
+    const options = [];
+    for (const learner of state.data.learners || []) {
+      for (const tree of learner.skillTrees || []) {
+        for (const node of tree.nodes || []) {
+          options.push(
+            `<option value="${node.id}">${escapeHtml(learner.fullName)} — ${escapeHtml(tree.targetProfession)}: #${node.orderNumber} ${escapeHtml(node.title)}</option>`
+          );
+        }
+      }
+    }
+    nodeSelect.innerHTML = options.length
+      ? options.join('')
+      : '<option value="">Немає доступних вузлів</option>';
+  }
+
+  const mentorSessions = $('mentorSessionsList');
+  if (mentorSessions) {
+    mentorSessions.innerHTML = sessions.length
+      ? sessions
+          .map((s) => {
+            const learner = (state.data.learners || []).find((l) => l.id === s.learnerId);
+            return `
+              <div class="session-card">
+                <div class="session-card-head">
+                  <div>
+                    <strong>${escapeHtml(s.topic)}</strong>
+                    <div class="muted-text">Студент: ${escapeHtml(learner?.fullName || `#${s.learnerId}`)} • ${new Date(s.startAt).toLocaleString('uk-UA')} • ${s.durationMin} хв (${s.price} ₴)</div>
+                  </div>
+                  <div class="session-card-badges">
+                    <span class="st-badge ${getStatusBadgeClass(s.status)}">${escapeHtml(s.status)}</span>
+                    <span class="st-badge ${getStatusBadgeClass(s.paymentStatus)}">${escapeHtml(s.paymentStatus)}</span>
+                  </div>
+                </div>
+                <div class="session-card-actions">
+                  ${
+                    s.status === 'BOOKED'
+                      ? `<button type="button" class="st-btn st-btn-primary st-btn-sm" data-confirm-session="${s.id}">✓ Підтвердити сесію</button>`
+                      : ''
+                  }
+                  ${
+                    s.status !== 'DONE' && s.status !== 'CANCELLED'
+                      ? `<button type="button" class="st-btn st-btn-danger st-btn-sm" data-cancel-session="${s.id}">Скасувати</button>`
+                      : ''
+                  }
+                </div>
+              </div>
+            `;
+          })
+          .join('')
+      : '<p class="muted-text">Наразі вхідних бронювань немає.</p>';
+  }
 }
 
-function openProfileModal() {
-  const user = getCurrentUser();
-  if (!user) return;
-  $('profFullName').value = user.fullName;
+function renderB2bPage() {
+  const teams = state.data.teams || [];
+  const learners = state.data.learners || [];
+  const professions = state.data.professions || [];
 
-  const extraContainer = $('profRoleFields');
+  if ($('professionList')) {
+    $('professionList').innerHTML = professions.map((p) => `<option value="${escapeHtml(p)}"></option>`).join('');
+  }
+
+  const learnerOpts = learners
+    .map((l) => `<option value="${l.id}">${escapeHtml(l.fullName)} (${escapeHtml(l.targetProfession)})</option>`)
+    .join('');
+  if ($('hrLearnerSelect')) $('hrLearnerSelect').innerHTML = learnerOpts;
+  if ($('addMemberLearnerSelect')) $('addMemberLearnerSelect').innerHTML = learnerOpts;
+
+  const teamSelect = $('teamSelect');
+  if (teamSelect) {
+    teamSelect.innerHTML = teams
+      .map((t) => `<option value="${t.id}">${escapeHtml(t.name)} (${t.memberIds.length} учасн.)</option>`)
+      .join('');
+    if (!teams.some((t) => t.id === state.selectedTeamId) && teams.length > 0) {
+      state.selectedTeamId = teams[0].id;
+    }
+    if (state.selectedTeamId) teamSelect.value = String(state.selectedTeamId);
+  }
+
+  const team = teams.find((t) => t.id === state.selectedTeamId) || teams[0];
+  if (!team) return;
+
+  const matrix = team.detailedMatrix || {
+    professionAverages: team.skillMatrix || {},
+    skillNodeAverages: {},
+    members: [],
+  };
+
+  const renderBars = (containerId, entries) => {
+    const el = $(containerId);
+    if (!el) return;
+    if (!entries.length) {
+      el.innerHTML = '<p class="muted-text">У команді ще немає призначених карт розвитку.</p>';
+      return;
+    }
+    el.innerHTML = entries
+      .map(
+        ([label, pct]) => `
+        <div class="matrix-row">
+          <div class="matrix-row-head">
+            <span>${escapeHtml(label)}</span>
+            <strong>${Number(pct).toFixed(1)}%</strong>
+          </div>
+          <div class="matrix-track">
+            <div class="matrix-fill" style="width: ${Math.min(100, Number(pct))}%"></div>
+          </div>
+        </div>
+      `
+      )
+      .join('');
+  };
+
+  renderBars('skillMatrixBars', Object.entries(matrix.professionAverages || {}));
+  renderBars('nodeMatrixBars', Object.entries(matrix.skillNodeAverages || {}).slice(0, 8));
+
+  const tbody = $('hrMembersTableBody');
+  if (tbody) {
+    tbody.innerHTML = matrix.members.length
+      ? matrix.members
+          .map(
+            (m) => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(m.fullName)}</strong>
+              <div class="muted-text">${escapeHtml(m.email)}</div>
+            </td>
+            <td>${escapeHtml(m.targetProfession)}</td>
+            <td><span class="st-badge">${escapeHtml(m.level)}</span></td>
+            <td>${m.treesCount}</td>
+            <td>${m.doneNodes}/${m.totalNodes}</td>
+            <td><strong>${m.progressPct.toFixed(1)}%</strong></td>
+            <td>${m.points} XP</td>
+          </tr>
+        `
+          )
+          .join('')
+      : '<tr><td colspan="7" class="muted-text">У цій команді поки що немає учасників.</td></tr>';
+  }
+}
+
+function renderProfilePage() {
+  const user = state.data.currentUser;
+  const notice = $('profileGuestNotice');
+  const content = $('profilePageContent');
+
+  if (!user) {
+    notice?.classList.remove('hidden');
+    content?.classList.add('hidden');
+    return;
+  }
+
+  notice?.classList.add('hidden');
+  content?.classList.remove('hidden');
+
+  if ($('profilePageAvatar')) $('profilePageAvatar').textContent = getInitials(user.fullName);
+  if ($('profilePageName')) $('profilePageName').textContent = user.fullName;
+  if ($('profilePageRole')) $('profilePageRole').textContent = getRoleLabel(user.role);
+  if ($('profilePageEmail')) $('profilePageEmail').textContent = user.email;
+
+  const wsLink = $('profileWorkspaceLink');
+  if (wsLink) {
+    const targetRoute =
+      user.role === 'MENTOR' ? '/mentor-cabinet' : user.role === 'HR' ? '/b2b' : '/roadmap';
+    wsLink.href = targetRoute;
+    wsLink.setAttribute('data-route', targetRoute);
+  }
+
+  const statsEl = $('profileStatsSummary');
+  if (statsEl) {
+    if (user.role === 'LEARNER') {
+      const learner = (state.data.learners || []).find((l) => l.id === user.id) || user;
+      const sessCount = (state.data.sessions || []).filter((s) => s.learnerId === user.id).length;
+      statsEl.innerHTML = `
+        <div class="profile-stat-box"><span>Карт навичок</span><strong>${(learner.skillTrees || []).length}</strong></div>
+        <div class="profile-stat-box"><span>Досвід (XP)</span><strong>${learner.points ?? 0}</strong></div>
+        <div class="profile-stat-box"><span>Бейджі</span><strong>${(learner.badges || []).length}</strong></div>
+        <div class="profile-stat-box"><span>Сесій з ментором</span><strong>${sessCount}</strong></div>
+      `;
+    } else if (user.role === 'MENTOR') {
+      const mentor = (state.data.mentors || []).find((m) => m.id === user.id) || user;
+      const sessCount = (state.data.sessions || []).filter((s) => s.mentorId === user.id).length;
+      statsEl.innerHTML = `
+        <div class="profile-stat-box"><span>Рейтинг</span><strong>★ ${Number(mentor.rating || 5).toFixed(2)}</strong></div>
+        <div class="profile-stat-box"><span>Ставка</span><strong>${mentor.hourlyRate ?? 800} ₴/год</strong></div>
+        <div class="profile-stat-box"><span>Матеріали</span><strong>${mentor.publishedMaterialsCount ?? 0}</strong></div>
+        <div class="profile-stat-box"><span>Консультацій</span><strong>${sessCount}</strong></div>
+      `;
+    } else {
+      const teams = (state.data.teams || []).filter((t) => t.hrManagerId === user.id);
+      statsEl.innerHTML = `
+        <div class="profile-stat-box"><span>Компанія</span><strong>${escapeHtml(user.company || 'TechCorp')}</strong></div>
+        <div class="profile-stat-box"><span>Ваші команди</span><strong>${teams.length}</strong></div>
+        <div class="profile-stat-box"><span>Студентів у базі</span><strong>${(state.data.learners || []).length}</strong></div>
+        <div class="profile-stat-box"><span>Сесій у системі</span><strong>${(state.data.sessions || []).length}</strong></div>
+      `;
+    }
+  }
+
+  if ($('profFullName')) $('profFullName').value = user.fullName || '';
+
+  const roleFields = $('profRoleFields');
+  if (!roleFields) return;
+
   if (user.role === 'LEARNER') {
-    extraContainer.innerHTML = `
-      <label class="field-stack">
-        <span>Цільова професія</span>
-        <input id="profTargetProfession" type="text" value="${esc(user.targetProfession)}" required />
-      </label>
-      <label class="field-stack">
-        <span>Рівень</span>
-        <select id="profLevel">
-          <option value="BEGINNER" ${user.level === 'BEGINNER' ? 'selected' : ''}>Початковий</option>
-          <option value="INTERMEDIATE" ${user.level === 'INTERMEDIATE' ? 'selected' : ''}>Середній</option>
-          <option value="ADVANCED" ${user.level === 'ADVANCED' ? 'selected' : ''}>Просунутий</option>
-        </select>
-      </label>
+    const learner = (state.data.learners || []).find((l) => l.id === user.id) || user;
+    roleFields.innerHTML = `
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="profTargetProfession">Цільова професія</label>
+          <input type="text" id="profTargetProfession" class="st-input" list="professionList" value="${escapeHtml(learner.targetProfession || '')}" />
+        </div>
+        <div class="form-group">
+          <label for="profLevel">Поточний рівень</label>
+          <select id="profLevel" class="st-input">
+            <option value="BEGINNER" ${learner.level === 'BEGINNER' ? 'selected' : ''}>BEGINNER</option>
+            <option value="INTERMEDIATE" ${learner.level === 'INTERMEDIATE' ? 'selected' : ''}>INTERMEDIATE</option>
+            <option value="ADVANCED" ${learner.level === 'ADVANCED' ? 'selected' : ''}>ADVANCED</option>
+          </select>
+        </div>
+      </div>
     `;
   } else if (user.role === 'MENTOR') {
-    extraContainer.innerHTML = `
-      <label class="field-stack">
-        <span>Спеціалізація</span>
-        <input id="profSpecialization" type="text" value="${esc(user.specialization)}" required />
-      </label>
-      <label class="field-stack">
-        <span>Годинна ставка (₴)</span>
-        <input id="profHourlyRate" type="number" min="100" value="${user.hourlyRate}" required />
-      </label>
-      <label class="field-stack">
-        <span>Про себе</span>
-        <textarea id="profBio" rows="3">${esc(user.bio)}</textarea>
-      </label>
+    const mentor = (state.data.mentors || []).find((m) => m.id === user.id) || user;
+    roleFields.innerHTML = `
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="profSpecialization">Спеціалізація</label>
+          <input type="text" id="profSpecialization" class="st-input" value="${escapeHtml(mentor.specialization || '')}" />
+        </div>
+        <div class="form-group">
+          <label for="profHourlyRate">Ставка (₴ / год)</label>
+          <input type="number" id="profHourlyRate" class="st-input" min="100" step="50" value="${Number(mentor.hourlyRate || 800)}" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="profBio">Про себе (біографія ментора)</label>
+        <textarea id="profBio" class="st-input" rows="3">${escapeHtml(mentor.bio || '')}</textarea>
+      </div>
     `;
   } else {
-    extraContainer.innerHTML = `
-      <label class="field-stack">
-        <span>Назва компанії</span>
-        <input id="profCompany" type="text" value="${esc(user.company)}" required />
-      </label>
+    roleFields.innerHTML = `
+      <div class="form-group">
+        <label for="profCompany">Компанія</label>
+        <input type="text" id="profCompany" class="st-input" value="${escapeHtml(user.company || '')}" />
+      </div>
     `;
   }
-  $('profileModal').classList.remove('hidden');
 }
 
-async function updateActiveNodeStatus(action) {
-  const learner = getActiveLearner();
-  const tree = getActiveTree(learner);
-  const node = getActiveNode(tree);
-  if (!tree || !node) return;
-  try {
-    const res = await api(`/api/trees/${tree.id}/nodes/${node.id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify({ action }),
-    });
-    syncSelectionsFromData(res.state);
-    renderAll();
-    showToast(
-      action === 'complete'
-        ? `Навичку завершено! Прогрес: ${res.treeProgress}%, досвід: ${res.learnerPoints} XP`
-        : 'Навичку переведено у статус «У процесі»'
-    );
-  } catch (err) {
-    showToast(err.message, true);
-  }
-}
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('skilltree_theme', theme);
-  $('themeToggleBtn').textContent = theme === 'light' ? '🌙' : '☀️';
-}
-
-function setupEventListeners() {
-  const savedTheme = localStorage.getItem('skilltree_theme') || 'light';
-  applyTheme(savedTheme);
-  $('themeToggleBtn').addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    applyTheme(current === 'light' ? 'dark' : 'light');
-  });
-
-  // Navbar active state on click
-  document.querySelectorAll('.nav-link').forEach((link) => {
-    link.addEventListener('click', () => {
-      document.querySelectorAll('.nav-link').forEach((l) => l.classList.remove('active'));
-      link.classList.add('active');
-    });
-  });
-
-  // Modals open/close
-  document.querySelectorAll('.close-modal-btn').forEach((btn) => {
-    btn.addEventListener('click', () => $(btn.dataset.close)?.classList.add('hidden'));
-  });
-  $('openAuthBtn').addEventListener('click', () => $('authModal').classList.remove('hidden'));
-  $('openWizardBtn').addEventListener('click', () => $('wizardModal').classList.remove('hidden'));
-  $('openAddNodeBtn').addEventListener('click', () => $('addNodeModal').classList.remove('hidden'));
-  $('openProfileBtn').addEventListener('click', openProfileModal);
-
-  // Auth Tabs & Forms
-  document.querySelectorAll('.auth-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.auth-tab').forEach((t) => t.classList.toggle('active', t === tab));
-      document.querySelectorAll('.auth-pane').forEach((p) => p.classList.toggle('active', p.dataset.authPane === tab.dataset.authTab));
-    });
-  });
-
-  $('regRole').addEventListener('change', (e) => {
-    const role = e.target.value;
-    if (role === 'MENTOR') {
-      $('regExtraLabel').textContent = 'Спеціалізація ментора';
-      $('regExtra').placeholder = 'Full-Stack & Architecture';
-    } else if (role === 'HR') {
-      $('regExtraLabel').textContent = 'Назва компанії';
-      $('regExtra').placeholder = 'TechNova Ukraine';
-    } else {
-      $('regExtraLabel').textContent = 'Цільова професія';
-      $('regExtra').placeholder = 'Full-Stack Developer';
+function bindEvents() {
+  // SPA Client-Side Routing across any [data-route] link/card
+  document.addEventListener('click', (event) => {
+    const routeEl = event.target.closest('[data-route]');
+    if (!routeEl) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const targetRoute = routeEl.getAttribute('data-route');
+    if (targetRoute) {
+      event.preventDefault();
+      navigateTo(targetRoute);
     }
   });
 
-  $('loginForm').addEventListener('submit', async (e) => {
+  window.addEventListener('popstate', () => {
+    navigateTo(window.location.pathname, false);
+  });
+
+  // Theme Toggle
+  $('themeToggleBtn')?.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // AI Settings Modal
+  $('openAiSettingsBtn')?.addEventListener('click', () => {
+    if ($('aiApiKeyInput')) $('aiApiKeyInput').value = localStorage.getItem('skilltree_gemini_key') || '';
+    if ($('aiModelSelect')) $('aiModelSelect').value = localStorage.getItem('skilltree_ai_model') || 'builtin';
+    openModal('aiSettingsModal');
+  });
+
+  $('aiSettingsForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const key = $('aiApiKeyInput')?.value.trim() || '';
+    const model = $('aiModelSelect')?.value || 'builtin';
+    if (key) localStorage.setItem('skilltree_gemini_key', key);
+    else localStorage.removeItem('skilltree_gemini_key');
+    localStorage.setItem('skilltree_ai_model', model);
+    closeModal('aiSettingsModal');
+    showToast('Налаштування ШІ-асистента збережено.');
+  });
+
+  $('clearAiKeyBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('skilltree_gemini_key');
+    localStorage.setItem('skilltree_ai_model', 'builtin');
+    if ($('aiApiKeyInput')) $('aiApiKeyInput').value = '';
+    if ($('aiModelSelect')) $('aiModelSelect').value = 'builtin';
+    showToast('Локальний API-ключ очищено.');
+  });
+
+  // Close Modals
+  document.addEventListener('click', (event) => {
+    const closeBtn = event.target.closest('[data-close-modal]');
+    if (closeBtn) {
+      closeModal(closeBtn.getAttribute('data-close-modal'));
+      return;
+    }
+    if (event.target.classList?.contains('st-modal')) {
+      event.target.classList.add('hidden');
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      document.querySelectorAll('.st-modal:not(.hidden)').forEach((m) => m.classList.add('hidden'));
+    }
+  });
+
+  // Auth Modal triggers
+  $('openAuthBtn')?.addEventListener('click', () => {
+    setAuthTab('login');
+    openModal('authModal');
+  });
+
+  $('openAuthFromProfileBtn')?.addEventListener('click', () => {
+    setAuthTab('login');
+    openModal('authModal');
+  });
+
+  $('openAuthFromMentorBtn')?.addEventListener('click', () => {
+    setAuthTab('register');
+    if ($('regRole')) {
+      $('regRole').value = 'MENTOR';
+      syncRegisterRoleField();
+    }
+    openModal('authModal');
+  });
+
+  $('authTabLogin')?.addEventListener('click', () => setAuthTab('login'));
+  $('authTabRegister')?.addEventListener('click', () => setAuthTab('register'));
+  $('authTabReset')?.addEventListener('click', () => setAuthTab('reset'));
+  $('regRole')?.addEventListener('change', syncRegisterRoleField);
+
+  $('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
+      const email = $('loginEmail').value.trim();
+      const password = $('loginPassword').value;
       const res = await api('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email: $('loginEmail').value, password: $('loginPassword').value }),
+        body: JSON.stringify({ email, password }),
       });
-      $('loginPassword').value = '';
-      $('authModal').classList.add('hidden');
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
+      state.selectedTreeId = null;
+      state.selectedNodeId = null;
+      closeModal('authModal');
       renderAll();
+      const role = res.user.role;
+      const dest = role === 'MENTOR' ? '/mentor-cabinet' : role === 'HR' ? '/b2b' : '/roadmap';
+      navigateTo(dest);
       showToast(`Вітаємо, ${res.user.fullName}!`);
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('registerForm').addEventListener('submit', async (e) => {
+  $('registerForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
       const role = $('regRole').value;
-      const extra = $('regExtra').value.trim();
+      const extraVal = $('regExtraInput').value.trim();
+      const body = {
+        fullName: $('regFullName').value.trim(),
+        email: $('regEmail').value.trim(),
+        password: $('regPassword').value,
+        role,
+      };
+      if (role === 'MENTOR' && extraVal) body.specialization = extraVal;
+      if (role === 'HR' && extraVal) body.company = extraVal;
+      if (role === 'LEARNER' && extraVal) body.targetProfession = extraVal;
+
       const res = await api('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify({
-          fullName: $('regName').value,
-          email: $('regEmail').value,
-          password: $('regPassword').value,
-          role,
-          targetProfession: role === 'LEARNER' ? extra || 'Full-Stack Developer' : undefined,
-          specialization: role === 'MENTOR' ? extra || 'Software Engineering' : undefined,
-          company: role === 'HR' ? extra || 'TechNova Ukraine' : undefined,
-        }),
+        body: JSON.stringify(body),
       });
-      $('regPassword').value = '';
-      $('authModal').classList.add('hidden');
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
+      state.selectedTreeId = null;
+      state.selectedNodeId = null;
+      closeModal('authModal');
       renderAll();
-      showToast(`Обліковий запис ${res.user.fullName} створено!`);
+      const dest = role === 'MENTOR' ? '/mentor-cabinet' : role === 'HR' ? '/b2b' : '/roadmap';
+      navigateTo(dest);
+      showToast(`Акаунт створено! Вітаємо, ${res.user.fullName}.`);
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('resetPasswordForm').addEventListener('submit', async (e) => {
+  $('resetPasswordForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
-      const res = await api('/api/auth/reset-password', {
+      await api('/api/auth/reset-password', {
         method: 'POST',
-        body: JSON.stringify({ email: $('resetEmail').value, newPassword: $('resetNewPassword').value }),
+        body: JSON.stringify({
+          email: $('resetEmail').value.trim(),
+          newPassword: $('resetNewPassword').value,
+        }),
       });
-      $('resetNewPassword').value = '';
-      showToast(res.message || 'Пароль оновлено.');
+      showToast('Пароль оновлено. Тепер ви можете увійти.');
+      setAuthTab('login');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('logoutBtn').addEventListener('click', async () => {
+  const handleLogout = async () => {
     try {
-      const res = await api('/api/auth/logout', { method: 'POST' });
-      syncSelectionsFromData(res.state);
+      const res = await api('/api/auth/logout', { method: 'POST', body: '{}' });
+      state.data = res.state;
+      state.selectedTreeId = null;
+      state.selectedNodeId = null;
       renderAll();
+      navigateTo('/');
       showToast('Ви вийшли з облікового запису.');
     } catch (err) {
       showToast(err.message, true);
     }
-  });
+  };
+  $('logoutBtn')?.addEventListener('click', handleLogout);
+  $('profileLogoutBtn')?.addEventListener('click', handleLogout);
 
-  $('profileForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const user = getCurrentUser();
-    if (!user) return;
-    try {
-      const payload = { fullName: $('profFullName').value };
-      if (user.role === 'LEARNER') {
-        payload.targetProfession = $('profTargetProfession').value;
-        payload.level = $('profLevel').value;
-      } else if (user.role === 'MENTOR') {
-        payload.specialization = $('profSpecialization').value;
-        payload.hourlyRate = Number($('profHourlyRate').value);
-        payload.bio = $('profBio').value;
-      } else {
-        payload.company = $('profCompany').value;
-      }
-      const res = await api('/api/profile', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      $('profileModal').classList.add('hidden');
-      syncSelectionsFromData(res.state);
-      renderAll();
-      showToast('Профіль оновлено.');
-    } catch (err) {
-      showToast(err.message, true);
-    }
-  });
-
-  // AI Settings Modal
-  $('openAiSettingsBtn').addEventListener('click', () => {
-    $('customApiKeyInput').value = localStorage.getItem('skilltree_api_key') || '';
-    $('aiSettingsModal').classList.remove('hidden');
-  });
-  $('aiSettingsForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    localStorage.setItem('skilltree_api_key', $('customApiKeyInput').value.trim());
-    $('aiSettingsModal').classList.add('hidden');
-    showToast('Ключ LLM API збережено у браузері.');
-  });
-  $('clearApiKeyBtn').addEventListener('click', () => {
-    localStorage.removeItem('skilltree_api_key');
-    $('customApiKeyInput').value = '';
-    $('aiSettingsModal').classList.add('hidden');
-    showToast('Ключ очищено, використовується вбудований ШІ-двигун.');
-  });
-
-  // Tree selector & 1-click preset pills
-  $('treeSelect').addEventListener('change', (e) => {
+  // Roadmap Actions
+  $('treeSelect')?.addEventListener('change', (e) => {
     state.selectedTreeId = Number(e.target.value);
     state.selectedNodeId = null;
-    syncSelectionsFromData(state.data);
-    renderAll();
+    renderRoadmapPage();
   });
 
-  $('quickProfessionsRow').addEventListener('click', async (e) => {
-    const pill = e.target.closest('.preset-pill');
-    if (!pill) return;
-    const profession = pill.dataset.quickProf;
+  $('openWizardBtn')?.addEventListener('click', () => openModal('wizardModal'));
+  $('openAddNodeBtn')?.addEventListener('click', () => openModal('addNodeModal'));
+
+  $('quickProfessionsRow')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-quick-profession]');
+    if (!btn) return;
+    const profession = btn.getAttribute('data-quick-profession');
     const learner = getActiveLearner();
     if (!learner) return;
-    const existing = learner.skillTrees.find(
-      (t) => t.targetProfession.toLowerCase() === profession.toLowerCase()
-    );
-    if (existing) {
-      state.selectedTreeId = existing.id;
-      state.selectedNodeId = existing.nodes[0]?.id ?? null;
-      renderAll();
-      showToast(`Відкрито карту «${existing.targetProfession}»`);
-      return;
-    }
     try {
       const res = await api('/api/trees/generate', {
         method: 'POST',
         body: JSON.stringify({ learnerId: learner.id, profession, level: 'BEGINNER' }),
       });
+      state.data = res.state;
       state.selectedTreeId = res.tree.id;
-      state.selectedNodeId = res.tree.nodes[0]?.id ?? null;
-      syncSelectionsFromData(res.state);
+      state.selectedNodeId = res.tree.nodes[0]?.id || null;
       renderAll();
-      showToast(`Карту «${res.tree.targetProfession}» згенеровано!`);
+      showToast(`Карту «${profession}» згенеровано!`);
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('generateTreeForm').addEventListener('submit', async (e) => {
+  $('wizardForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const learner = getActiveLearner();
+    if (!learner) return;
     try {
-      const learner = getActiveLearner();
       const res = await api('/api/trees/generate', {
         method: 'POST',
         body: JSON.stringify({
           learnerId: learner.id,
-          profession: $('genProfession').value,
-          level: $('genLevel').value,
+          profession: $('wizardProfession').value.trim(),
+          level: $('wizardLevel').value,
+          goal: $('wizardGoal').value.trim(),
         }),
       });
-      $('wizardModal').classList.add('hidden');
+      state.data = res.state;
       state.selectedTreeId = res.tree.id;
-      state.selectedNodeId = res.tree.nodes[0]?.id ?? null;
-      syncSelectionsFromData(res.state);
+      state.selectedNodeId = res.tree.nodes[0]?.id || null;
+      closeModal('wizardModal');
+      $('wizardForm').reset();
       renderAll();
-      showToast(`Карту «${res.tree.targetProfession}» згенеровано!`);
+      showToast(`Карту «${res.tree.targetProfession}» створено!`);
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  // Node timeline & Add Node
-  $('nodesList').addEventListener('click', async (e) => {
-    const deleteBtn = e.target.closest('.delete-node-btn');
-    if (deleteBtn) {
-      e.stopPropagation();
-      const learner = getActiveLearner();
-      const tree = getActiveTree(learner);
+  $('addNodeForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const learner = getActiveLearner();
+    const tree = getActiveTree(learner);
+    if (!tree) return;
+    try {
+      const res = await api(`/api/trees/${tree.id}/nodes`, {
+        method: 'POST',
+        body: JSON.stringify({
+          title: $('newNodeTitle').value.trim(),
+          description: $('newNodeDesc').value.trim(),
+          materialTitle: $('newNodeMaterialTitle').value.trim() || undefined,
+          materialUrl: $('newNodeMaterialUrl').value.trim() || undefined,
+        }),
+      });
+      state.data = res.state;
+      state.selectedNodeId = res.node.id;
+      closeModal('addNodeModal');
+      $('addNodeForm').reset();
+      renderAll();
+      showToast(`Вузол «${res.node.title}» додано до карти.`);
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  $('nodesList')?.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-node-id]');
+    if (!item) return;
+    state.selectedNodeId = Number(item.getAttribute('data-node-id'));
+    renderRoadmapPage();
+  });
+
+  $('nodeActionButtons')?.addEventListener('click', async (e) => {
+    const learner = getActiveLearner();
+    const tree = getActiveTree(learner);
+    const node = getActiveNode(tree);
+    if (!tree || !node) return;
+
+    const statusBtn = e.target.closest('[data-node-status]');
+    if (statusBtn) {
       try {
-        const res = await api(`/api/trees/${tree.id}/nodes/${Number(deleteBtn.dataset.deleteNode)}`, {
-          method: 'DELETE',
+        const res = await api(`/api/trees/${tree.id}/nodes/${node.id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: statusBtn.getAttribute('data-node-status') }),
         });
-        syncSelectionsFromData(res.state);
+        state.data = res.state;
         renderAll();
-        showToast('Навичку видалено з карти.');
+        showToast('Статус вузла оновлено.');
       } catch (err) {
         showToast(err.message, true);
       }
       return;
     }
 
-    const card = e.target.closest('.timeline-item');
-    if (card) {
-      state.selectedNodeId = Number(card.dataset.nodeId);
-      renderAll();
+    if (e.target.closest('#deleteNodeBtn')) {
+      try {
+        const res = await api(`/api/trees/${tree.id}/nodes/${node.id}`, { method: 'DELETE' });
+        state.data = res.state;
+        state.selectedNodeId = null;
+        renderAll();
+        showToast('Вузол видалено з карти.');
+      } catch (err) {
+        showToast(err.message, true);
+      }
     }
   });
 
-  $('addNodeForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const learner = getActiveLearner();
-    const tree = getActiveTree(learner);
-    try {
-      const res = await api(`/api/trees/${tree.id}/nodes`, {
-        method: 'POST',
-        body: JSON.stringify({
-          title: $('newNodeTitle').value,
-          description: $('newNodeDesc').value,
-          materialTitle: $('newNodeMaterialTitle').value,
-          materialUrl: $('newNodeMaterialUrl').value,
-        }),
-      });
-      $('newNodeTitle').value = '';
-      $('newNodeDesc').value = '';
-      $('newNodeMaterialTitle').value = '';
-      $('newNodeMaterialUrl').value = '';
-      $('addNodeModal').classList.add('hidden');
-      state.selectedNodeId = res.node.id;
-      syncSelectionsFromData(res.state);
-      renderAll();
-      showToast(`Додано навичку «${res.node.title}»`);
-    } catch (err) {
-      showToast(err.message, true);
-    }
+  $('nodeMaterialsList')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-open-material]');
+    if (!btn) return;
+    openMaterialReader(Number(btn.getAttribute('data-open-material')));
   });
 
-  // Study Card handlers
-  $('nodeActionButtons').addEventListener('click', (e) => {
-    if (e.target.closest('#startNodeBtn')) updateActiveNodeStatus('start');
-    if (e.target.closest('#completeNodeBtn')) updateActiveNodeStatus('complete');
-  });
-
-  $('nodeMaterialsList').addEventListener('click', (e) => {
-    const lessonBtn = e.target.closest('.open-lesson-btn');
-    if (lessonBtn) {
-      openMaterialModal(Number(lessonBtn.dataset.materialId));
-    }
-  });
-
-  document.querySelectorAll('.chip-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      $('aiQuestionInput').value = btn.dataset.prompt;
-      $('aiQuestionInput').focus();
+  document.querySelectorAll('.chip-btn[data-prompt]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      if ($('aiQuestionInput')) {
+        $('aiQuestionInput').value = chip.getAttribute('data-prompt') || '';
+        $('askAiForm')?.requestSubmit();
+      }
     });
   });
 
-  $('askAiForm').addEventListener('submit', async (e) => {
+  $('askAiForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const learner = getActiveLearner();
     const tree = getActiveTree(learner);
     const node = getActiveNode(tree);
-    if (!node) return;
-    const questionText = $('aiQuestionInput').value.trim();
-    if (!questionText) return;
-
-    const chatEl = $('chatMessages');
-    if (node.messages.length === 0) chatEl.innerHTML = '';
-    const typingTurn = document.createElement('div');
-    typingTurn.className = 'chat-turn';
-    typingTurn.innerHTML = `
-      <div class="bubble-user">${esc(questionText)}</div>
-      <div class="bubble-ai typing-bubble">
-        <span>ШІ-асистент аналізує запит</span>
-        <span class="typing-dots" aria-hidden="true">
-          <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
-        </span>
-      </div>
-    `;
-    chatEl.appendChild(typingTurn);
-    chatEl.scrollTop = chatEl.scrollHeight;
-    $('aiQuestionInput').value = '';
+    const question = $('aiQuestionInput')?.value.trim();
+    if (!tree || !node || !question) return;
 
     try {
-      const customKey = localStorage.getItem('skilltree_api_key') || '';
+      const apiKey = localStorage.getItem('skilltree_gemini_key') || undefined;
+      const model = localStorage.getItem('skilltree_ai_model') || undefined;
       const res = await api(`/api/trees/${tree.id}/nodes/${node.id}/chat`, {
         method: 'POST',
-        body: JSON.stringify({
-          question: questionText,
-          apiKey: customKey || undefined,
-        }),
+        body: JSON.stringify({ question, apiKey, model }),
       });
-      syncSelectionsFromData(res.state);
+      $('aiQuestionInput').value = '';
+      state.data = res.state;
       renderAll();
-      showToast(`ШІ відповів за ${res.message.responseTimeMs} мс`);
-    } catch (err) {
-      typingTurn.remove();
-      showToast(err.message, true);
-    }
-  });
-
-  $('chatMessages').addEventListener('click', async (e) => {
-    const rateBtn = e.target.closest('.rate-btn');
-    if (!rateBtn) return;
-    try {
-      const res = await api(`/api/chat/${Number(rateBtn.dataset.rateMsg)}/rate`, {
-        method: 'PATCH',
-        body: JSON.stringify({ helpful: rateBtn.dataset.helpful === 'true' }),
-      });
-      syncSelectionsFromData(res.state);
-      renderAll();
+      const box = $('chatMessages');
+      if (box) box.scrollTop = box.scrollHeight;
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  // Mentors & Sessions
-  const tomorrow = new Date(Date.now() + 86400000);
-  $('bookingStartAt').value = tomorrow.toISOString().slice(0, 16);
-
-  $('mentorsDirectoryGrid').addEventListener('click', (e) => {
-    const btn = e.target.closest('.select-mentor-book-btn');
+  $('chatMessages')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-rate-msg]');
     if (!btn) return;
-    $('bookingMentorSelect').value = btn.dataset.mentorId;
-    $('bookingTopic').focus();
+    const messageId = Number(btn.getAttribute('data-rate-msg'));
+    const helpful = btn.getAttribute('data-helpful') === 'true';
+    try {
+      const res = await api(`/api/chat/${messageId}/rate`, {
+        method: 'PATCH',
+        body: JSON.stringify({ helpful }),
+      });
+      state.data = res.state;
+      renderAll();
+      showToast(helpful ? 'Дякуємо! Відповідь позначено як корисну.' : 'Оцінку збережено.');
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  // Mentors & Payment Checkout
+  $('mentorsDirectoryGrid')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-select-mentor]');
+    if (!btn) return;
+    const mentorId = btn.getAttribute('data-select-mentor');
+    if ($('bookingMentorSelect')) $('bookingMentorSelect').value = mentorId;
+    $('bookingTopic')?.focus();
     showToast('Ментора обрано у формі бронювання нижче.');
   });
 
-  $('bookSessionForm').addEventListener('submit', async (e) => {
+  $('bookSessionForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const learner = getActiveLearner();
+    if (!learner) return;
     try {
+      const durationMin = Number($('bookingDuration').value);
+      const startAtVal = $('bookingStartAt').value;
       const res = await api('/api/sessions', {
         method: 'POST',
         body: JSON.stringify({
           learnerId: learner.id,
           mentorId: Number($('bookingMentorSelect').value),
-          topic: $('bookingTopic').value,
-          startAt: $('bookingStartAt').value,
-          durationMin: Number($('bookingDuration').value),
+          topic: $('bookingTopic').value.trim(),
+          startAt: new Date(startAtVal).toISOString(),
+          durationMin,
+          durationMinutes: durationMin,
         }),
       });
+      state.data = res.state;
       $('bookingTopic').value = '';
-      syncSelectionsFromData(res.state);
       renderAll();
-      showToast('Сесію заброньовано! Тепер натисніть «Оплатити сесію».');
+      showToast('Сесію заброньовано! Тепер можна перейти до оплати.');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('learnerSessionsList').addEventListener('click', async (e) => {
-    const payBtn = e.target.closest('.open-checkout-btn');
+  $('learnerSessionsList')?.addEventListener('click', async (e) => {
+    const payBtn = e.target.closest('[data-open-pay]');
     if (payBtn) {
-      openCheckoutModal(Number(payBtn.dataset.sessionId));
+      const sessionId = Number(payBtn.getAttribute('data-open-pay'));
+      const session = (state.data.sessions || []).find((s) => s.id === sessionId);
+      if (!session) return;
+      state.paymentSessionId = sessionId;
+      const mentor = (state.data.mentors || []).find((m) => m.id === session.mentorId);
+      if ($('paymentSessionSummary')) {
+        $('paymentSessionSummary').innerHTML = `
+          <div><strong>Тема:</strong> ${escapeHtml(session.topic)}</div>
+          <div><strong>Ментор:</strong> ${escapeHtml(mentor?.fullName || '')}</div>
+          <div><strong>Дата:</strong> ${new Date(session.startAt).toLocaleString('uk-UA')} (${session.durationMin} хв)</div>
+        `;
+      }
+      if ($('paymentAmount')) $('paymentAmount').textContent = `${session.price} ₴`;
+      openModal('paymentModal');
       return;
     }
 
-    const receiptBtn = e.target.closest('.view-receipt-btn');
+    const receiptBtn = e.target.closest('[data-view-receipt]');
     if (receiptBtn) {
-      openReceiptModal(Number(receiptBtn.dataset.sessionId));
+      const sessionId = Number(receiptBtn.getAttribute('data-view-receipt'));
+      const receipt = (state.data.receipts || []).find((r) => r.sessionId === sessionId);
+      const session = (state.data.sessions || []).find((s) => s.id === sessionId);
+      if ($('receiptBody')) {
+        $('receiptBody').innerHTML = receipt
+          ? `
+            <div><strong>ID транзакції:</strong> <code>${escapeHtml(receipt.transactionId)}</code></div>
+            <div><strong>Сесія:</strong> #${receipt.sessionId} (${escapeHtml(session?.topic || '')})</div>
+            <div><strong>Сума:</strong> ${receipt.amount} ${escapeHtml(receipt.currency)}</div>
+            <div><strong>Статус:</strong> ${escapeHtml(receipt.status)}</div>
+            <div><strong>Час оплати:</strong> ${new Date(receipt.processedAt).toLocaleString('uk-UA')}</div>
+          `
+          : `<div><strong>Сесія #${sessionId}:</strong> Оплата підтверджена (${session?.price || 0} ₴).</div>`;
+      }
+      openModal('receiptModal');
       return;
     }
 
-    const cancelBtn = e.target.closest('.cancel-session-btn');
+    const cancelBtn = e.target.closest('[data-cancel-session]');
     if (cancelBtn) {
+      const sessionId = Number(cancelBtn.getAttribute('data-cancel-session'));
       try {
-        const res = await api(`/api/sessions/${cancelBtn.dataset.sessionId}/cancel`, { method: 'POST' });
-        syncSelectionsFromData(res.state);
+        const res = await api(`/api/sessions/${sessionId}/cancel`, { method: 'POST', body: '{}' });
+        state.data = res.state;
         renderAll();
         showToast('Сесію скасовано.');
       } catch (err) {
@@ -1107,100 +1326,142 @@ function setupEventListeners() {
     }
   });
 
-  $('checkoutForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!state.checkoutSessionId) return;
-    try {
-      const res = await api(`/api/sessions/${state.checkoutSessionId}/pay`, { method: 'POST' });
-      $('paymentModal').classList.add('hidden');
-      syncSelectionsFromData(res.state);
-      renderAll();
-      openReceiptModal(res.session.id);
-      showToast('Оплату успішно проведено!');
-    } catch (err) {
-      showToast(err.message, true);
-    }
-  });
-
-  $('learnerSessionsList').addEventListener('submit', async (e) => {
-    const form = e.target.closest('.feedback-form');
+  $('learnerSessionsList')?.addEventListener('submit', async (e) => {
+    const form = e.target.closest('[data-feedback-form]');
     if (!form) return;
     e.preventDefault();
+    const sessionId = Number(form.getAttribute('data-feedback-form'));
+    const rating = Number(form.elements.rating.value);
+    const feedback = form.elements.comment.value.trim();
     try {
-      const res = await api(`/api/sessions/${form.dataset.sessionId}/feedback`, {
+      const res = await api(`/api/sessions/${sessionId}/feedback`, {
         method: 'POST',
-        body: JSON.stringify({
-          rating: Number(form.querySelector('[name="rating"]').value),
-          feedback: form.querySelector('[name="feedback"]').value,
-        }),
+        body: JSON.stringify({ rating, feedback, comment: feedback }),
       });
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
       renderAll();
-      showToast(`Відгук збережено! Новий рейтинг ментора: ★ ${res.mentorRating}`);
+      showToast('Дякуємо! Відгук та оцінку ментора збережено.');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  // Mentor self-cabinet handlers
-  $('publishMaterialForm').addEventListener('submit', async (e) => {
+  $('confirmPaymentForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const mentor = getActiveMentor();
-    if (!mentor) return;
-    const nodeId = Number($('mentorNodeSelect').value);
+    if (!state.paymentSessionId) return;
     try {
+      const res = await api(`/api/sessions/${state.paymentSessionId}/pay`, {
+        method: 'POST',
+        body: JSON.stringify({ method: $('paymentMethod').value }),
+      });
+      state.data = res.state;
+      closeModal('paymentModal');
+      renderAll();
+      showToast(`Оплату підтверджено! Чек ${res.receipt?.transactionId || ''}`);
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  // Mentor Cabinet Actions
+  $('publishMaterialForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nodeId = Number($('mentorNodeSelect').value);
+    if (!nodeId) return;
+    try {
+      const mentorId = state.data.currentUser?.id;
       const res = await api(`/api/nodes/${nodeId}/materials`, {
         method: 'POST',
         body: JSON.stringify({
-          mentorId: mentor.id,
-          title: $('materialTitle').value,
+          mentorId,
+          title: $('materialTitle').value.trim(),
           type: $('materialType').value,
-          url: $('materialUrl').value,
-          description: $('materialDesc').value,
-          content: $('materialContent').value,
+          url: $('materialUrl').value.trim(),
+          description: $('materialDesc').value.trim(),
+          content: $('materialContent').value.trim(),
         }),
       });
-      $('materialTitle').value = '';
-      $('materialUrl').value = '';
-      $('materialDesc').value = '';
-      $('materialContent').value = '';
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
+      $('publishMaterialForm').reset();
       renderAll();
-      showToast(`Урок «${res.material.title}» опубліковано!`);
+      showToast('Навчальний матеріал успішно опубліковано у вузол!');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('mentorSessionsList').addEventListener('click', async (e) => {
-    const btn = e.target.closest('.confirm-session-btn');
-    if (!btn) return;
-    try {
-      const res = await api(`/api/sessions/${btn.dataset.sessionId}/confirm`, { method: 'POST' });
-      syncSelectionsFromData(res.state);
-      renderAll();
-      showToast('Менторську сесію підтверджено!');
-    } catch (err) {
-      showToast(err.message, true);
+  $('mentorSessionsList')?.addEventListener('click', async (e) => {
+    const confirmBtn = e.target.closest('[data-confirm-session]');
+    if (confirmBtn) {
+      const id = Number(confirmBtn.getAttribute('data-confirm-session'));
+      try {
+        const res = await api(`/api/sessions/${id}/confirm`, { method: 'POST', body: '{}' });
+        state.data = res.state;
+        renderAll();
+        showToast('Сесію підтверджено!');
+      } catch (err) {
+        showToast(err.message, true);
+      }
+      return;
+    }
+
+    const cancelBtn = e.target.closest('[data-cancel-session]');
+    if (cancelBtn) {
+      const id = Number(cancelBtn.getAttribute('data-cancel-session'));
+      try {
+        const res = await api(`/api/sessions/${id}/cancel`, { method: 'POST', body: '{}' });
+        state.data = res.state;
+        renderAll();
+        showToast('Сесію скасовано.');
+      } catch (err) {
+        showToast(err.message, true);
+      }
     }
   });
 
-  // B2B HR handlers
-  $('teamSelect').addEventListener('change', (e) => {
+  // B2B Actions
+  $('teamSelect')?.addEventListener('change', (e) => {
     state.selectedTeamId = Number(e.target.value);
-    renderB2bSection();
+    renderB2bPage();
   });
 
-  $('createTeamForm').addEventListener('submit', async (e) => {
+  $('assignTreeForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
+      const res = await api('/api/hr/assign-tree', {
+        method: 'POST',
+        body: JSON.stringify({
+          learnerId: Number($('hrLearnerSelect').value),
+          profession: $('hrAssignProfession').value.trim(),
+          level: $('hrAssignLevel').value,
+        }),
+      });
+      state.data = res.state;
+      $('hrAssignProfession').value = '';
+      renderAll();
+      showToast('Індивідуальну карту розвитку призначено працівнику.');
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  $('createTeamForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const hrManagerId =
+        state.data.currentUser?.role === 'HR'
+          ? state.data.currentUser.id
+          : state.data.hrManagers?.[0]?.id;
       const res = await api('/api/teams', {
         method: 'POST',
-        body: JSON.stringify({ name: $('newTeamName').value }),
+        body: JSON.stringify({
+          name: $('newTeamName').value.trim(),
+          hrManagerId,
+        }),
       });
-      $('newTeamName').value = '';
+      state.data = res.state;
       state.selectedTeamId = res.team.id;
-      syncSelectionsFromData(res.state);
+      $('newTeamName').value = '';
       renderAll();
       showToast(`Команду «${res.team.name}» створено.`);
     } catch (err) {
@@ -1208,64 +1469,119 @@ function setupEventListeners() {
     }
   });
 
-  $('addTeamMemberForm').addEventListener('submit', async (e) => {
+  $('addTeamMemberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!state.selectedTeamId) return;
     try {
       const res = await api(`/api/teams/${state.selectedTeamId}/members`, {
         method: 'POST',
         body: JSON.stringify({ learnerId: Number($('addMemberLearnerSelect').value) }),
       });
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
       renderAll();
-      showToast('Співробітника додано до команди.');
+      showToast('Учасника додано до команди.');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('assignTreeForm').addEventListener('submit', async (e) => {
+  $('previewCsvBtn')?.addEventListener('click', async () => {
+    if (!state.selectedTeamId) return;
+    try {
+      const csvText = await api(`/api/teams/${state.selectedTeamId}/export?format=CSV`);
+      if ($('csvPreviewContent')) $('csvPreviewContent').textContent = csvText;
+      $('csvPreviewCard')?.classList.remove('hidden');
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  $('closeCsvPreviewBtn')?.addEventListener('click', () => {
+    $('csvPreviewCard')?.classList.add('hidden');
+  });
+
+  $('exportCsvBtn')?.addEventListener('click', async () => {
+    if (!state.selectedTeamId) return;
+    try {
+      const csvText = await api(`/api/teams/${state.selectedTeamId}/export?format=CSV`);
+      const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `skilltree-team-${state.selectedTeamId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV-звіт сформовано та завантажено.');
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  // Profile Edit & Password Change on Dedicated Profile Page
+  $('profileForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const user = state.data?.currentUser;
+    if (!user) return;
     try {
-      const res = await api('/api/hr/assign-tree', {
-        method: 'POST',
-        body: JSON.stringify({
-          learnerId: Number($('hrLearnerSelect').value),
-          profession: $('hrAssignProfession').value,
-          level: $('hrAssignLevel').value,
-        }),
+      const payload = { fullName: $('profFullName').value.trim() };
+      if (user.role === 'LEARNER') {
+        payload.targetProfession = $('profTargetProfession')?.value.trim();
+        payload.level = $('profLevel')?.value;
+      } else if (user.role === 'MENTOR') {
+        payload.specialization = $('profSpecialization')?.value.trim();
+        payload.hourlyRate = Number($('profHourlyRate')?.value);
+        payload.bio = $('profBio')?.value.trim();
+      } else if (user.role === 'HR') {
+        payload.company = $('profCompany')?.value.trim();
+      }
+
+      const res = await api('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
       });
-      syncSelectionsFromData(res.state);
+      state.data = res.state;
       renderAll();
-      showToast(`Карту «${res.tree.targetProfession}» призначено співробітнику!`);
+      showToast('Дані профілю успішно збережено!');
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  $('exportCsvBtn').addEventListener('click', () => {
-    window.location.href = `/api/teams/${state.selectedTeamId}/export?format=CSV`;
-  });
-
-  $('previewCsvBtn').addEventListener('click', async () => {
+  $('profilePasswordForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = state.data?.currentUser;
+    if (!user) return;
+    const newPassword = $('profileNewPassword').value;
+    const confirmPassword = $('profileConfirmPassword').value;
+    if (newPassword !== confirmPassword) {
+      showToast('Паролі не співпадають.', true);
+      return;
+    }
     try {
-      const csv = await api(`/api/teams/${state.selectedTeamId}/export?format=CSV`);
-      $('csvPreviewContent').textContent = csv;
-      $('csvPreviewCard').classList.remove('hidden');
+      await api('/api/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: user.email, newPassword }),
+      });
+      $('profilePasswordForm').reset();
+      showToast('Пароль облікового запису успішно оновлено.');
     } catch (err) {
       showToast(err.message, true);
     }
-  });
-
-  $('closeCsvPreviewBtn').addEventListener('click', () => {
-    $('csvPreviewCard').classList.add('hidden');
   });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  setupEventListeners();
+async function init() {
+  applyTheme(localStorage.getItem('skilltree_theme') || 'dark');
+  syncRegisterRoleField();
+  bindEvents();
+  navigateTo(window.location.pathname, false);
   try {
-    await refreshState();
+    await loadState();
   } catch (err) {
-    showToast(err.message, true);
+    showToast(`Не вдалося завантажити дані: ${err.message}`, true);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

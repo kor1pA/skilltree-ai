@@ -1,264 +1,626 @@
 <!DOCTYPE html>
-<html lang="uk" data-theme="light">
+<html lang="uk" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkillTree AI — Сучасна платформа карт розвитку, ШІ-менторства та B2B Skill Matrix</title>
+  <title>SkillTree AI — Персоналізовані карти розвитку та ШІ-навчання</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <!-- STICKY GLASSMORPHISM NAVBAR -->
+  <!-- Sticky Top Navbar -->
   <header class="navbar">
-    <div class="container navbar-inner">
-      <a href="#section-home" class="brand">
+    <div class="container nav-inner">
+      <a href="/" data-route="/" class="brand" aria-label="SkillTree AI На головну">
         <span class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-            <circle cx="16" cy="6" r="4" fill="#FFFFFF" />
-            <circle cx="7.5" cy="23" r="4" fill="#34D399" />
-            <circle cx="24.5" cy="23" r="4" fill="#38BDF8" />
-            <path d="M16 10V15M16 15L7.5 19M16 15L24.5 19" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5" r="3"></circle>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="18" r="3"></circle>
+            <path d="M12 8v4l-4.5 3.5M12 12l4.5 3.5"></path>
           </svg>
         </span>
         <span class="brand-text">
           <strong>SkillTree AI</strong>
-          <small>Розумний трек кар’єри</small>
+          <small>Розумний трек кар'єри</small>
         </span>
       </a>
 
       <nav class="nav-links" aria-label="Головна навігація">
-        <a href="#section-home" class="nav-link active">Головна</a>
-        <a href="#section-roadmap" class="nav-link">Карта навичок</a>
-        <a href="#section-mentors" class="nav-link">Ментори</a>
-        <a href="#section-b2b" class="nav-link">Для команд (B2B)</a>
+        <a href="/" data-route="/" class="nav-link active">Головна</a>
+        <a href="/roadmap" data-route="/roadmap" class="nav-link" id="navRoadmapLink">Карта навичок</a>
+        <a href="/mentors" data-route="/mentors" class="nav-link" id="navMentorsLink">Ментори</a>
+        <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="nav-link" id="navMentorLink">Кабінет ментора</a>
+        <a href="/b2b" data-route="/b2b" class="nav-link" id="navB2bLink">Для команд (B2B)</a>
+        <a href="/profile" data-route="/profile" class="nav-link hidden" id="navProfileLink">Мій профіль</a>
       </nav>
 
       <div class="nav-actions">
-        <button id="themeToggleBtn" type="button" class="icon-btn" title="Перемкнути світлу/темну тему" aria-label="Тема">🌙</button>
-        <button id="openAiSettingsBtn" type="button" class="icon-btn" title="Налаштування ключа LLM API" aria-label="Налаштування ШІ">🤖</button>
+        <button type="button" id="themeToggleBtn" class="icon-btn" title="Змінити тему (Світла / Темна)" aria-label="Змінити тему">☀️</button>
+        <button type="button" id="openAiSettingsBtn" class="icon-btn" title="Налаштування ШІ-асистента" aria-label="Налаштування ШІ">⚙️</button>
 
-        <!-- Guest state -->
-        <button id="openAuthBtn" type="button" class="btn btn-primary btn-sm">Увійти / Реєстрація</button>
+        <button type="button" id="openAuthBtn" class="st-btn st-btn-primary">Увійти / Реєстрація</button>
 
-        <!-- Authenticated state -->
         <div id="userMenu" class="user-menu hidden">
-          <button id="openProfileBtn" type="button" class="user-chip" title="Редагувати профіль">
-            <span id="navAvatar" class="avatar-xs">ВГ</span>
-            <span id="navUserName">Користувач</span>
-          </button>
-          <button id="logoutBtn" type="button" class="btn btn-ghost btn-sm">Вийти</button>
+          <a href="/profile" data-route="/profile" id="openProfileBtn" class="user-chip" title="Відкрити мій профіль">
+            <span id="navAvatar" class="user-avatar">ВГ</span>
+            <span id="navUserName" class="user-name">Профіль</span>
+          </a>
+          <button type="button" id="logoutBtn" class="st-btn st-btn-ghost st-btn-sm" title="Вийти з акаунта">Вийти</button>
         </div>
       </div>
     </div>
   </header>
 
-  <main>
-    <!-- HERO SECTION + BENTO GRID -->
-    <section id="section-home" class="hero-section">
-      <div class="container">
-        <div class="hero-grid">
-          <div class="hero-content">
-            <span class="eyebrow-pill">✦ Платформа персоналізованого ІТ-навчання</span>
-            <h1 class="hero-title">
-              Опануйте нову ІТ-професію за <span>інтерактивною картою</span> з ШІ-ментором
-            </h1>
-            <p class="hero-subtitle">
-              Чіткий покроковий план без хаосу, вбудовані конспекти й приклади коду, миттєві підказки ШІ за ≤ 5 секунд та 1-на-1 сесії з практикуючими експертами.
-            </p>
+  <main class="app-main">
+    <!-- PAGE 1: HOME (/) -->
+    <section id="page-home" class="page-view active" data-page="/">
+      <div id="hero-section" class="page-section hero-section">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <div class="hero-pill">✦ Платформа персоналізованого ІТ-навчання</div>
+              <h1 class="hero-title">
+                Опануйте нову ІТ-професію за <span class="gradient-text">інтерактивною картою</span> з ШІ-ментором
+              </h1>
+              <p class="hero-subtitle">
+                Чіткий покроковий план без хаосу, вбудовані конспекти й приклади коду, миттєві підказки ШІ за &le; 5 секунд та 1-на-1 сесії з практикуючими експертами.
+              </p>
 
-            <ul class="hero-bullets">
-              <li>✓ Готові маршрути під 8+ ІТ-професій або будь-який ваш запит</li>
-              <li>✓ Контекстний ШІ-асистент прямо всередині кожної теми</li>
-              <li>✓ Прозора матриця навичок команди для HR та TeamLead</li>
-            </ul>
+              <ul class="hero-checklist">
+                <li>✓ Готові маршрути під 8+ ІТ-професій або будь-який ваш запит</li>
+                <li>✓ Контекстний ШІ-асистент прямо всередині кожної теми</li>
+                <li>✓ Прозора матриця навичок команди для HR та TeamLead</li>
+              </ul>
 
-            <div class="hero-ctas">
-              <a href="#section-roadmap" class="btn btn-primary btn-lg">Побудувати свою карту →</a>
-              <a href="#section-mentors" class="btn btn-secondary btn-lg">Переглянути менторів</a>
+              <div class="hero-cta">
+                <a href="/roadmap" data-route="/roadmap" class="st-btn st-btn-primary st-btn-lg">Побудувати свою карту →</a>
+                <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline st-btn-lg">Переглянути менторів</a>
+              </div>
+
+              <div class="hero-stats">
+                <div class="hero-stat">
+                  <strong>8+</strong>
+                  <span>ІТ-напрямів</span>
+                </div>
+                <div class="hero-stat">
+                  <strong id="heroAiSla">180 мс</strong>
+                  <span>відповідь ШІ</span>
+                </div>
+                <div class="hero-stat">
+                  <strong>4.9 ★</strong>
+                  <span>рейтинг менторів</span>
+                </div>
+              </div>
             </div>
 
-            <div class="hero-stats">
-              <div class="stat-item">
-                <strong>8+</strong>
-                <span>ІТ-напрямів</span>
-              </div>
-              <div class="stat-divider"></div>
-              <div class="stat-item">
-                <strong id="heroAiSla">≤ 0.3 с</strong>
-                <span>відповідь ШІ</span>
-              </div>
-              <div class="stat-divider"></div>
-              <div class="stat-item">
-                <strong>4.9 ★</strong>
-                <span>рейтинг менторів</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Visual Interactive Preview Card -->
-          <div class="hero-visual">
-            <div class="preview-card">
-              <div class="preview-card-head">
-                <div>
-                  <span class="tag-soft">Поточний трек</span>
-                  <h3 id="heroTrackTitle">Full-Stack Developer</h3>
-                </div>
-                <div class="ring-wrap" title="Прогрес карти">
-                  <svg class="progress-ring" width="60" height="60" viewBox="0 0 60 60">
-                    <circle class="ring-bg" cx="30" cy="30" r="24" />
-                    <circle id="heroRingFill" class="ring-fill" cx="30" cy="30" r="24" />
-                  </svg>
-                  <span id="heroRingText" class="ring-text">40%</span>
-                </div>
-              </div>
-
-              <!-- Clean SVG Tree Preview -->
-              <div class="preview-nodes">
-                <div class="preview-node done">
-                  <span class="p-dot">✓</span>
+            <div class="hero-visual">
+              <div class="hero-preview-card st-card">
+                <div class="hero-preview-top">
                   <div>
-                    <strong>1. HTML5, CSS3 та верстка</strong>
-                    <small>Завершено • +50 XP</small>
+                    <span class="mini-label">Поточний трек</span>
+                    <h3 id="heroTrackTitle">Full-Stack Developer</h3>
+                  </div>
+                  <div class="ring-wrap" aria-label="Прогрес карти">
+                    <svg class="progress-ring" width="62" height="62" viewBox="0 0 64 64">
+                      <circle class="ring-track" cx="32" cy="32" r="26" fill="none" stroke-width="6"></circle>
+                      <circle id="heroRingFill" class="ring-fill" cx="32" cy="32" r="26" fill="none" stroke-width="6" stroke-dasharray="163.36" stroke-dashoffset="98"></circle>
+                    </svg>
+                    <span id="heroRingText" class="ring-text">40%</span>
                   </div>
                 </div>
-                <div class="preview-connector"></div>
-                <div class="preview-node done">
-                  <span class="p-dot">✓</span>
-                  <div>
-                    <strong>2. TypeScript та ES2022+</strong>
-                    <small>Завершено • +50 XP</small>
-                  </div>
-                </div>
-                <div class="preview-connector"></div>
-                <div class="preview-node active">
-                  <span class="p-dot">3</span>
-                  <div>
-                    <strong>3. Backend REST API на Node.js</strong>
-                    <small>У процесі • 2 уроки</small>
-                  </div>
-                </div>
-              </div>
 
-              <div class="floating-ai-card">
-                <div class="floating-ai-head">
-                  <span>🤖 ШІ-помічник</span>
-                  <span class="sla-pill">215 мс</span>
+                <div class="preview-steps">
+                  <div class="preview-step done">
+                    <span class="step-dot">✓</span>
+                    <div>
+                      <strong>1. HTML5, CSS3 та верстка</strong>
+                      <small>Завершено • +50 XP</small>
+                    </div>
+                  </div>
+                  <div class="preview-step done">
+                    <span class="step-dot">✓</span>
+                    <div>
+                      <strong>2. TypeScript та ES2022+</strong>
+                      <small>Завершено • +50 XP</small>
+                    </div>
+                  </div>
+                  <div class="preview-step active">
+                    <span class="step-dot">3</span>
+                    <div>
+                      <strong>3. Backend REST API на Node.js</strong>
+                      <small>У процесі • 2 уроки</small>
+                    </div>
+                  </div>
                 </div>
-                <p>«PUT повністю перезаписує ресурс, а PATCH оновлює окремі поля — ідеально для зміни статусу вузла.»</p>
+
+                <div class="hero-ai-snippet">
+                  <div class="snippet-head">
+                    <span>🤖 ШІ-помічник</span>
+                    <span class="sla-pill">~215 мс</span>
+                  </div>
+                  <p>«PUT повністю перезаписує ресурс, а PATCH оновлює окремі поля — ідеально для зміни статусу вузла.»</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 3-Card Bento Grid -->
-        <div class="bento-grid">
-          <article class="bento-card">
-            <div class="bento-icon indigo">🗺️</div>
-            <h3>Інтерактивні дерева навичок</h3>
-            <p>Генеруйте покроковий маршрут навчання під ваш рівень (Junior / Middle / Senior), додавайте власні вузли та читайте готові уроки.</p>
-          </article>
-          <article class="bento-card">
-            <div class="bento-icon cyan">🤖</div>
-            <h3>Миттєвий ШІ-асистент ≤ 5 с</h3>
-            <p>Задавайте питання прямо на сторінці теми — отримуйте приклади коду та оцінюйте якість відповідей для контролю точності &gt; 90%.</p>
-          </article>
-          <article class="bento-card">
-            <div class="bento-icon emerald">📊</div>
-            <h3>Менторство та B2B Skill Matrix</h3>
-            <p>Бронюйте консультації з оплатою й квитанціями, а в командному кабінеті оцінюйте навички співробітників та вивантажуйте CSV.</p>
-          </article>
+          <!-- Bento Features -->
+          <div class="bento-grid">
+            <article class="st-card bento-card">
+              <div class="bento-icon">🗺️</div>
+              <h3>Інтерактивні дерева навичок</h3>
+              <p>Генеруйте покроковий маршрут навчання під ваш рівень (Beginner / Intermediate / Advanced), додавайте власні вузли та читайте готові конспекти.</p>
+            </article>
+            <article class="st-card bento-card">
+              <div class="bento-icon">⚡</div>
+              <h3>Миттєвий ШІ-асистент &le; 5 с</h3>
+              <p>Задавайте питання прямо на сторінці теми — отримуйте приклади коду та оцінюйте якість відповідей для контролю точності &gt; 90%.</p>
+            </article>
+            <article class="st-card bento-card">
+              <div class="bento-icon">📊</div>
+              <h3>Менторство та B2B Skill Matrix</h3>
+              <p>Бронюйте консультації з оплатою й квитанціями, а в командному кабінеті оцінюйте навички співробітників та вивантажуйте CSV.</p>
+            </article>
+          </div>
+
+          <!-- Role Portals (Separate Dedicated Pages per Profile Role) -->
+          <div class="portals-block">
+            <div class="section-intro">
+              <span class="mini-label">Оберіть робочий простір</span>
+              <h2>Окремі сторінки для кожної ролі на платформі</h2>
+              <p>Кожна роль має власний повноцінний кабінет з окремим маршрутом без нескінченного скролу.</p>
+            </div>
+
+            <div class="portals-grid">
+              <a href="/roadmap" data-route="/roadmap" class="st-card portal-card">
+                <div class="portal-top">
+                  <span class="portal-badge portal-badge-learner">Студент / Фахівець</span>
+                  <span class="portal-arrow">→</span>
+                </div>
+                <h3>Карта навичок та ШІ-тьютор</h3>
+                <p>Генерація персональної карти, проходження вузлів із нарахуванням XP і бейджів, вбудовані уроки та чат із ШІ-асистентом.</p>
+                <span class="portal-cta">Відкрити /roadmap</span>
+              </a>
+
+              <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="st-card portal-card">
+                <div class="portal-top">
+                  <span class="portal-badge portal-badge-mentor">Ментор / Експерт</span>
+                  <span class="portal-arrow">→</span>
+                </div>
+                <h3>Кабінет ментора</h3>
+                <p>Публікація навчальних матеріалів у вузли карти розвитку, управління вхідними 1-на-1 бронюваннями та перегляд рейтингу.</p>
+                <span class="portal-cta">Відкрити /mentor-cabinet</span>
+              </a>
+
+              <a href="/b2b" data-route="/b2b" class="st-card portal-card">
+                <div class="portal-top">
+                  <span class="portal-badge portal-badge-hr">HR / TeamLead (B2B)</span>
+                  <span class="portal-arrow">→</span>
+                </div>
+                <h3>Командна аналітика Skill Matrix</h3>
+                <p>Створення команд, призначення індивідуальних карт розвитку працівникам, візуалізація прогалин та експорт звітів у CSV.</p>
+                <span class="portal-cta">Відкрити /b2b</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 1: INTERACTIVE SKILL TREE & AI WORKSPACE -->
-    <section id="section-roadmap" class="page-section alt-bg">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <span class="eyebrow-text">Інтерактивна робоча область</span>
-            <h2>Ваша карта розвитку та ШІ-асистент</h2>
-            <p class="muted">Оберіть напрям в 1 клік або налаштуйте власну карту — усі зміни миттєво зберігаються.</p>
+    <!-- PAGE 2: ROADMAP (/roadmap) -->
+    <section id="page-roadmap" class="page-view" data-page="/roadmap">
+      <div class="page-band">
+        <div class="container">
+          <div class="page-header-row">
+            <div>
+              <span class="mini-label">Кабінет студента • UC2, UC3, UC4, UC10, UC11</span>
+              <h1>Інтерактивна карта навичок</h1>
+              <p class="page-lead">Обирайте модулі, вивчайте конспекти, ставте запитання контекстному ШІ-помічнику та заробляйте XP.</p>
+            </div>
+            <div class="toolbar-actions">
+              <select id="treeSelect" class="st-input st-select" aria-label="Активна карта розвитку"></select>
+              <button type="button" id="openAddNodeBtn" class="st-btn st-btn-outline">+ Додати вузол</button>
+              <button type="button" id="openWizardBtn" class="st-btn st-btn-primary">✨ Нова ШІ-карта</button>
+            </div>
           </div>
 
-          <div class="section-controls">
-            <label class="select-pill">
-              <span>Активна карта:</span>
-              <select id="treeSelect"></select>
-            </label>
-            <button id="openAddNodeBtn" type="button" class="btn btn-secondary">➕ Додати навичку</button>
-            <button id="openWizardBtn" type="button" class="btn btn-primary">✨ Створити нову карту</button>
+          <div class="quick-professions-bar">
+            <span class="quick-label">Швидкі треки:</span>
+            <div id="quickProfessionsRow" class="quick-professions-row"></div>
+          </div>
+
+          <div class="workspace-grid">
+            <!-- Left column: SkillTree & Nodes -->
+            <div class="st-card workspace-card">
+              <div class="tree-summary-head">
+                <div>
+                  <h2 id="treeTitle">Full-Stack Developer</h2>
+                  <p id="treeMeta" class="muted-text">Рівень: BEGINNER • Вузлів: 5</p>
+                </div>
+                <div class="tree-stats-badges">
+                  <span id="learnerPointsBadge" class="st-badge st-badge-accent">0 балів</span>
+                  <span id="treePercentBadge" class="st-badge st-badge-success">0%</span>
+                </div>
+              </div>
+
+              <div class="progress-track" aria-label="Прогрес дерева навичок">
+                <div id="treeProgressFill" class="progress-fill" style="width: 0%"></div>
+              </div>
+
+              <div id="badgesRow" class="badges-row"></div>
+
+              <div id="nodesList" class="nodes-list"></div>
+            </div>
+
+            <!-- Right column: Node Inspector & AI Tutor -->
+            <div class="st-card workspace-card inspector-card">
+              <div id="nodeInspectorEmpty" class="empty-state">
+                <div class="empty-icon">🧭</div>
+                <h3>Оберіть вузол ліворуч</h3>
+                <p>Клацніть на будь-яку тему в карті навичок, щоб відкрити матеріали, змінити статус і поставити питання ШІ-тьютору.</p>
+              </div>
+
+              <div id="nodeInspectorContent" class="hidden">
+                <div class="inspector-head">
+                  <div>
+                    <span id="activeNodeBadge" class="st-badge">NOT_STARTED</span>
+                    <h2 id="activeNodeTitle">Назва теми</h2>
+                  </div>
+                  <div id="nodeActionButtons" class="node-action-buttons"></div>
+                </div>
+
+                <p id="activeNodeDesc" class="inspector-desc"></p>
+
+                <div class="materials-block">
+                  <div class="block-head">
+                    <h3>📚 Навчальні матеріали</h3>
+                    <span id="materialsCount" class="st-badge">0</span>
+                  </div>
+                  <div id="nodeMaterialsList" class="materials-list"></div>
+                </div>
+
+                <div class="ai-tutor-block">
+                  <div class="block-head">
+                    <div>
+                      <h3>🤖 Контекстний ШІ-тьютор</h3>
+                      <small class="muted-text">Відповідає з урахуванням обраного вузла</small>
+                    </div>
+                    <span id="aiSlaBadge" class="st-badge st-badge-accent">SLA &le; 5000 мс</span>
+                  </div>
+
+                  <div class="quick-prompts">
+                    <button type="button" class="chip-btn" data-prompt="Поясни простими словами ключову концепцію цієї теми">З чого почати?</button>
+                    <button type="button" class="chip-btn" data-prompt="Наведи практичний приклад коду для цього вузла">Наведи приклад коду</button>
+                    <button type="button" class="chip-btn" data-prompt="Які типові помилки роблять новачки в цій темі?">Типові помилки</button>
+                  </div>
+
+                  <div id="chatMessages" class="chat-messages"></div>
+
+                  <form id="askAiForm" class="chat-form">
+                    <input type="text" id="aiQuestionInput" class="st-input" placeholder="Поставте запитання ШІ по поточній темі..." required />
+                    <button type="submit" class="st-btn st-btn-primary">Запитати</button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- 1-Click Profession Pills -->
-        <div id="quickProfessionsRow" class="preset-pills-row"></div>
-
-        <div class="workspace-grid">
-          <!-- Left: Roadmap Timeline -->
-          <div class="surface-card roadmap-card">
-            <div class="card-top">
-              <div>
-                <h3 id="treeTitle">Full-Stack Developer</h3>
-                <p id="treeMeta" class="muted">Рівень: Початковий • Вузлів: 5</p>
-              </div>
-              <div class="xp-group">
-                <span id="learnerPointsBadge" class="xp-pill">100 XP</span>
-                <span id="treePercentBadge" class="pct-pill">40%</span>
-              </div>
+    <!-- PAGE 3: MENTORS MARKETPLACE (/mentors) -->
+    <section id="page-mentors" class="page-view" data-page="/mentors">
+      <div class="page-band">
+        <div class="container">
+          <div class="page-header-row">
+            <div>
+              <span class="mini-label">Менторство • UC6, UC9</span>
+              <h1>Експерти та 1-на-1 консультації</h1>
+              <p class="page-lead">Обирайте практикуючого ментора, бронюйте зручний час та оплачуйте консультацію з автоматичною генерацією квитанції.</p>
             </div>
-
-            <div class="progress-track">
-              <div id="treeProgressFill" class="progress-fill" style="width: 40%"></div>
-            </div>
-
-            <div id="badgesRow" class="badges-row"></div>
-            <div id="nodesList" class="timeline-list"></div>
+            <a href="/mentor-cabinet" data-route="/mentor-cabinet" class="st-btn st-btn-outline">Я ментор → Кабінет ментора</a>
           </div>
 
-          <!-- Right: Active Node Study + AI Assistant -->
-          <div class="surface-card study-card">
-            <div id="nodeInspectorEmpty" class="empty-state">
-              Оберіть навичку ліворуч, щоб відкрити матеріали та чат із ШІ-помічником.
+          <div id="mentorsDirectoryGrid" class="mentors-grid"></div>
+
+          <div id="learnerMentorshipGrid" class="two-col mentorship-workspace">
+            <div class="st-card">
+              <h2>📅 Забронювати консультацію (UC6)</h2>
+              <p class="muted-text">Після бронювання ви можете оплатити сесію онлайн та залишити оцінку.</p>
+              <form id="bookSessionForm" class="stack-form">
+                <div class="form-group">
+                  <label for="bookingMentorSelect">Оберіть ментора</label>
+                  <select id="bookingMentorSelect" class="st-input" required></select>
+                </div>
+                <div class="form-group">
+                  <label for="bookingTopic">Тема консультації</label>
+                  <input type="text" id="bookingTopic" class="st-input" placeholder="Наприклад: Code Review архітектури REST API" required />
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="bookingStartAt">Дата та час початку</label>
+                    <input type="datetime-local" id="bookingStartAt" class="st-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="bookingDuration">Тривалість</label>
+                    <select id="bookingDuration" class="st-input">
+                      <option value="30">30 хв</option>
+                      <option value="60" selected>60 хв</option>
+                      <option value="90">90 хв</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="st-btn st-btn-primary">Забронювати сесію</button>
+              </form>
             </div>
 
-            <div id="nodeInspectorContent" class="hidden">
-              <div class="study-header">
-                <div>
-                  <span id="activeNodeBadge" class="status-pill">У процесі</span>
-                  <h3 id="activeNodeTitle">Назва навички</h3>
+            <div class="st-card">
+              <h2>🧾 Мої бронювання та оплати (UC9)</h2>
+              <p class="muted-text">Контролюйте статус оплати, завантажуйте квитанції та оцінюйте менторів.</p>
+              <div id="learnerSessionsList" class="sessions-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 4: MENTOR CABINET (/mentor-cabinet) -->
+    <section id="page-mentor-cabinet" class="page-view" data-page="/mentor-cabinet">
+      <div class="page-band">
+        <div class="container">
+          <div class="page-header-row">
+            <div>
+              <span class="mini-label">Профіль експерта • UC5, UC6</span>
+              <h1>Кабінет ментора</h1>
+              <p class="page-lead">Публікуйте навчальні матеріали у вузли карти навичок та підтверджуйте бронювання студентів.</p>
+            </div>
+            <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline">← До каталогу менторів</a>
+          </div>
+
+          <div id="mentorGuestNotice" class="st-card notice-card hidden">
+            <div class="notice-icon">🎓</div>
+            <h2>Доступ до кабінету ментора</h2>
+            <p>Щоб публікувати власні уроки у вузли карти навичок та підтверджувати консультації студентів, увійдіть під обліковим записом з роллю <strong>Ментор / Експерт</strong> або зареєструйте новий акаунт ментора.</p>
+            <div class="notice-actions">
+              <button type="button" id="openAuthFromMentorBtn" class="st-btn st-btn-primary">Увійти / Зареєструватися як Ментор</button>
+              <a href="/mentors" data-route="/mentors" class="st-btn st-btn-outline">Перейти до бронювання</a>
+            </div>
+          </div>
+
+          <div id="mentorCabinetContent" class="hidden">
+            <div id="mentorCabinetPanel">
+              <div id="mentorProfileSummary" class="mentor-kpi-grid"></div>
+
+              <div class="two-col">
+                <div class="st-card">
+                  <h2>✍️ Опублікувати навчальний матеріал (UC5)</h2>
+                  <p class="muted-text">Додайте конспект, відеорозбір або зовнішнє посилання прямо у вузол студента.</p>
+                  <form id="publishMaterialForm" class="stack-form">
+                    <div class="form-group">
+                      <label for="mentorNodeSelect">Цільовий вузол навички</label>
+                      <select id="mentorNodeSelect" class="st-input" required></select>
+                    </div>
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label for="materialTitle">Назва матеріалу</label>
+                        <input type="text" id="materialTitle" class="st-input" placeholder="Напр.: Гайд по патерну Adapter" required />
+                      </div>
+                      <div class="form-group">
+                        <label for="materialType">Тип контенту</label>
+                        <select id="materialType" class="st-input">
+                          <option value="TEXT">TEXT (Внутрішній урок)</option>
+                          <option value="LINK">LINK (Документація / Стаття)</option>
+                          <option value="VIDEO">VIDEO (Відеолекція)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="materialUrl">Посилання (необов'язково для TEXT)</label>
+                      <input type="url" id="materialUrl" class="st-input" placeholder="https://..." />
+                    </div>
+                    <div class="form-group">
+                      <label for="materialDesc">Короткий опис</label>
+                      <input type="text" id="materialDesc" class="st-input" placeholder="Чому це важливо для практики" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="materialContent">Повний текст конспекту</label>
+                      <textarea id="materialContent" class="st-input" rows="4" placeholder="Ключові тези, приклади коду та чекліст..."></textarea>
+                    </div>
+                    <button type="submit" class="st-btn st-btn-primary">Опублікувати у вузол</button>
+                  </form>
                 </div>
-                <div id="nodeActionButtons" class="study-actions"></div>
+
+                <div class="st-card">
+                  <h2>🗓️ Вхідні консультації студентів</h2>
+                  <p class="muted-text">Підтверджуйте заброньовані слоти або керуйте розкладом.</p>
+                  <div id="mentorSessionsList" class="sessions-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 5: B2B ANALYTICS (/b2b) -->
+    <section id="page-b2b" class="page-view" data-page="/b2b">
+      <div class="page-band">
+        <div class="container">
+          <div class="page-header-row">
+            <div>
+              <span class="mini-label">B2B Кабінет HR / TeamLead • UC7, UC8, UC12</span>
+              <h1>Матриця навичок команди</h1>
+              <p class="page-lead">Відстежуйте середній рівень володіння навичками в команді, призначайте карти розвитку та вивантажуйте звіти у CSV.</p>
+            </div>
+            <div class="toolbar-actions">
+              <select id="teamSelect" class="st-input st-select" aria-label="Оберіть команду"></select>
+              <button type="button" id="previewCsvBtn" class="st-btn st-btn-outline">Переглянути CSV</button>
+              <button type="button" id="exportCsvBtn" class="st-btn st-btn-primary">⬇ Завантажити CSV</button>
+            </div>
+          </div>
+
+          <div class="two-col b2b-top-grid">
+            <div class="st-card">
+              <h2>📈 Матриця прогресу за професіями</h2>
+              <p class="muted-text">Середній відсоток виконання індивідуальних карт розвитку у команді.</p>
+              <div id="skillMatrixBars" class="matrix-bars"></div>
+
+              <h3 class="sub-heading">Покриття ключових модулів (вузлів)</h3>
+              <div id="nodeMatrixBars" class="matrix-bars"></div>
+            </div>
+
+            <div class="st-card">
+              <h2>🎯 Керування командою та призначення карт (UC8)</h2>
+
+              <form id="assignTreeForm" class="stack-form">
+                <h3>Призначити карту працівнику</h3>
+                <div class="form-group">
+                  <label for="hrLearnerSelect">Співробітник</label>
+                  <select id="hrLearnerSelect" class="st-input" required></select>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="hrAssignProfession">Професія / напрямок</label>
+                    <input type="text" id="hrAssignProfession" class="st-input" list="professionList" placeholder="Напр.: Backend Developer" required />
+                    <datalist id="professionList"></datalist>
+                  </div>
+                  <div class="form-group">
+                    <label for="hrAssignLevel">Цільовий рівень</label>
+                    <select id="hrAssignLevel" class="st-input">
+                      <option value="BEGINNER">BEGINNER</option>
+                      <option value="INTERMEDIATE">INTERMEDIATE</option>
+                      <option value="ADVANCED">ADVANCED</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="st-btn st-btn-primary">Призначити карту розвитку</button>
+              </form>
+
+              <hr class="divider" />
+
+              <div class="form-grid-2">
+                <form id="createTeamForm" class="stack-form">
+                  <label for="newTeamName">Створити нову команду</label>
+                  <div class="inline-form-row">
+                    <input type="text" id="newTeamName" class="st-input" placeholder="Назва команди" required />
+                    <button type="submit" class="st-btn st-btn-outline">Створити</button>
+                  </div>
+                </form>
+
+                <form id="addTeamMemberForm" class="stack-form">
+                  <label for="addMemberLearnerSelect">Додати учасника до команди</label>
+                  <div class="inline-form-row">
+                    <select id="addMemberLearnerSelect" class="st-input" required></select>
+                    <button type="submit" class="st-btn st-btn-outline">Додати</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="st-card b2b-table-card">
+            <div class="block-head">
+              <h2>👥 Учасники обраної команди</h2>
+              <span class="mini-label">Дані оновлюються в реальному часі</span>
+            </div>
+            <div class="table-wrap">
+              <table class="st-table">
+                <thead>
+                  <tr>
+                    <th>Співробітник</th>
+                    <th>Цільова професія</th>
+                    <th>Рівень</th>
+                    <th>Карти</th>
+                    <th>Вузли</th>
+                    <th>Прогрес</th>
+                    <th>XP</th>
+                  </tr>
+                </thead>
+                <tbody id="hrMembersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="csvPreviewCard" class="st-card hidden">
+            <div class="block-head">
+              <h3>📄 Попередній перегляд CSV-звіту (RFC-4180 + UTF-8 BOM)</h3>
+              <button type="button" id="closeCsvPreviewBtn" class="st-btn st-btn-ghost st-btn-sm">Закрити</button>
+            </div>
+            <pre id="csvPreviewContent" class="csv-pre"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6: USER PROFILE (/profile) -->
+    <section id="page-profile" class="page-view" data-page="/profile">
+      <div class="page-band">
+        <div class="container">
+          <div class="page-header-row">
+            <div>
+              <span class="mini-label">Особистий акаунт • UC1</span>
+              <h1>Мій профіль та налаштування</h1>
+              <p class="page-lead">Керуйте особистими даними, спеціалізацією та параметрами безпеки вашого облікового запису.</p>
+            </div>
+            <a href="/" data-route="/" class="st-btn st-btn-outline">← На головну</a>
+          </div>
+
+          <div id="profileGuestNotice" class="st-card notice-card hidden">
+            <div class="notice-icon">🔐</div>
+            <h2>Ви ще не увійшли в акаунт</h2>
+            <p>Увійдіть або зареєструйте новий профіль (Студент, Ментор або HR), щоб переглядати свою статистику, редагувати дані та керувати безпекою.</p>
+            <div class="notice-actions">
+              <button type="button" id="openAuthFromProfileBtn" class="st-btn st-btn-primary">Увійти / Реєстрація</button>
+              <a href="/roadmap" data-route="/roadmap" class="st-btn st-btn-outline">Продовжити як гість у карті</a>
+            </div>
+          </div>
+
+          <div id="profilePageContent" class="profile-page-grid hidden">
+            <aside class="st-card profile-hero-card">
+              <div class="profile-avatar-lg" id="profilePageAvatar">ВГ</div>
+              <h2 id="profilePageName">Користувач</h2>
+              <span id="profilePageRole" class="st-badge st-badge-accent">LEARNER</span>
+              <p id="profilePageEmail" class="muted-text">user@skilltree.ai</p>
+
+              <div id="profileStatsSummary" class="profile-stats-summary"></div>
+
+              <div class="profile-quick-actions">
+                <a href="/roadmap" data-route="/roadmap" id="profileWorkspaceLink" class="st-btn st-btn-primary">Перейти у робочий кабінет →</a>
+                <button type="button" id="profileLogoutBtn" class="st-btn st-btn-outline">Вийти з акаунта</button>
+              </div>
+            </aside>
+
+            <div class="profile-forms-col">
+              <div class="st-card">
+                <h2>👤 Персональні дані та рольові параметри</h2>
+                <form id="profileForm" class="stack-form">
+                  <div class="form-group">
+                    <label for="profFullName">Повне ім'я (ПІБ)</label>
+                    <input type="text" id="profFullName" class="st-input" required />
+                  </div>
+                  <div id="profRoleFields"></div>
+                  <button type="submit" class="st-btn st-btn-primary">Зберегти зміни профілю</button>
+                </form>
               </div>
 
-              <p id="activeNodeDesc" class="study-desc"></p>
-
-              <!-- Materials -->
-              <div class="sub-block">
-                <div class="sub-block-head">
-                  <h4>📚 Навчальні матеріали</h4>
-                  <span id="materialsCount" class="muted">0 матеріалів</span>
-                </div>
-                <div id="nodeMaterialsList" class="materials-grid"></div>
-              </div>
-
-              <!-- AI Chat -->
-              <div class="sub-block">
-                <div class="sub-block-head">
-                  <h4>🤖 Контекстний ШІ-асистент</h4>
-                  <span id="aiSlaBadge" class="sla-pill">SLA ≤ 5 сек</span>
-                </div>
-
-                <div class="quick-chips">
-                  <button type="button" class="chip-btn" data-prompt="З чого почати вивчення цієї теми?">З чого почати?</button>
-                  <button type="button" class="chip-btn" data-prompt="Поясни простими словами і наведи приклад коду">Приклад коду</button>
-                  <button type="button" class="chip-btn" data-prompt="У мене помилка при виконанні завдання, як знайти причину?">Допомогти з помилкою</button>
-                </div>
-
-                <div id="chatMessages" class="chat-feed"></div>
-
-                <form id="askAiForm" class="chat-composer">
-                  <input id="aiQuestionInput" type="text" placeholder="Задайте запитання по цій навичці..." required />
-                  <button type="submit" class="btn btn-primary">Запитати ШІ</button>
+              <div class="st-card">
+                <h2>🔑 Зміна пароля</h2>
+                <p class="muted-text">Оновіть пароль для вашого облікового запису (мінімум 4 символи).</p>
+                <form id="profilePasswordForm" class="stack-form">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label for="profileNewPassword">Новий пароль</label>
+                      <input type="password" id="profileNewPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="profileConfirmPassword">Підтвердьте пароль</label>
+                      <input type="password" id="profileConfirmPassword" class="st-input" minlength="4" placeholder="Повторіть пароль" required />
+                    </div>
+                  </div>
+                  <button type="submit" class="st-btn st-btn-outline">Оновити пароль</button>
                 </form>
               </div>
             </div>
@@ -266,458 +628,259 @@
         </div>
       </div>
     </section>
-
-    <!-- SECTION 2: MENTORS & CONSULTATIONS -->
-    <section id="section-mentors" class="page-section">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <span class="eyebrow-text">Гібридне менторство (UC5, UC6, UC9)</span>
-            <h2>Експерти-практики та персональні сесії</h2>
-            <p class="muted">Оберіть ментора для код-рев’ю, оплатіть сесію з миттєвою квитанцією та залиште відгук.</p>
-          </div>
-        </div>
-
-        <!-- Mentor Directory Cards -->
-        <div id="mentorsDirectoryGrid" class="mentors-grid"></div>
-
-        <!-- Mentor Self-Cabinet (Shown when logged in as MENTOR) -->
-        <div id="mentorCabinetPanel" class="mentor-cabinet hidden">
-          <div class="section-subheader">
-            <h3>🧑‍🏫 Мій кабінет ментора</h3>
-            <div id="mentorProfileSummary" class="mentor-stats-row"></div>
-          </div>
-
-          <div class="two-col">
-            <div class="surface-card">
-              <h4>📝 Опублікувати урок у вузол карти (UC5)</h4>
-              <form id="publishMaterialForm" class="stack-form">
-                <label class="field-stack">
-                  <span>Цільова навичка</span>
-                  <select id="mentorNodeSelect"></select>
-                </label>
-                <label class="field-stack">
-                  <span>Назва уроку / матеріалу</span>
-                  <input id="materialTitle" type="text" placeholder="Напр. Патерни чистої архітектури" required />
-                </label>
-                <div class="form-grid-2">
-                  <label class="field-stack">
-                    <span>Формат</span>
-                    <select id="materialType">
-                      <option value="TEXT">Урок / Конспект (TEXT)</option>
-                      <option value="LINK">Посилання (LINK)</option>
-                      <option value="VIDEO">Відео (VIDEO)</option>
-                    </select>
-                  </label>
-                  <label class="field-stack">
-                    <span>Зовнішнє посилання</span>
-                    <input id="materialUrl" type="url" placeholder="https://..." />
-                  </label>
-                </div>
-                <label class="field-stack">
-                  <span>Короткий опис</span>
-                  <input id="materialDesc" type="text" placeholder="Що студент засвоїть" required />
-                </label>
-                <label class="field-stack">
-                  <span>Повний текст конспекту / код</span>
-                  <textarea id="materialContent" rows="3" placeholder="Вміст уроку для вбудованої читалки..."></textarea>
-                </label>
-                <button type="submit" class="btn btn-primary">Опублікувати урок</button>
-              </form>
-            </div>
-
-            <div class="surface-card">
-              <h4>📥 Вхідні бронювання студентів (UC6)</h4>
-              <p class="muted" style="margin-bottom:0.75rem;">Підтвердження можливе лише після оплати студентом (UC6 → «include» UC9).</p>
-              <div id="mentorSessionsList" class="sessions-feed"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Learner Booking & Sessions -->
-        <div id="learnerMentorshipGrid" class="two-col" style="margin-top: 1.75rem;">
-          <div class="surface-card">
-            <h3>📅 Забронювати консультацію</h3>
-            <form id="bookSessionForm" class="stack-form" style="margin-top:0.85rem;">
-              <label class="field-stack">
-                <span>Обраний ментор</span>
-                <select id="bookingMentorSelect"></select>
-              </label>
-              <label class="field-stack">
-                <span>Тема консультації</span>
-                <input id="bookingTopic" type="text" placeholder="Напр. Архітектура REST API та тестування" required />
-              </label>
-              <div class="form-grid-2">
-                <label class="field-stack">
-                  <span>Дата й час</span>
-                  <input id="bookingStartAt" type="datetime-local" required />
-                </label>
-                <label class="field-stack">
-                  <span>Тривалість</span>
-                  <select id="bookingDuration">
-                    <option value="30">30 хвилин</option>
-                    <option value="60" selected>60 хвилин</option>
-                    <option value="90">90 хвилин</option>
-                  </select>
-                </label>
-              </div>
-              <button type="submit" class="btn btn-primary">Забронювати сесію</button>
-            </form>
-          </div>
-
-          <div class="surface-card">
-            <h3>💳 Заплановані та проведені сесії</h3>
-            <div id="learnerSessionsList" class="sessions-feed" style="margin-top:0.85rem;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: B2B SKILL MATRIX (HR & TEAMLEAD) -->
-    <section id="section-b2b" class="page-section alt-bg">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <span class="eyebrow-text">Корпоративний B2B кабінет (UC7, UC8, UC12)</span>
-            <h2>Skill Matrix та розвиток команд</h2>
-            <p class="muted">Оцінюйте готовність спеціалістів за напрямами, призначайте індивідуальні плани та експортуйте звіти.</p>
-          </div>
-
-          <div class="section-controls">
-            <label class="select-pill">
-              <span>Команда:</span>
-              <select id="teamSelect"></select>
-            </label>
-            <button id="previewCsvBtn" type="button" class="btn btn-secondary">👁 Переглянути CSV</button>
-            <button id="exportCsvBtn" type="button" class="btn btn-primary">⬇ Завантажити CSV</button>
-          </div>
-        </div>
-
-        <div class="two-col" style="margin-bottom: 1.5rem;">
-          <div class="surface-card">
-            <h3>📊 Матриця компетенцій команди</h3>
-            <p class="muted">Середній прогрес опанування за професіями та ключовими вузлами.</p>
-            <div id="skillMatrixBars" class="matrix-list"></div>
-            <h4 style="margin-top: 1.35rem; font-size: 0.92rem;">Рівень за окремими навичками</h4>
-            <div id="nodeMatrixBars" class="matrix-list"></div>
-          </div>
-
-          <div class="surface-card">
-            <h3>🎯 Призначити карту розвитку працівнику</h3>
-            <p class="muted">Миттєве створення плану онбордингу або апскілу (UC8).</p>
-            <form id="assignTreeForm" class="stack-form" style="margin-top:0.85rem;">
-              <label class="field-stack">
-                <span>Співробітник</span>
-                <select id="hrLearnerSelect"></select>
-              </label>
-              <label class="field-stack">
-                <span>Цільова професія</span>
-                <input id="hrAssignProfession" list="professionList" value="Full-Stack Developer" required />
-                <datalist id="professionList"></datalist>
-              </label>
-              <label class="field-stack">
-                <span>Рівень</span>
-                <select id="hrAssignLevel">
-                  <option value="BEGINNER">Початковий</option>
-                  <option value="INTERMEDIATE" selected>Середній</option>
-                  <option value="ADVANCED">Просунутий</option>
-                </select>
-              </label>
-              <button type="submit" class="btn btn-primary">Призначити план розвитку</button>
-            </form>
-
-            <div class="divider-line"></div>
-
-            <form id="createTeamForm" class="inline-form">
-              <input id="newTeamName" type="text" placeholder="Нова команда (напр. Core Backend)" required />
-              <button type="submit" class="btn btn-secondary">Створити</button>
-            </form>
-            <form id="addTeamMemberForm" class="inline-form" style="margin-top: 0.6rem;">
-              <select id="addMemberLearnerSelect"></select>
-              <button type="submit" class="btn btn-secondary">Додати в команду</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="surface-card">
-          <h3>👥 Деталізація прогресу учасників команди</h3>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>ПІБ співробітника</th>
-                  <th>Email</th>
-                  <th>Професія</th>
-                  <th>Рівень</th>
-                  <th>Карт</th>
-                  <th>Вузлів</th>
-                  <th>Прогрес</th>
-                  <th>Досвід</th>
-                </tr>
-              </thead>
-              <tbody id="hrMembersTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="csvPreviewCard" class="surface-card hidden" style="margin-top: 1.5rem;">
-          <div class="card-top">
-            <h3>Попередній перегляд RFC-4180 CSV-звіту</h3>
-            <button id="closeCsvPreviewBtn" type="button" class="btn btn-ghost btn-sm">Закрити</button>
-          </div>
-          <pre id="csvPreviewContent" class="csv-pre"></pre>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <div>
         <strong>SkillTree AI</strong>
-        <p class="muted">Платформа персоналізованих карт розвитку з гібридним менторством та ШІ-підтримкою.</p>
+        <p id="footerKpiText" class="muted-text">Платформа інтерактивного ІТ-навчання, ШІ-менторства та B2B-аналітики.</p>
       </div>
-      <div class="footer-kpi">
-        <span id="footerKpiText" class="sla-pill">ШІ SLA: 215 мс • Корисність: 100%</span>
-        <span class="muted">© 2026 SkillTree AI</span>
+      <div class="footer-links">
+        <a href="/" data-route="/">Головна</a>
+        <a href="/roadmap" data-route="/roadmap">Карта навичок</a>
+        <a href="/mentors" data-route="/mentors">Ментори</a>
+        <a href="/mentor-cabinet" data-route="/mentor-cabinet">Кабінет ментора</a>
+        <a href="/b2b" data-route="/b2b">Для команд (B2B)</a>
       </div>
     </div>
   </footer>
 
-  <!-- Toast -->
-  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <!-- MODALS -->
 
-  <!-- MODAL: Custom Roadmap Generator Wizard -->
-  <div id="wizardModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-md">
-      <div class="card-top">
-        <div>
-          <span class="tag-soft">Генератор ШІ (UC2)</span>
-          <h2>Створити нову карту розвитку</h2>
-        </div>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="wizardModal">✕</button>
+  <!-- Modal 1: Generate SkillTree Wizard (UC2) -->
+  <div id="wizardModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="wizardTitle">✨ Генерація персональної карти (UC2)</h2>
+        <button type="button" class="st-modal-close" data-close-modal="wizardModal" aria-label="Закрити">✕</button>
       </div>
-      <form id="generateTreeForm" class="stack-form">
-        <label class="field-stack">
-          <span>Цільова професія або напрям</span>
-          <input id="genProfession" list="professionList" placeholder="Напр. Full-Stack Developer або Python AI Engineer" value="Full-Stack Developer" required />
-        </label>
-        <label class="field-stack">
-          <span>Поточний рівень знань</span>
-          <select id="genLevel">
-            <option value="BEGINNER">Початковий (Junior / З нуля)</option>
-            <option value="INTERMEDIATE">Середній (Middle / Є база)</option>
-            <option value="ADVANCED">Просунутий (Senior / Системний дизайн)</option>
+      <form id="wizardForm" class="stack-form">
+        <div class="form-group">
+          <label for="wizardProfession">Цільова ІТ-професія або тема</label>
+          <input type="text" id="wizardProfession" class="st-input" list="professionList" placeholder="Напр.: Full-Stack Developer, Data Analyst, DevOps..." required />
+        </div>
+        <div class="form-group">
+          <label for="wizardLevel">Початковий рівень</label>
+          <select id="wizardLevel" class="st-input">
+            <option value="BEGINNER">BEGINNER (Початківець)</option>
+            <option value="INTERMEDIATE">INTERMEDIATE (Середній)</option>
+            <option value="ADVANCED">ADVANCED (Просунутий)</option>
           </select>
-        </label>
-        <button type="submit" class="btn btn-primary btn-lg full-width">🚀 Згенерувати дерево навичок</button>
+        </div>
+        <div class="form-group">
+          <label for="wizardGoal">Кар'єрна мета (опційно)</label>
+          <input type="text" id="wizardGoal" class="st-input" placeholder="Напр.: Підготовка до першого комерційного проєкту" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="st-btn st-btn-ghost" data-close-modal="wizardModal">Скасувати</button>
+          <button type="submit" class="st-btn st-btn-primary">Згенерувати карту</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Lesson Reader -->
-  <div id="materialModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-lg">
-      <div class="card-top">
+  <!-- Modal 2: Lesson / Material Reader (UC3) -->
+  <div id="materialModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="materialModalTitle">
+    <div class="st-modal-panel st-modal-lg">
+      <div class="st-modal-head">
         <div>
-          <span id="modalMaterialType" class="tag-soft">Урок</span>
-          <h2 id="modalMaterialTitle">Назва матеріалу</h2>
+          <span id="materialModalType" class="st-badge st-badge-accent">TEXT</span>
+          <h2 id="materialModalTitle">Назва матеріалу</h2>
+          <small id="materialModalAuthor" class="muted-text"></small>
         </div>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="materialModal">✕</button>
+        <button type="button" class="st-modal-close" data-close-modal="materialModal" aria-label="Закрити">✕</button>
       </div>
-      <p id="modalMaterialDesc" class="muted" style="margin-bottom: 1rem;"></p>
-      <div id="modalMaterialBody" class="lesson-body"></div>
-      <div class="modal-footer">
-        <a id="modalMaterialExternalLink" href="#" target="_blank" rel="noopener" class="btn btn-primary hidden">Відкрити зовнішнє джерело ↗</a>
-        <button type="button" class="btn btn-secondary close-modal-btn" data-close="materialModal">Закрити урок</button>
+      <p id="materialModalDesc" class="muted-text"></p>
+      <div id="materialModalBody" class="lesson-body"></div>
+      <div class="modal-actions">
+        <a id="materialModalExternal" href="#" target="_blank" rel="noopener noreferrer" class="st-btn st-btn-outline hidden">Відкрити зовнішнє джерело ↗</a>
+        <button type="button" class="st-btn st-btn-primary" data-close-modal="materialModal">Закрити урок</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Checkout -->
-  <div id="paymentModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-sm">
-      <div class="card-top">
-        <div>
-          <span class="tag-soft">SkillTree Pay (UC9)</span>
-          <h2>Оплата менторської сесії</h2>
-        </div>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="paymentModal">✕</button>
+  <!-- Modal 3: Payment Checkout (UC9) -->
+  <div id="paymentModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="paymentModalTitle">💳 Оплата менторської сесії (UC9)</h2>
+        <button type="button" class="st-modal-close" data-close-modal="paymentModal" aria-label="Закрити">✕</button>
       </div>
-      <div id="checkoutSummary" class="checkout-summary"></div>
-      <form id="checkoutForm" class="stack-form">
-        <label class="field-stack">
-          <span>Номер картки</span>
-          <input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" required />
-        </label>
+      <div id="paymentSessionSummary" class="summary-box"></div>
+      <form id="confirmPaymentForm" class="stack-form">
         <div class="form-grid-2">
-          <label class="field-stack">
-            <span>Термін дії</span>
-            <input id="payCardExp" type="text" maxlength="5" placeholder="MM/YY" required />
-          </label>
-          <label class="field-stack">
-            <span>CVV</span>
-            <input id="payCardCvv" type="password" maxlength="3" placeholder="•••" required />
-          </label>
+          <div class="form-group">
+            <label for="paymentMethod">Спосіб оплати</label>
+            <select id="paymentMethod" class="st-input">
+              <option value="CARD">Банківська картка (Visa / Mastercard)</option>
+              <option value="APPLE_PAY">Apple Pay / Google Pay</option>
+              <option value="CORPORATE">Корпоративний рахунок (B2B)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Сума до сплати</label>
+            <div id="paymentAmount" class="price-display">0 ₴</div>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg full-width">💳 Оплатити зараз</button>
+        <div class="modal-actions">
+          <button type="button" class="st-btn st-btn-ghost" data-close-modal="paymentModal">Скасувати</button>
+          <button type="submit" class="st-btn st-btn-primary">Підтвердити оплату</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Electronic Receipt -->
-  <div id="receiptModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-sm">
-      <div class="card-top">
-        <div>
-          <span class="sla-pill">Оплату підтверджено</span>
-          <h2>Електронна квитанція</h2>
-        </div>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="receiptModal">✕</button>
+  <!-- Modal 4: Electronic Receipt -->
+  <div id="receiptModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="receiptModalTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="receiptModalTitle">🧾 Електронна квитанція</h2>
+        <button type="button" class="st-modal-close" data-close-modal="receiptModal" aria-label="Закрити">✕</button>
       </div>
-      <div id="receiptDetails" class="receipt-box"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary close-modal-btn" data-close="receiptModal">Готово</button>
+      <div id="receiptBody" class="receipt-box"></div>
+      <div class="modal-actions">
+        <button type="button" class="st-btn st-btn-primary" data-close-modal="receiptModal">Готово</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Add Node -->
-  <div id="addNodeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-sm">
-      <div class="card-top">
-        <h2>➕ Додати власну навичку</h2>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="addNodeModal">✕</button>
+  <!-- Modal 5: Add Custom SkillNode (UC10) -->
+  <div id="addNodeModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="addNodeModalTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="addNodeModalTitle">➕ Додати власний вузол (UC10)</h2>
+        <button type="button" class="st-modal-close" data-close-modal="addNodeModal" aria-label="Закрити">✕</button>
       </div>
       <form id="addNodeForm" class="stack-form">
-        <label class="field-stack">
-          <span>Назва навички</span>
-          <input id="newNodeTitle" type="text" placeholder="Напр. Контейнеризація у Docker" required />
-        </label>
-        <label class="field-stack">
-          <span>Короткий опис</span>
-          <input id="newNodeDesc" type="text" placeholder="Що саме потрібно вивчити" />
-        </label>
-        <label class="field-stack">
-          <span>Назва першого матеріалу (необов’язково)</span>
-          <input id="newNodeMaterialTitle" type="text" placeholder="Напр. Офіційний гайд Docker" />
-        </label>
-        <label class="field-stack">
-          <span>Посилання або конспект</span>
-          <input id="newNodeMaterialUrl" type="text" placeholder="https://docs.docker.com/..." />
-        </label>
-        <button type="submit" class="btn btn-primary full-width">Додати до карти</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: Auth (Login, Register, Password Reset) -->
-  <div id="authModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-md">
-      <div class="card-top">
-        <h2>🔐 Обліковий запис SkillTree AI</h2>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="authModal">✕</button>
-      </div>
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab active" data-auth-tab="login">Вхід</button>
-        <button type="button" class="auth-tab" data-auth-tab="register">Реєстрація</button>
-        <button type="button" class="auth-tab" data-auth-tab="reset">Відновлення пароля</button>
-      </div>
-
-      <form id="loginForm" class="stack-form auth-pane active" data-auth-pane="login">
-        <label class="field-stack">
-          <span>Електронна пошта</span>
-          <input id="loginEmail" type="email" placeholder="name@example.com" required />
-        </label>
-        <label class="field-stack">
-          <span>Пароль</span>
-          <input id="loginPassword" type="password" placeholder="Введіть пароль" required />
-        </label>
-        <button type="submit" class="btn btn-primary btn-lg full-width">Увійти</button>
-      </form>
-
-      <form id="registerForm" class="stack-form auth-pane" data-auth-pane="register">
-        <label class="field-stack">
-          <span>Повне ім’я (ПІБ)</span>
-          <input id="regName" type="text" placeholder="Іван Петренко" required />
-        </label>
-        <label class="field-stack">
-          <span>Електронна пошта</span>
-          <input id="regEmail" type="email" placeholder="ivan@example.com" required />
-        </label>
-        <label class="field-stack">
-          <span>Пароль (від 4 символів)</span>
-          <input id="regPassword" type="password" placeholder="••••" required />
-        </label>
-        <label class="field-stack">
-          <span>Роль</span>
-          <select id="regRole">
-            <option value="LEARNER">Студент / фахівець</option>
-            <option value="MENTOR">Ментор / експерт</option>
-            <option value="HR">HR-менеджер / TeamLead</option>
-          </select>
-        </label>
-        <label class="field-stack">
-          <span id="regExtraLabel">Цільова професія</span>
-          <input id="regExtra" type="text" placeholder="Full-Stack Developer" required />
-        </label>
-        <button type="submit" class="btn btn-primary btn-lg full-width">Створити акаунт</button>
-      </form>
-
-      <form id="resetPasswordForm" class="stack-form auth-pane" data-auth-pane="reset">
-        <label class="field-stack">
-          <span>Електронна пошта</span>
-          <input id="resetEmail" type="email" placeholder="name@example.com" required />
-        </label>
-        <label class="field-stack">
-          <span>Новий пароль</span>
-          <input id="resetNewPassword" type="password" placeholder="••••" required />
-        </label>
-        <button type="submit" class="btn btn-primary btn-lg full-width">Оновити пароль</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: Profile Edit -->
-  <div id="profileModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-sm">
-      <div class="card-top">
-        <h2>⚙️ Налаштування профілю</h2>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="profileModal">✕</button>
-      </div>
-      <form id="profileForm" class="stack-form">
-        <label class="field-stack">
-          <span>Повне ім’я (ПІБ)</span>
-          <input id="profFullName" type="text" required />
-        </label>
-        <div id="profRoleFields" class="stack-form"></div>
-        <button type="submit" class="btn btn-primary full-width">Зберегти зміни</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: AI Key Settings -->
-  <div id="aiSettingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-    <div class="modal-card modal-sm">
-      <div class="card-top">
-        <h2>🤖 Налаштування ШІ-провайдера</h2>
-        <button type="button" class="btn btn-ghost btn-sm close-modal-btn" data-close="aiSettingsModal">✕</button>
-      </div>
-      <p class="muted">За замовчуванням працює вбудований швидкий інтелектуальний асистент. За бажання підключіть власний ключ Google Gemini (<code>AIza...</code>) або OpenAI (<code>sk-...</code>).</p>
-      <form id="aiSettingsForm" class="stack-form" style="margin-top: 0.85rem;">
-        <label class="field-stack">
-          <span>API ключ (зберігається лише у вашому браузері)</span>
-          <input id="customApiKeyInput" type="password" placeholder="AIza... або sk-..." />
-        </label>
+        <div class="form-group">
+          <label for="newNodeTitle">Назва навички / модуля</label>
+          <input type="text" id="newNodeTitle" class="st-input" placeholder="Напр.: Docker та контейнеризація" required />
+        </div>
+        <div class="form-group">
+          <label for="newNodeDesc">Короткий опис</label>
+          <textarea id="newNodeDesc" class="st-input" rows="2" placeholder="Що саме потрібно вивчити у цьому модулі" required></textarea>
+        </div>
         <div class="form-grid-2">
-          <button type="submit" class="btn btn-primary">Зберегти</button>
-          <button type="button" id="clearApiKeyBtn" class="btn btn-secondary">Очистити</button>
+          <div class="form-group">
+            <label for="newNodeMaterialTitle">Стартовий матеріал (опційно)</label>
+            <input type="text" id="newNodeMaterialTitle" class="st-input" placeholder="Назва конспекту чи посилання" />
+          </div>
+          <div class="form-group">
+            <label for="newNodeMaterialUrl">URL матеріалу (опційно)</label>
+            <input type="url" id="newNodeMaterialUrl" class="st-input" placeholder="https://..." />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="st-btn st-btn-ghost" data-close-modal="addNodeModal">Скасувати</button>
+          <button type="submit" class="st-btn st-btn-primary">Додати до карти</button>
         </div>
       </form>
     </div>
   </div>
+
+  <!-- Modal 6: Auth Modal (UC1: Login / Register / Reset Password) -->
+  <div id="authModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="authModalTitle">🔐 Обліковий запис SkillTree AI</h2>
+        <button type="button" class="st-modal-close" data-close-modal="authModal" aria-label="Закрити">✕</button>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" id="authTabLogin" class="auth-tab active">Вхід</button>
+        <button type="button" id="authTabRegister" class="auth-tab">Реєстрація</button>
+        <button type="button" id="authTabReset" class="auth-tab">Відновити пароль</button>
+      </div>
+
+      <form id="loginForm" class="stack-form">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" class="st-input" placeholder="slava@skilltree.ai" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Пароль</label>
+          <input type="password" id="loginPassword" class="st-input" placeholder="••••••••" required />
+        </div>
+        <p class="auth-hint muted-text">Акаунти платформи: студент <code>slava@skilltree.ai</code>, ментор <code>andriy.mentor@skilltree.ai</code>, HR <code>maria.hr@technova.ua</code> (пароль: <code>demo1234</code>).</p>
+        <button type="submit" class="st-btn st-btn-primary">Увійти в кабінет</button>
+      </form>
+
+      <form id="registerForm" class="stack-form hidden">
+        <div class="form-group">
+          <label for="regFullName">Повне ім'я (ПІБ)</label>
+          <input type="text" id="regFullName" class="st-input" placeholder="Іван Коваленко" required />
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" class="st-input" placeholder="ivan@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Пароль</label>
+            <input type="password" id="regPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regRole">Роль на платформі</label>
+          <select id="regRole" class="st-input">
+            <option value="LEARNER">Студент / Фахівець</option>
+            <option value="MENTOR">Ментор / Експерт</option>
+            <option value="HR">HR / TeamLead (B2B)</option>
+          </select>
+        </div>
+        <div id="regExtraGroup" class="form-group">
+          <label id="regExtraLabel" for="regExtraInput">Цільова професія</label>
+          <input type="text" id="regExtraInput" class="st-input" placeholder="Напр.: Full-Stack Developer" />
+        </div>
+        <button type="submit" class="st-btn st-btn-primary">Створити акаунт</button>
+      </form>
+
+      <form id="resetPasswordForm" class="stack-form hidden">
+        <div class="form-group">
+          <label for="resetEmail">Email акаунта</label>
+          <input type="email" id="resetEmail" class="st-input" placeholder="user@skilltree.ai" required />
+        </div>
+        <div class="form-group">
+          <label for="resetNewPassword">Новий пароль</label>
+          <input type="password" id="resetNewPassword" class="st-input" minlength="4" placeholder="Мінімум 4 символи" required />
+        </div>
+        <button type="submit" class="st-btn st-btn-primary">Скинути пароль</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 7: AI Settings Modal -->
+  <div id="aiSettingsModal" class="st-modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiSettingsTitle">
+    <div class="st-modal-panel">
+      <div class="st-modal-head">
+        <h2 id="aiSettingsTitle">⚙️ Параметри ШІ-асистента</h2>
+        <button type="button" class="st-modal-close" data-close-modal="aiSettingsModal" aria-label="Закрити">✕</button>
+      </div>
+      <form id="aiSettingsForm" class="stack-form">
+        <p class="muted-text">За замовчуванням використовується вбудований швидкий рушій знань (SLA &le; 5 c). Ви також можете зберегти власний Gemini API key локально у браузері.</p>
+        <div class="form-group">
+          <label for="aiApiKeyInput">Gemini API Key (опційно, зберігається лише локально)</label>
+          <input type="password" id="aiApiKeyInput" class="st-input" placeholder="AIza..." />
+        </div>
+        <div class="form-group">
+          <label for="aiModelSelect">Режим моделі</label>
+          <select id="aiModelSelect" class="st-input">
+            <option value="builtin">Вбудований контекстний рушій SkillTree AI</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (якщо вказано ключ)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="clearAiKeyBtn" class="st-btn st-btn-ghost">Скинути ключ</button>
+          <button type="submit" class="st-btn st-btn-primary">Зберегти</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="st-toast hidden" role="status" aria-live="polite"></div>
 
   <script src="/app.js"></script>
 </body>
