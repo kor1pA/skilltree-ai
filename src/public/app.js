@@ -1,6 +1,5 @@
 const state = {
   data: null,
-  activeView: 'learner-tree',
   selectedTreeId: null,
   selectedNodeId: null,
   selectedTeamId: null,
@@ -44,34 +43,6 @@ const LABELS = {
     TEXT: '📖 Урок / Конспект',
     LINK: '🔗 Документація',
     VIDEO: '🎬 Відеоурок',
-  },
-  role: {
-    LEARNER: 'Студент / Фахівець',
-    MENTOR: 'Ментор / Експерт',
-    HR: 'HR / TeamLead',
-  },
-};
-
-const VIEW_META = {
-  'learner-tree': {
-    title: 'Мої карти розвитку',
-    subtitle: 'Проходьте навички покроково, читайте вбудовані уроки та вирішуйте питання з ШІ.',
-  },
-  'learner-create': {
-    title: 'Створити нову карту розвитку',
-    subtitle: 'Оберіть професію та рівень — ШІ згенерує покроковий план навчання з матеріалами.',
-  },
-  'learner-mentors': {
-    title: 'Ментори та консультації',
-    subtitle: 'Оберіть експерта для 1-на-1 розбору коду, оплатіть сесію та залиште відгук.',
-  },
-  'mentor-dashboard': {
-    title: 'Кабінет ментора',
-    subtitle: 'Публікуйте авторські уроки у вузли карт та підтверджуйте оплачені сесії.',
-  },
-  'hr-dashboard': {
-    title: 'B2B Кабінет: Skill Matrix команди',
-    subtitle: 'Аналізуйте рівень компетенцій співробітників, призначайте карти та експортуйте CSV-звіти.',
   },
 };
 
@@ -136,16 +107,21 @@ function getCurrentUser() {
   return state.data?.currentUser || null;
 }
 
+// Rule of 3 Clicks: visitors can immediately explore and interact with the workspace;
+// if signed in as a specific Learner, operates on their own account.
 function getActiveLearner() {
-  const user = getCurrentUser();
-  if (!user || user.role !== 'LEARNER') return null;
-  return state.data.learners.find((l) => l.id === user.id) || user;
+  if (!state.data?.learners?.length) return null;
+  const current = getCurrentUser();
+  if (current?.role === 'LEARNER') {
+    return state.data.learners.find((l) => l.id === current.id) || current;
+  }
+  return state.data.learners[0];
 }
 
 function getActiveMentor() {
-  const user = getCurrentUser();
-  if (!user || user.role !== 'MENTOR') return null;
-  return state.data.mentors.find((m) => m.id === user.id) || user;
+  const current = getCurrentUser();
+  if (!current || current.role !== 'MENTOR') return null;
+  return state.data.mentors.find((m) => m.id === current.id) || current;
 }
 
 function getActiveTree(learner) {
@@ -158,117 +134,70 @@ function getActiveNode(tree) {
   return tree.nodes.find((n) => n.id === state.selectedNodeId) || tree.nodes[0];
 }
 
-function switchView(viewName) {
-  state.activeView = viewName;
-  document.querySelectorAll('.nav-item').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.view === viewName);
-  });
-  document.querySelectorAll('.view-panel').forEach((panel) => {
-    panel.classList.toggle('active', panel.id === `view-${viewName}`);
-  });
-  const meta = VIEW_META[viewName] || VIEW_META['learner-tree'];
-  $('pageTitle').textContent = meta.title;
-  $('pageSubtitle').textContent = meta.subtitle;
-}
-
 function syncSelectionsFromData(data) {
   state.data = data;
-  const current = getCurrentUser();
-  if (!current) {
-    state.selectedTreeId = null;
-    state.selectedNodeId = null;
-    return;
-  }
-
-  if (current.role === 'LEARNER') {
-    const learner = getActiveLearner();
-    if (learner) {
-      if (!learner.skillTrees.some((t) => t.id === state.selectedTreeId)) {
-        state.selectedTreeId = learner.skillTrees[0]?.id ?? null;
-      }
-      const tree = getActiveTree(learner);
-      if (tree && !tree.nodes.some((n) => n.id === state.selectedNodeId)) {
-        state.selectedNodeId = tree.nodes[0]?.id ?? null;
-      }
+  const learner = getActiveLearner();
+  if (learner) {
+    if (!learner.skillTrees.some((t) => t.id === state.selectedTreeId)) {
+      state.selectedTreeId = learner.skillTrees[0]?.id ?? null;
     }
-    if (!['learner-tree', 'learner-create', 'learner-mentors'].includes(state.activeView)) {
-      state.activeView = 'learner-tree';
-    }
-  } else if (current.role === 'MENTOR') {
-    state.activeView = 'mentor-dashboard';
-  } else if (current.role === 'HR') {
-    if (!state.selectedTeamId && data.teams[0]) {
-      state.selectedTeamId = data.teams[0].id;
-    }
-    state.activeView = 'hr-dashboard';
-  }
-}
-
-function renderKpis() {
-  const user = getCurrentUser();
-  const { kpi, sessions, teams, learners } = state.data;
-  const kpiRow = $('kpiRow');
-
-  if (!user) {
-    kpiRow.innerHTML = '';
-    return;
-  }
-
-  if (user.role === 'LEARNER') {
-    const learner = getActiveLearner();
     const tree = getActiveTree(learner);
-    kpiRow.innerHTML = `
-      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Прогрес карти</span><strong>${tree ? tree.progress : 0}%</strong></div>
-      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Досвід студента</span><strong>${learner ? learner.points : 0} XP</strong></div>
-      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
-      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Корисність ШІ</span><strong>${kpi.aiHelpfulnessPct}%</strong></div>
-    `;
-  } else if (user.role === 'MENTOR') {
-    const mentor = getActiveMentor();
-    const mySessions = sessions.filter((s) => s.mentorId === mentor.id);
-    kpiRow.innerHTML = `
-      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Рейтинг ментора</span><strong>★ ${mentor.rating}</strong></div>
-      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Ставка</span><strong>${mentor.hourlyRate} ₴/год</strong></div>
-      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Сесій у черзі</span><strong>${mySessions.length}</strong></div>
-      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Публікацій</span><strong>${mentor.publishedMaterialsCount ?? 0}</strong></div>
-    `;
-  } else {
-    const activeTeam = teams.find((t) => t.id === state.selectedTeamId) || teams[0];
-    const avgProgress = activeTeam?.detailedMatrix?.teamAverageProgress ?? 0;
-    kpiRow.innerHTML = `
-      <div class="kpi-pill" style="--stagger-i:0"><span class="kpi-pill-label">Команд</span><strong>${teams.length}</strong></div>
-      <div class="kpi-pill" style="--stagger-i:1"><span class="kpi-pill-label">Співробітників</span><strong>${learners.length}</strong></div>
-      <div class="kpi-pill" style="--stagger-i:2"><span class="kpi-pill-label">Середній прогрес</span><strong>${avgProgress}%</strong></div>
-      <div class="kpi-pill" style="--stagger-i:3"><span class="kpi-pill-label">Швидкість ШІ</span><strong>${kpi.avgAiResponseMs} мс</strong></div>
-    `;
+    if (tree && !tree.nodes.some((n) => n.id === state.selectedNodeId)) {
+      state.selectedNodeId = tree.nodes[0]?.id ?? null;
+    }
+  }
+  if (!state.selectedTeamId && data.teams[0]) {
+    state.selectedTeamId = data.teams[0].id;
   }
 }
 
-function renderSidebarAndHeader() {
+function renderNavbarAndHero() {
   const user = getCurrentUser();
-  if (!user) return;
+  const { kpi, professions } = state.data;
 
-  $('sidebarAvatar').textContent = getInitials(user.fullName);
-  $('sidebarUserName').textContent = user.fullName;
-  $('sidebarUserEmail').textContent = user.email;
-  $('sidebarUserRole').textContent = LABELS.role[user.role] || user.role;
+  if (user) {
+    $('openAuthBtn').classList.add('hidden');
+    $('userMenu').classList.remove('hidden');
+    $('navAvatar').textContent = getInitials(user.fullName);
+    $('navUserName').textContent = user.fullName;
+  } else {
+    $('openAuthBtn').classList.remove('hidden');
+    $('userMenu').classList.add('hidden');
+  }
 
-  // Strict RBAC navigation visibility
-  $('navGroupLearner').classList.toggle('hidden', user.role !== 'LEARNER');
-  $('navGroupMentor').classList.toggle('hidden', user.role !== 'MENTOR');
-  $('navGroupHr').classList.toggle('hidden', user.role !== 'HR');
-
-  $('professionList').innerHTML = (state.data.professions || [])
+  $('professionList').innerHTML = (professions || [])
     .map((p) => `<option value="${esc(p)}"></option>`)
     .join('');
 
-  switchView(state.activeView);
-  renderKpis();
+  $('heroAiSla').textContent = kpi.avgAiResponseMs > 0 ? `${kpi.avgAiResponseMs} мс` : '≤ 0.3 с';
+  $('footerKpiText').textContent = `ШІ SLA: ${kpi.avgAiResponseMs} мс • Корисність: ${kpi.aiHelpfulnessPct}%`;
+
+  const learner = getActiveLearner();
+  const tree = getActiveTree(learner);
+  if (tree) {
+    $('heroTrackTitle').textContent = tree.targetProfession;
+    const pct = tree.progress || 0;
+    const circumference = 150.8;
+    const offset = circumference - (pct / 100) * circumference;
+    $('heroRingFill').style.strokeDashoffset = String(offset);
+    $('heroRingText').textContent = `${pct}%`;
+  }
 }
 
-function renderLearnerTreeView() {
+function renderRoadmapSection() {
+  const { professions } = state.data;
   const learner = getActiveLearner();
   if (!learner) return;
+
+  const tree = getActiveTree(learner);
+  const currentProf = tree?.targetProfession || '';
+
+  $('quickProfessionsRow').innerHTML = (professions || [])
+    .map(
+      (p) =>
+        `<button type="button" class="preset-pill ${p.toLowerCase() === currentProf.toLowerCase() ? 'active' : ''}" data-quick-prof="${esc(p)}">${esc(p)}</button>`
+    )
+    .join('');
 
   $('treeSelect').innerHTML = learner.skillTrees
     .map(
@@ -277,18 +206,13 @@ function renderLearnerTreeView() {
     )
     .join('');
 
-  const tree = getActiveTree(learner);
+  $('learnerPointsBadge').textContent = `${learner.points} XP`;
   $('badgesRow').innerHTML =
     learner.badges.length > 0
       ? learner.badges.map((b) => `<span class="badge-chip">🏆 ${esc(b)}</span>`).join('')
       : '<span class="muted">Завершіть першу навичку, щоб отримати бейдж!</span>';
 
-  if (!tree) {
-    $('treeTitle').textContent = 'Карта відсутня';
-    $('nodesList').innerHTML = '<div class="muted">Створіть свою першу карту розвитку!</div>';
-    renderNodeStudyPanel(null);
-    return;
-  }
+  if (!tree) return;
 
   $('treeTitle').textContent = tree.targetProfession;
   $('treeMeta').textContent = `Рівень: ${LABELS.skillLevel[tree.level] || tree.level} • Вузлів: ${tree.nodes.length}`;
@@ -406,25 +330,10 @@ function renderNodeStudyPanel(node) {
   }
 }
 
-function renderCreateWizard() {
-  const { professions } = state.data;
-  const currentProf = $('genProfession').value.trim();
-  $('professionCardsGrid').innerHTML = professions
-    .map(
-      (p, idx) => `
-      <button type="button" class="preset-card ${p.toLowerCase() === currentProf.toLowerCase() ? 'selected' : ''}" data-preset-prof="${esc(p)}" style="--stagger-i:${idx}">
-        <strong>${esc(p)}</strong>
-        <span>Готовий трек навичок + уроки</span>
-      </button>
-    `
-    )
-    .join('');
-}
-
-function renderMentorsView() {
+function renderMentorsSection() {
+  const { mentors, learners, sessions, receipts } = state.data;
   const learner = getActiveLearner();
-  if (!learner) return;
-  const { mentors, sessions, receipts } = state.data;
+  const mentorUser = getActiveMentor();
 
   $('mentorsDirectoryGrid').innerHTML = mentors
     .map(
@@ -434,11 +343,11 @@ function renderMentorsView() {
           <div class="avatar-circle">${getInitials(m.fullName)}</div>
           <div>
             <strong>${esc(m.fullName)}</strong>
-            <div class="muted">${esc(m.specialization)} • ★ ${m.rating} • ${m.hourlyRate} ₴/год</div>
+            <div class="muted">${esc(m.specialization)} • ★ ${m.rating} • <strong>${m.hourlyRate} ₴/год</strong></div>
           </div>
         </div>
         <p class="muted">${esc(m.bio)}</p>
-        <button type="button" class="btn btn-secondary btn-sm select-mentor-book-btn" data-mentor-id="${m.id}">Обрати для бронювання</button>
+        <button type="button" class="btn btn-secondary btn-sm select-mentor-book-btn" data-mentor-id="${m.id}">Забронювати консультацію</button>
       </div>
     `
     )
@@ -451,10 +360,66 @@ function renderMentorsView() {
     )
     .join('');
 
-  const learnerSessions = sessions.filter((s) => s.learnerId === learner.id);
+  // Show mentor self-cabinet if logged in as MENTOR
+  if (mentorUser) {
+    $('mentorCabinetPanel').classList.remove('hidden');
+    $('mentorProfileSummary').innerHTML = `
+      <span><strong>Ментор:</strong> ${esc(mentorUser.fullName)}</span>
+      <span><strong>Спеціалізація:</strong> ${esc(mentorUser.specialization)}</span>
+      <span><strong>Рейтинг:</strong> ★ ${mentorUser.rating}</span>
+    `;
+
+    const nodeOptions = [];
+    for (const l of learners) {
+      for (const t of l.skillTrees) {
+        for (const n of t.nodes) {
+          nodeOptions.push(
+            `<option value="${n.id}">${esc(l.fullName)} → ${esc(t.targetProfession)} → ${n.orderNumber}. ${esc(n.title)}</option>`
+          );
+        }
+      }
+    }
+    $('mentorNodeSelect').innerHTML = nodeOptions.join('');
+
+    const mentorSessions = sessions.filter((s) => s.mentorId === mentorUser.id);
+    const mEl = $('mentorSessionsList');
+    mEl.innerHTML =
+      mentorSessions.length === 0
+        ? '<div class="muted">Немає вхідних бронювань.</div>'
+        : mentorSessions
+            .map((s) => {
+              const l = learners.find((x) => x.id === s.learnerId);
+              const dateStr = new Date(s.startAt).toLocaleString('uk-UA');
+              return `
+                <div class="session-item">
+                  <div class="session-item-top">
+                    <div>
+                      <strong>${esc(s.topic)}</strong>
+                      <div class="muted">Студент: ${esc(l?.fullName ?? s.learnerId)} • ${esc(dateStr)} • ${s.price} ₴</div>
+                    </div>
+                    <div style="display:flex;gap:0.35rem;">
+                      <span class="status-pill ${s.status}">${LABELS.sessionStatus[s.status] || s.status}</span>
+                      <span class="status-pill ${s.paymentStatus}">${LABELS.paymentStatus[s.paymentStatus] || s.paymentStatus}</span>
+                    </div>
+                  </div>
+                  ${
+                    s.status === 'BOOKED'
+                      ? `<div class="session-item-actions"><button type="button" class="btn btn-primary btn-sm confirm-session-btn" data-session-id="${s.id}">✓ Підтвердити сесію</button></div>`
+                      : ''
+                  }
+                </div>
+              `;
+            })
+            .join('');
+  } else {
+    $('mentorCabinetPanel').classList.add('hidden');
+  }
+
+  // Learner sessions list
+  const learnerSessions = learner ? sessions.filter((s) => s.learnerId === learner.id) : [];
   const el = $('learnerSessionsList');
   if (learnerSessions.length === 0) {
-    el.innerHTML = '<div class="muted">У вас ще немає заброньованих сесій.</div>';
+    el.innerHTML = '<div class="muted">Поки що немає заброньованих сесій.</div>';
     return;
   }
 
@@ -508,70 +473,7 @@ function renderMentorsView() {
     .join('');
 }
 
-function renderMentorDashboard() {
-  const mentor = getActiveMentor();
-  if (!mentor) return;
-  const { learners, sessions } = state.data;
-
-  $('mentorProfileSummary').innerHTML = `
-    <span><strong>Ментор:</strong> ${esc(mentor.fullName)}</span>
-    <span><strong>Спеціалізація:</strong> ${esc(mentor.specialization)}</span>
-    <span><strong>Ставка:</strong> ${mentor.hourlyRate} ₴/год</span>
-    <span><strong>Рейтинг:</strong> ★ ${mentor.rating}</span>
-  `;
-
-  const nodeOptions = [];
-  for (const l of learners) {
-    for (const t of l.skillTrees) {
-      for (const n of t.nodes) {
-        nodeOptions.push(
-          `<option value="${n.id}">${esc(l.fullName)} → ${esc(t.targetProfession)} → ${n.orderNumber}. ${esc(n.title)}</option>`
-        );
-      }
-    }
-  }
-  $('mentorNodeSelect').innerHTML = nodeOptions.join('');
-
-  const mentorSessions = sessions.filter((s) => s.mentorId === mentor.id);
-  const el = $('mentorSessionsList');
-  if (mentorSessions.length === 0) {
-    el.innerHTML = '<div class="muted">У вас поки немає запланованих сесій.</div>';
-    return;
-  }
-
-  el.innerHTML = mentorSessions
-    .map((s) => {
-      const learner = learners.find((l) => l.id === s.learnerId);
-      const dateStr = new Date(s.startAt).toLocaleString('uk-UA');
-      const canConfirm = s.status === 'BOOKED';
-
-      return `
-        <div class="session-item">
-          <div class="session-item-top">
-            <div>
-              <strong>${esc(s.topic)}</strong>
-              <div class="muted">Студент: ${esc(learner?.fullName ?? s.learnerId)} • ${esc(dateStr)} • ${s.price} ₴</div>
-            </div>
-            <div style="display:flex;gap:0.35rem;">
-              <span class="status-pill ${s.status}">${LABELS.sessionStatus[s.status] || s.status}</span>
-              <span class="status-pill ${s.paymentStatus}">${LABELS.paymentStatus[s.paymentStatus] || s.paymentStatus}</span>
-            </div>
-          </div>
-          ${s.feedback ? `<div class="muted">Відгук студента (★ ${s.rating}/5): «${esc(s.feedback)}»</div>` : ''}
-          ${
-            canConfirm
-              ? `<div class="session-item-actions"><button type="button" class="btn btn-primary btn-sm confirm-session-btn" data-session-id="${s.id}">✓ Підтвердити сесію</button></div>`
-              : ''
-          }
-        </div>
-      `;
-    })
-    .join('');
-}
-
-function renderHrDashboard() {
-  const user = getCurrentUser();
-  if (!user || user.role !== 'HR') return;
+function renderB2bSection() {
   const { teams, learners } = state.data;
 
   $('teamSelect').innerHTML = teams
@@ -640,26 +542,10 @@ function renderHrDashboard() {
 
 function renderAll() {
   if (!state.data) return;
-  const user = getCurrentUser();
-  if (!user) {
-    $('authScreen').classList.remove('hidden');
-    $('appLayout').classList.add('hidden');
-    return;
-  }
-
-  $('authScreen').classList.add('hidden');
-  $('appLayout').classList.remove('hidden');
-
-  renderSidebarAndHeader();
-  if (user.role === 'LEARNER') {
-    renderLearnerTreeView();
-    renderCreateWizard();
-    renderMentorsView();
-  } else if (user.role === 'MENTOR') {
-    renderMentorDashboard();
-  } else if (user.role === 'HR') {
-    renderHrDashboard();
-  }
+  renderNavbarAndHero();
+  renderRoadmapSection();
+  renderMentorsSection();
+  renderB2bSection();
 }
 
 async function refreshState() {
@@ -682,7 +568,7 @@ function openMaterialModal(materialId) {
   const bodyText =
     material.content && material.content.trim()
       ? material.content
-      : `Матеріал «${material.title}» прикріплений до навички «${node.title}».\n\n${material.description || 'Скористайтеся кнопкою нижче або поставте запитання ШІ-асистенту.'}`;
+      : `Матеріал «${material.title}» прикріплений до навички «${node.title}».\n\n${material.description || 'Скористайтеся ШІ-асистентом для детального розбору.'}`;
   $('modalMaterialBody').innerHTML = formatRichText(bodyText);
 
   const extBtn = $('modalMaterialExternalLink');
@@ -758,7 +644,7 @@ function openProfileModal() {
         <input id="profHourlyRate" type="number" min="100" value="${user.hourlyRate}" required />
       </label>
       <label class="field-stack">
-        <span>Про себе (біо)</span>
+        <span>Про себе</span>
         <textarea id="profBio" rows="3">${esc(user.bio)}</textarea>
       </label>
     `;
@@ -798,31 +684,33 @@ async function updateActiveNodeStatus(action) {
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('skilltree_theme', theme);
-  const label = theme === 'light' ? '🌙 Темна тема' : '☀️ Світла тема';
-  $('themeToggleBtn').textContent = label;
-  $('authThemeToggleBtn').textContent = label;
+  $('themeToggleBtn').textContent = theme === 'light' ? '🌙' : '☀️';
 }
 
 function setupEventListeners() {
-  const savedTheme = localStorage.getItem('skilltree_theme') || 'dark';
+  const savedTheme = localStorage.getItem('skilltree_theme') || 'light';
   applyTheme(savedTheme);
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    applyTheme(current === 'dark' ? 'light' : 'dark');
-  };
-  $('themeToggleBtn').addEventListener('click', toggleTheme);
-  $('authThemeToggleBtn').addEventListener('click', toggleTheme);
-
-  // Sidebar navigation
-  document.querySelectorAll('.nav-item').forEach((btn) => {
-    btn.addEventListener('click', () => switchView(btn.dataset.view));
+  $('themeToggleBtn').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'light' ? 'dark' : 'light');
   });
-  $('goToCreateBtn').addEventListener('click', () => switchView('learner-create'));
 
-  // Close modals
+  // Navbar active state on click
+  document.querySelectorAll('.nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.nav-link').forEach((l) => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  // Modals open/close
   document.querySelectorAll('.close-modal-btn').forEach((btn) => {
     btn.addEventListener('click', () => $(btn.dataset.close)?.classList.add('hidden'));
   });
+  $('openAuthBtn').addEventListener('click', () => $('authModal').classList.remove('hidden'));
+  $('openWizardBtn').addEventListener('click', () => $('wizardModal').classList.remove('hidden'));
+  $('openAddNodeBtn').addEventListener('click', () => $('addNodeModal').classList.remove('hidden'));
+  $('openProfileBtn').addEventListener('click', openProfileModal);
 
   // Auth Tabs & Forms
   document.querySelectorAll('.auth-tab').forEach((tab) => {
@@ -854,6 +742,7 @@ function setupEventListeners() {
         body: JSON.stringify({ email: $('loginEmail').value, password: $('loginPassword').value }),
       });
       $('loginPassword').value = '';
+      $('authModal').classList.add('hidden');
       syncSelectionsFromData(res.state);
       renderAll();
       showToast(`Вітаємо, ${res.user.fullName}!`);
@@ -880,6 +769,7 @@ function setupEventListeners() {
         }),
       });
       $('regPassword').value = '';
+      $('authModal').classList.add('hidden');
       syncSelectionsFromData(res.state);
       renderAll();
       showToast(`Обліковий запис ${res.user.fullName} створено!`);
@@ -902,7 +792,6 @@ function setupEventListeners() {
     }
   });
 
-  // Real Logout (UC1)
   $('logoutBtn').addEventListener('click', async () => {
     try {
       const res = await api('/api/auth/logout', { method: 'POST' });
@@ -914,8 +803,6 @@ function setupEventListeners() {
     }
   });
 
-  // Profile Edit Modal
-  $('openProfileBtn').addEventListener('click', openProfileModal);
   $('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const user = getCurrentUser();
@@ -963,7 +850,7 @@ function setupEventListeners() {
     showToast('Ключ очищено, використовується вбудований ШІ-двигун.');
   });
 
-  // Tree selection
+  // Tree selector & 1-click preset pills
   $('treeSelect').addEventListener('change', (e) => {
     state.selectedTreeId = Number(e.target.value);
     state.selectedNodeId = null;
@@ -971,12 +858,35 @@ function setupEventListeners() {
     renderAll();
   });
 
-  // Preset cards & generate tree
-  $('professionCardsGrid').addEventListener('click', (e) => {
-    const card = e.target.closest('.preset-card');
-    if (!card) return;
-    $('genProfession').value = card.dataset.presetProf;
-    renderCreateWizard();
+  $('quickProfessionsRow').addEventListener('click', async (e) => {
+    const pill = e.target.closest('.preset-pill');
+    if (!pill) return;
+    const profession = pill.dataset.quickProf;
+    const learner = getActiveLearner();
+    if (!learner) return;
+    const existing = learner.skillTrees.find(
+      (t) => t.targetProfession.toLowerCase() === profession.toLowerCase()
+    );
+    if (existing) {
+      state.selectedTreeId = existing.id;
+      state.selectedNodeId = existing.nodes[0]?.id ?? null;
+      renderAll();
+      showToast(`Відкрито карту «${existing.targetProfession}»`);
+      return;
+    }
+    try {
+      const res = await api('/api/trees/generate', {
+        method: 'POST',
+        body: JSON.stringify({ learnerId: learner.id, profession, level: 'BEGINNER' }),
+      });
+      state.selectedTreeId = res.tree.id;
+      state.selectedNodeId = res.tree.nodes[0]?.id ?? null;
+      syncSelectionsFromData(res.state);
+      renderAll();
+      showToast(`Карту «${res.tree.targetProfession}» згенеровано!`);
+    } catch (err) {
+      showToast(err.message, true);
+    }
   });
 
   $('generateTreeForm').addEventListener('submit', async (e) => {
@@ -991,18 +901,18 @@ function setupEventListeners() {
           level: $('genLevel').value,
         }),
       });
+      $('wizardModal').classList.add('hidden');
       state.selectedTreeId = res.tree.id;
       state.selectedNodeId = res.tree.nodes[0]?.id ?? null;
       syncSelectionsFromData(res.state);
       renderAll();
-      switchView('learner-tree');
       showToast(`Карту «${res.tree.targetProfession}» згенеровано!`);
     } catch (err) {
       showToast(err.message, true);
     }
   });
 
-  // Node timeline clicks & Add Node modal
+  // Node timeline & Add Node
   $('nodesList').addEventListener('click', async (e) => {
     const deleteBtn = e.target.closest('.delete-node-btn');
     if (deleteBtn) {
@@ -1029,7 +939,6 @@ function setupEventListeners() {
     }
   });
 
-  $('openAddNodeBtn').addEventListener('click', () => $('addNodeModal').classList.remove('hidden'));
   $('addNodeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const learner = getActiveLearner();
@@ -1088,9 +997,7 @@ function setupEventListeners() {
     if (!questionText) return;
 
     const chatEl = $('chatMessages');
-    if (node.messages.length === 0) {
-      chatEl.innerHTML = '';
-    }
+    if (node.messages.length === 0) chatEl.innerHTML = '';
     const typingTurn = document.createElement('div');
     typingTurn.className = 'chat-turn';
     typingTurn.innerHTML = `
@@ -1098,9 +1005,7 @@ function setupEventListeners() {
       <div class="bubble-ai typing-bubble">
         <span>ШІ-асистент аналізує запит</span>
         <span class="typing-dots" aria-hidden="true">
-          <span class="typing-dot"></span>
-          <span class="typing-dot"></span>
-          <span class="typing-dot"></span>
+          <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
         </span>
       </div>
     `;
@@ -1237,10 +1142,11 @@ function setupEventListeners() {
     }
   });
 
-  // Mentor Dashboard (own mentor only)
+  // Mentor self-cabinet handlers
   $('publishMaterialForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const mentor = getActiveMentor();
+    if (!mentor) return;
     const nodeId = Number($('mentorNodeSelect').value);
     try {
       const res = await api(`/api/nodes/${nodeId}/materials`, {
@@ -1279,10 +1185,10 @@ function setupEventListeners() {
     }
   });
 
-  // HR Dashboard
+  // B2B HR handlers
   $('teamSelect').addEventListener('change', (e) => {
     state.selectedTeamId = Number(e.target.value);
-    renderHrDashboard();
+    renderB2bSection();
   });
 
   $('createTeamForm').addEventListener('submit', async (e) => {
