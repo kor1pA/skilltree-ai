@@ -16,6 +16,9 @@ export class PaymentAdapter {
   readonly currency = 'UAH';
 
   processPayment(session: MentorSession): PaymentReceipt {
+    if (session.paymentStatus === PaymentStatus.PAID) {
+      throw new Error('Сесія вже оплачена.');
+    }
     const ok = session.pay();
     if (!ok) {
       throw new Error('Неможливо оплатити скасовану менторську сесію.');

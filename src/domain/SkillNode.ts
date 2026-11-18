@@ -35,6 +35,9 @@ export class SkillNode {
   }
 
   start(): void {
+    if (this.status === NodeStatus.DONE) {
+      return;
+    }
     this.status = NodeStatus.IN_PROGRESS;
   }
 

@@ -242,4 +242,104 @@ describe('SkillTree AI — REST API Integration Tests (UC1–UC12)', () => {
     assert.ok(csv.includes('ПІБ співробітника'));
     assert.ok(csv.includes('Дмитро Мельник'));
   });
+
+  it('UC1 Edge Flow: profile update (PUT /api/profile), password reset, and logout', async () => {
+    // Login as seeded learner
+    const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'slava@skilltree.ai', password: 'demo1234' }),
+    });
+    assert.equal(loginRes.status, 200);
+
+    // Update own profile
+    const profRes = await fetch(`${baseUrl}/api/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName: 'Вячеслав Гой (Оновлено)' }),
+    });
+    assert.equal(profRes.status, 200);
+    const profData = await profRes.json();
+    assert.equal(profData.user.fullName, 'Вячеслав Гой (Оновлено)');
+
+    // Reset password
+    const resetRes = await fetch(`${baseUrl}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'slava@skilltree.ai', newPassword: 'newpass77' }),
+    });
+    assert.equal(resetRes.status, 200);
+
+    // Logout clears currentUser
+    const logoutRes = await fetch(`${baseUrl}/api/auth/logout`, { method: 'POST' });
+    assert.equal(logoutRes.status, 200);
+    const logoutData = await logoutRes.json();
+    assert.equal(logoutData.currentUser, null);
+    assert.equal(logoutData.state.currentUser, null);
+
+    // Login with new password works
+    const reloginRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'slava@skilltree.ai', password: 'newpass77' }),
+    });
+    assert.equal(reloginRes.status, 200);
+  });
+
+  it('Negative API Edge Cases: double payment, cancel DONE session, and delete last SkillNode return 400', async () => {
+    const stateRes = await fetch(`${baseUrl}/api/state`);
+    const state = await stateRes.json();
+    const mentorId = state.mentors[0].id;
+
+    // Book and pay once
+    const bookRes = await fetch(`${baseUrl}/api/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        learnerId: 1,
+        mentorId,
+        topic: 'Edge Case Session',
+        startAt: new Date(Date.now() + 86400000).toISOString(),
+        durationMin: 60,
+      }),
+    });
+    assert.equal(bookRes.status, 201);
+    const { session } = await bookRes.json();
+
+    const pay1 = await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
+    assert.equal(pay1.status, 200);
+
+    // Second payment MUST fail with 400
+    const pay2 = await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
+    assert.equal(pay2.status, 400);
+
+    // Complete session via confirm + feedback -> cancel MUST fail with 400
+    await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, { method: 'POST' });
+    await fetch(`${baseUrl}/api/sessions/${session.id}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: 5, feedback: 'Super' }),
+    });
+    const cancelDone = await fetch(`${baseUrl}/api/sessions/${session.id}/cancel`, { method: 'POST' });
+    assert.equal(cancelDone.status, 400);
+
+    // Generate tree and try deleting all nodes -> deleting the last remaining node MUST return 400
+    const genRes = await fetch(`${baseUrl}/api/trees/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ learnerId: 1, profession: 'QA Automation Engineer', level: 'BEGINNER' }),
+    });
+    const { tree } = await genRes.json();
+    for (let i = 0; i < tree.nodes.length - 1; i += 1) {
+      const delOk = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${tree.nodes[i].id}`, {
+        method: 'DELETE',
+      });
+      assert.equal(delOk.status, 200);
+    }
+    const lastNode = tree.nodes[tree.nodes.length - 1];
+    const delLast = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${lastNode.id}`, {
+      method: 'DELETE',
+    });
+    assert.equal(delLast.status, 400);
+  });
 });

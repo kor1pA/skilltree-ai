@@ -193,6 +193,12 @@ export class Learner extends User {
   }
 
   bookSession(mentor: Mentor, startAt: Date, topic?: string, durationMin = 60): MentorSession {
+    if (!Number.isFinite(durationMin) || durationMin <= 0) {
+      throw new Error('Тривалість сесії має бути більшою за 0 хвилин.');
+    }
+    if (!(startAt instanceof Date) || Number.isNaN(startAt.getTime())) {
+      throw new Error('Некоректна дата початку сесії.');
+    }
     const price = Number(((mentor.hourlyRate * durationMin) / 60).toFixed(2));
     const session = new MentorSession({
       id: Date.now() + Math.floor(Math.random() * 1000),

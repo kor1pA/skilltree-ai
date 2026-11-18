@@ -290,4 +290,67 @@ describe('SkillTree AI — UML Domain Model (10 Classes & 5 Enums)', () => {
     assert.ok(csv.includes('"Коваленко, Тарас"'), 'Comma in fullName must be RFC-4180 quoted');
     assert.ok(csv.includes('50.0'), 'Progress 50.0 must be present in CSV');
   });
+
+  it('Edge Cases: MentorSession double payment, cancelling DONE session, non-integer rating, and invalid booking inputs', () => {
+    const learner = new Learner({
+      id: 60,
+      fullName: 'Ігор',
+      email: 'igor@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+    });
+    const mentor = new Mentor({
+      id: 61,
+      fullName: 'Сергій',
+      email: 'serhiy@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+      hourlyRate: 1200,
+    });
+    const paymentAdapter = new PaymentAdapter();
+
+    // Невалідна тривалість і дата бронювання
+    assert.throws(() => learner.bookSession(mentor, new Date(Date.now() + 3600000), 'Test', 0), /більшою за 0/);
+    assert.throws(() => learner.bookSession(mentor, new Date(Date.now() + 3600000), 'Test', -30), /більшою за 0/);
+    assert.throws(() => learner.bookSession(mentor, new Date('invalid-date'), 'Test', 60), /Некоректна дата/);
+
+    // Подвійна оплата заборонена
+    const session = learner.bookSession(mentor, new Date(Date.now() + 86400000), 'Code Review', 60);
+    paymentAdapter.processPayment(session);
+    assert.equal(session.pay(), false);
+    assert.throws(() => paymentAdapter.processPayment(session), /вже оплачена/);
+
+    // Дробова оцінка заборонена
+    assert.throws(() => session.leaveFeedback(4.5, 'Добре'), /цілим числом/);
+
+    // Завершену (DONE) сесію не можна скасувати
+    mentor.confirmSession(session);
+    session.leaveFeedback(5, 'Відмінно');
+    assert.throws(() => session.cancel(), /завершену сесію/);
+  });
+
+  it('Edge Cases: SkillNode.start() does not downgrade DONE node and empty SkillTree progress is 0%', () => {
+    const emptyTree = new SkillTree({
+      id: 700,
+      title: 'Empty',
+      targetProfession: 'QA',
+      learnerId: 1,
+      nodes: [],
+    });
+    assert.equal(emptyTree.calculateProgress(), 0);
+
+    const node = new SkillNode({ id: 701, title: 'Unit Tests', orderNumber: 1 });
+    const tree = new SkillTree({
+      id: 702,
+      title: 'QA',
+      targetProfession: 'QA',
+      learnerId: 1,
+      nodes: [node],
+    });
+    node.complete();
+    assert.equal(tree.calculateProgress(), 100);
+
+    // Повторний виклик start() не повинен понижувати статус DONE назад у IN_PROGRESS
+    node.start();
+    assert.equal(node.status, NodeStatus.DONE);
+    assert.equal(tree.calculateProgress(), 100);
+  });
 });

@@ -45,7 +45,7 @@ export class MentorSession {
   }
 
   pay(): boolean {
-    if (this.status === SessionStatus.CANCELLED) {
+    if (this.status === SessionStatus.CANCELLED || this.paymentStatus === PaymentStatus.PAID) {
       return false;
     }
     this.paymentStatus = PaymentStatus.PAID;
@@ -53,6 +53,9 @@ export class MentorSession {
   }
 
   cancel(): void {
+    if (this.status === SessionStatus.DONE) {
+      throw new Error('Неможливо скасувати вже завершену сесію.');
+    }
     this.status = SessionStatus.CANCELLED;
     if (this.paymentStatus === PaymentStatus.PAID) {
       this.paymentStatus = PaymentStatus.REFUNDED;
