@@ -10,6 +10,8 @@ import {
   debounce,
   escapeHtml,
   getInitials,
+  getPaymentMethodLabel,
+  getPaymentStatusLabel,
   openModal,
   renderSessionStatusBadges,
   showToast,
@@ -282,7 +284,7 @@ export function bindMentorsEvents({ navigateTo, renderActiveView }) {
     });
   });
 
-  // Атомарне бронювання + оплата в одній SQLite-транзакції із блокуванням кнопки
+  // Бронювання та миттєва оплата сесії із блокуванням повторного натискання
   $('confirmPaymentBtn')?.addEventListener('click', async () => {
     const learner = getActiveLearner();
     if (!learner || !state.bookingMentorId) return;
@@ -312,7 +314,7 @@ export function bindMentorsEvents({ navigateTo, renderActiveView }) {
         renderView: renderActiveView,
         onSuccess: (res) => {
           if ($('paymentTxnId')) {
-            $('paymentTxnId').textContent = `Транзакція ${res.receipt?.transactionId || 'PAID'}`;
+            $('paymentTxnId').textContent = `Транзакція ${res.receipt?.transactionId || 'підтверджена'}`;
           }
           $('paymentSuccessToast')?.classList.remove('hidden');
         },
@@ -348,8 +350,8 @@ export function bindMentorsEvents({ navigateTo, renderActiveView }) {
             <div><strong>Транзакція:</strong> <code class="text-cyan-300">${escapeHtml(receipt.transactionId)}</code></div>
             <div><strong>Сесія:</strong> #${receipt.sessionId} (${escapeHtml(session?.topic || '')})</div>
             <div><strong>Сума:</strong> ${receipt.amount} ${escapeHtml(receipt.currency)}</div>
-            <div><strong>Спосіб:</strong> ${escapeHtml(receipt.method || 'CARD')}</div>
-            <div><strong>Статус:</strong> ${escapeHtml(receipt.status)}</div>
+            <div><strong>Спосіб:</strong> ${escapeHtml(getPaymentMethodLabel(receipt.method))}</div>
+            <div><strong>Статус:</strong> ${escapeHtml(getPaymentStatusLabel(receipt.status))}</div>
             <div><strong>Дата:</strong> ${new Date(receipt.processedAt).toLocaleString('uk-UA')}</div>
           `
           : `<div>Сесія #${id} оплачена (${session?.price || 0} ₴).</div>`;

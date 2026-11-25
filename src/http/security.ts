@@ -128,10 +128,10 @@ export const csrfGuardMiddleware: MiddlewareHandler<AppEnv> = async (c, next) =>
       try {
         originHost = new URL(origin).host.toLowerCase();
       } catch {
-        throw new ForbiddenError('CSRF перевірка не пройдена: некоректний заголовок Origin.');
+        throw new ForbiddenError('Запит відхилено системою безпеки.');
       }
       if (expectedHost && originHost !== expectedHost) {
-        throw new ForbiddenError('CSRF перевірка не пройдена: невідповідний Origin.');
+        throw new ForbiddenError('Запит відхилено системою безпеки.');
       }
     } else {
       const referer = c.req.header('referer');
@@ -140,10 +140,10 @@ export const csrfGuardMiddleware: MiddlewareHandler<AppEnv> = async (c, next) =>
         try {
           refHost = new URL(referer).host.toLowerCase();
         } catch {
-          throw new ForbiddenError('CSRF перевірка не пройдена: некоректний заголовок Referer.');
+          throw new ForbiddenError('Запит відхилено системою безпеки.');
         }
         if (expectedHost && refHost !== expectedHost) {
-          throw new ForbiddenError('CSRF перевірка не пройдена: невідповідний Referer.');
+          throw new ForbiddenError('Запит відхилено системою безпеки.');
         }
       }
     }
@@ -154,9 +154,7 @@ export const csrfGuardMiddleware: MiddlewareHandler<AppEnv> = async (c, next) =>
     const hasJsonContentType = contentType.includes('application/json');
 
     if (!hasCustomHeader && !hasJsonContentType) {
-      throw new ForbiddenError(
-        'CSRF перевірка не пройдена: потрібен заголовок X-Requested-With або application/json.'
-      );
+      throw new ForbiddenError('Запит відхилено системою безпеки.');
     }
   }
 

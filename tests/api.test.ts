@@ -1,6 +1,6 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ServerType } from '@hono/node-server';
 import { serve } from '@hono/node-server';
@@ -79,7 +79,7 @@ describe('SkillTree AI — Production Hono REST API, SQLite, RBAC & Security Sui
     assert.equal(healthRes.status, 200);
     const health = await healthRes.json();
     assert.equal(health.status, 'ok');
-    assert.equal(health.dbDriver, 'node:sqlite');
+    assert.equal(health.dbDriver, undefined);
 
     // Security headers check
     assert.ok((healthRes.headers.get('content-security-policy') || '').includes("script-src 'self'"));
@@ -600,6 +600,22 @@ describe('SkillTree AI — Production Hono REST API, SQLite, RBAC & Security Sui
     assert.equal(html.includes('cdn.tailwindcss.com'), false);
     assert.equal(html.includes('demo1234'), false);
     assert.equal(html.includes('resetPasswordModal'), false);
+
+    const leakPattern =
+      /\bUC\d+\b|\bUS-\d+\b|PaymentAdapter|AIServiceAdapter|RFC-4180|UTF-8 BOM|SQLite|Turso|HttpOnly|scrypt|NAV_PROTOCOLS|AUTH_GATEWAY|SESSION_SECURITY_CONDUIT|SQLITE_AUTH_SESSIONS|Synthetic Nexus|SLA\s*[≤<=]|HRManager|композиція 1/i;
+    assert.equal(leakPattern.test(html), false, 'public/index.html must not contain TЗ/stack leaks');
+
+    const jsRoot = resolve(process.cwd(), 'public/js');
+    for (const rel of readdirSync(jsRoot, { recursive: true, encoding: 'utf8' })) {
+      if (!rel.endsWith('.js')) continue;
+      const content = readFileSync(resolve(jsRoot, rel), 'utf-8');
+      assert.equal(
+        leakPattern.test(content),
+        false,
+        `public/js/${rel} must not contain TЗ/stack leaks`
+      );
+    }
+
     for (const id of [
       'page-auth',
       'page-roadmap',

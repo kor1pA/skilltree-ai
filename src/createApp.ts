@@ -95,12 +95,11 @@ export function createApp(
     );
   });
 
-  // Healthcheck (доступний для Vercel моніторингу й діагностики)
+  // Healthcheck (доступний для моніторингу й діагностики)
   app.get('/api/health', (c) => {
     return c.json(
       {
         status: 'ok',
-        dbDriver: repo.db.driverName,
         timestamp: new Date().toISOString(),
       },
       200,

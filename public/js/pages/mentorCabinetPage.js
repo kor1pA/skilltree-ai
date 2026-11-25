@@ -4,6 +4,7 @@ import {
   closeModal,
   escapeHtml,
   getInitials,
+  getMaterialTypeLabel,
   openModal,
   renderSessionStatusBadges,
 } from '../core/dom.js';
@@ -53,7 +54,7 @@ export function renderMentorCabinetPage() {
               `<option value="${n.nodeId}" class="bg-[#121422]">${escapeHtml(n.ownerName)} — ${escapeHtml(n.profession)}: ${escapeHtml(n.nodeTitle)}</option>`
           )
           .join('')
-      : '<option value="" disabled>Поки що немає вузлів у базі</option>';
+      : '<option value="" disabled>Поки що немає доступних вузлів</option>';
   }
 
   const sessContainer = $('mentorSessionsList');
@@ -82,7 +83,7 @@ export function renderMentorCabinetPage() {
                 <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#22273c]">
                   ${
                     s.status !== 'DONE' && s.status !== 'CANCELLED'
-                      ? `<button type="button" data-cancel-session="${s.id}" class="px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-semibold cursor-pointer">Скасувати ${s.paymentStatus === 'PAID' ? '(REFUND)' : ''}</button>`
+                      ? `<button type="button" data-cancel-session="${s.id}" class="px-4 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-semibold cursor-pointer">Скасувати${s.paymentStatus === 'PAID' ? ' з поверненням' : ''}</button>`
                       : '<span></span>'
                   }
                   ${
@@ -107,7 +108,7 @@ export function renderMentorCabinetPage() {
             (m) => `
           <div class="p-4 rounded-2xl bg-[#141724]/80 border border-[#2b304c] flex flex-col gap-2">
             <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary font-mono text-[11px] font-bold">${escapeHtml(m.type)}</span>
+              <span class="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary font-mono text-[11px] font-bold">${escapeHtml(getMaterialTypeLabel(m.type))}</span>
               <span class="text-[11px] text-slate-400 font-mono truncate max-w-[60%]">Вузол: ${escapeHtml(m.nodeTitle || '')}</span>
             </div>
             <div class="text-sm text-white font-semibold">${escapeHtml(m.title)}</div>

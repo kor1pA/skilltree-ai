@@ -758,7 +758,7 @@ export class SkillTreeRepository {
       const removed = tree.removeNode(nodeId);
       if (!removed) {
         throw new BadRequestError(
-          'Неможливо видалити останній вузол карти розвитку (композиція 1 : 1..*).'
+          'Неможливо видалити останній вузол: карта розвитку має містити щонайменше одну тему.'
         );
       }
 

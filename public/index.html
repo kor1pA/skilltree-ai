@@ -16,9 +16,7 @@
 </head>
 <body class="bg-[#0b0d14] font-sans text-[#e3e1eb] min-h-screen selection:bg-brand-500 selection:text-white relative overflow-x-hidden antialiased">
 
-  <!-- ======================================================================= -->
-  <!-- SCREEN 1: FULL-SCREEN 3D PORTAL AUTHENTICATION (/auth, /login)          -->
-  <!-- ======================================================================= -->
+  <!-- Портал входу -->
   <section id="page-auth" class="page-view min-h-screen w-full flex-col justify-between items-center relative overflow-hidden bg-[#0d0e14]">
     <canvas id="antigravity-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
     <div id="cursor-glow" class="fixed pointer-events-none w-[520px] h-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-brand-600/20 via-cyan-500/12 to-transparent blur-3xl opacity-0 transition-opacity duration-500 z-0"></div>
@@ -42,7 +40,7 @@
       <div class="flex items-center gap-2.5 self-end sm:self-auto">
         <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161827]/90 border border-brand-500/30 text-xs text-slate-300 backdrop-blur-md shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-          <span class="font-mono text-[11px]">Scrypt + HttpOnly Auth</span>
+          <span class="font-mono text-[11px]">Захищений вхід</span>
         </div>
         <a href="/mentors" data-route="/mentors" class="px-3.5 py-1.5 rounded-full bg-[#181b2c] hover:bg-[#22263f] border border-brand-500/40 text-xs text-white font-semibold transition-all">
           Каталог менторів →
@@ -60,7 +58,7 @@
           <div class="text-center mb-5">
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold mb-2.5">
               <span class="material-symbols-outlined text-sm text-cyan-300">lock</span>
-              <span>Безпечна автентифікація користувача (UC1)</span>
+              <span>Захищена автентифікація</span>
             </div>
             <h1 id="portal-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1.5 font-display">Вхід до SkillTree AI</h1>
             <p id="portal-subtitle" class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">Увійдіть за email і паролем або створіть новий обліковий запис</p>
@@ -87,7 +85,7 @@
                   <div class="p-1.5 rounded-lg bg-brand-500/20 text-brand-300 shrink-0"><span class="material-symbols-outlined text-sm">school</span></div>
                   <div>
                     <div class="text-xs font-bold text-white leading-none">Студент</div>
-                    <div class="text-[10px] text-brand-300 font-mono mt-0.5">Learner</div>
+                    <div class="text-[10px] text-brand-300 font-mono mt-0.5">Навчання</div>
                   </div>
                 </div>
                 <p class="text-[10px] text-slate-400 leading-tight">Карти розвитку, ШІ-асистент, проходження вузлів</p>
@@ -97,7 +95,7 @@
                   <div class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 shrink-0"><span class="material-symbols-outlined text-sm">psychology</span></div>
                   <div>
                     <div class="text-xs font-bold text-white leading-none">Ментор</div>
-                    <div class="text-[10px] text-indigo-300 font-mono mt-0.5">Mentor</div>
+                    <div class="text-[10px] text-indigo-300 font-mono mt-0.5">Менторство</div>
                   </div>
                 </div>
                 <p class="text-[10px] text-slate-400 leading-tight">Публікація матеріалів, платні сесії</p>
@@ -107,7 +105,7 @@
                   <div class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 shrink-0"><span class="material-symbols-outlined text-sm">corporate_fare</span></div>
                   <div>
                     <div class="text-xs font-bold text-white leading-none">HR-менеджер</div>
-                    <div class="text-[10px] text-cyan-300 font-mono mt-0.5">HRManager</div>
+                    <div class="text-[10px] text-cyan-300 font-mono mt-0.5">Команди (B2B)</div>
                   </div>
                 </div>
                 <p class="text-[10px] text-slate-400 leading-tight">Skill Matrix команд, аналітика, експорт CSV</p>
@@ -143,7 +141,7 @@
                 <label class="block text-xs font-medium text-slate-300" for="input-password">Пароль</label>
                 <div class="flex items-center gap-1.5 text-[11px] text-cyan-400 font-mono">
                   <span class="material-symbols-outlined text-xs">verified_user</span>
-                  <span>Scrypt Захист</span>
+                  <span>Захищене з'єднання</span>
                 </div>
               </div>
               <div class="relative flex items-center">
@@ -174,12 +172,12 @@
       <div class="mt-4 flex flex-wrap items-center justify-between text-xs text-slate-500 px-2 gap-2">
         <div class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm text-brand-400">shield</span>
-          <span>Захищене хешування паролів scrypt & HttpOnly сесії</span>
+          <span>Надійний захист облікового запису та приватних даних</span>
         </div>
         <div class="flex items-center gap-3">
           <a href="/mentors" data-route="/mentors" class="hover:text-slate-300 transition">Каталог менторів</a>
           <span>•</span>
-          <span class="font-mono text-slate-400">SkillTree AI • SQLite</span>
+          <span class="font-mono text-slate-400">SkillTree AI</span>
         </div>
       </div>
     </main>
@@ -187,9 +185,7 @@
     <footer class="relative z-10 w-full py-3 text-center text-[11px] text-slate-500">© 2026 SkillTree AI. Платформа адаптивного навчання та сертифікації. Всі права захищено.</footer>
   </section>
 
-  <!-- ======================================================================= -->
-  <!-- DASHBOARD SHELL (SCREENS 2, 3, 4, 5, 6)                                -->
-  <!-- ======================================================================= -->
+  <!-- Робочий інтерфейс платформи -->
   <div id="dashboard-shell" class="min-h-screen w-full cyber-grid">
     <!-- Mobile Drawer Backdrop -->
     <div id="mobileSidebarBackdrop" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"></div>
@@ -210,7 +206,7 @@
         </a>
 
         <div class="px-2">
-          <span class="font-display text-[10px] uppercase tracking-widest text-slate-500 px-2">// NAV_PROTOCOLS</span>
+          <span class="font-display text-[10px] uppercase tracking-widest text-slate-500 px-2">Навігація</span>
         </div>
 
         <nav class="flex flex-col gap-1.5" aria-label="Головне меню">
@@ -241,9 +237,9 @@
         <a href="/auth" data-route="/auth" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#181b2c] hover:bg-[#22263f] border border-[#2b304c] hover:border-primary/40 text-xs text-slate-200 transition-all">
           <span class="flex items-center gap-2">
             <span class="material-symbols-outlined text-base text-cyan-400">passkey</span>
-            <span class="font-semibold">3D Портал входу</span>
+            <span class="font-semibold">Портал входу</span>
           </span>
-          <span class="font-mono text-[10px] text-primary">/auth</span>
+          <span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
         </a>
 
         <div class="p-3.5 rounded-xl bg-[#141624] border border-[#23273c] flex items-center gap-3 shadow-inner">
@@ -254,11 +250,11 @@
             <span class="font-display text-xs text-white font-semibold">AI Асистент</span>
             <span class="font-mono text-[10px] text-emerald-400 flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              SQLITE // ONLINE
+              Онлайн
             </span>
           </div>
         </div>
-        <div class="text-center font-display text-[11px] text-slate-500 py-1">© 2026 SkillTree AI • Synthetic Nexus</div>
+        <div class="text-center font-display text-[11px] text-slate-500 py-1">© 2026 SkillTree AI</div>
       </div>
     </aside>
 
@@ -281,7 +277,7 @@
             <span class="text-amber-400">⭐</span>
             <span id="headerXpText" class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300">0 XP</span>
             <span class="text-slate-600">|</span>
-            <span class="text-slate-400">Рівень: <span id="headerLevelText" class="text-slate-200 font-semibold">BEGINNER</span></span>
+            <span class="text-slate-400">Рівень: <span id="headerLevelText" class="text-slate-200 font-semibold">Початковий</span></span>
           </div>
 
           <!-- User Account Menu Dropdown -->
@@ -310,12 +306,9 @@
                   <span class="material-symbols-outlined text-slate-400 text-lg">security</span>
                   <span>Налаштування та пароль</span>
                 </button>
-                <a href="/auth" data-route="/auth" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-cyan-300 hover:bg-[#1e1f26] transition-all">
-                  <span class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-lg">switch_account</span>
-                    <span>Увійти / Створити акаунт</span>
-                  </span>
-                  <span class="font-mono text-[10px] bg-[#292930] px-1.5 py-0.5 rounded text-cyan-200">/auth</span>
+                <a href="/auth" data-route="/auth" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-cyan-300 hover:bg-[#1e1f26] transition-all">
+                  <span class="material-symbols-outlined text-lg">switch_account</span>
+                  <span>Увійти / Створити акаунт</span>
                 </a>
               </div>
 
@@ -331,9 +324,7 @@
       <!-- Main Route Views Container -->
       <main class="relative pt-16 flex-1 w-full">
 
-        <!-- ================================================================= -->
-        <!-- SCREEN 2: MY ROADMAP & 3D CONSTELLATION (/ and /roadmap)          -->
-        <!-- ================================================================= -->
+        <!-- Карта розвитку та 3D-сузір'я -->
         <section id="page-roadmap" class="page-view active" data-page="/roadmap">
           <div class="relative w-full overflow-hidden pointer-events-none">
             <div class="absolute -top-32 left-1/4 w-[32rem] h-[32rem] bg-primary/15 rounded-full blur-[120px]"></div>
@@ -354,12 +345,12 @@
                     <div>
                       <div class="flex flex-wrap items-center gap-2">
                         <h1 id="treeTitle" class="text-xl text-white font-bold tracking-tight m-0">Full-Stack Developer</h1>
-                        <span id="treeTechBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] uppercase font-bold tracking-wider">UC2 / UC3</span>
+                        <span id="treeTechBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] uppercase font-bold tracking-wider">Персональний трек</span>
                       </div>
                       <p class="text-xs text-slate-400 flex flex-wrap items-center gap-1.5 mt-1">
                         <span>Персоналізований трек розвитку компетенцій</span>
                         <span class="inline-block w-1 h-1 rounded-full bg-slate-600"></span>
-                        <span id="treeLevelBadge" class="text-cyan-300 font-semibold">BEGINNER</span>
+                        <span id="treeLevelBadge" class="text-cyan-300 font-semibold">Початковий</span>
                       </p>
                     </div>
                   </div>
@@ -492,10 +483,10 @@
               <div class="lg:col-span-5 flex flex-col gap-5">
                 <div class="bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col gap-4">
                   <div class="flex items-center justify-between gap-2">
-                    <span id="activeNodeBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] font-bold uppercase tracking-wider">IN_PROGRESS</span>
+                    <span id="activeNodeBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] font-bold uppercase tracking-wider">В процесі</span>
                     <div class="flex items-center gap-2">
                       <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/40 text-purple-200 font-display text-xs font-bold">+50 XP</span>
-                      <button id="deleteNodeBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors cursor-pointer" title="Видалити вузол (UC10)">
+                      <button id="deleteNodeBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors cursor-pointer" title="Видалити вузол">
                         <span class="material-symbols-outlined text-base">delete</span>
                       </button>
                     </div>
@@ -517,7 +508,7 @@
                   <div id="nodeActionButtons" class="pt-1 flex flex-wrap gap-2"></div>
                 </div>
 
-                <!-- AI Blocker Chat (UC4 / UC11) -->
+                <!-- Чат із ШІ-асистентом -->
                 <div class="bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden">
                   <div class="p-4 bg-[#141624] border-b border-[#202538] flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
@@ -526,7 +517,7 @@
                       </div>
                       <div>
                         <div class="flex items-center gap-1.5">
-                          <span class="text-xs text-white font-bold">AI Blocker Chat (UC4)</span>
+                          <span class="text-xs text-white font-bold">ШІ-асистент теми</span>
                           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                         </div>
                         <span id="aiContextNodeTitle" class="text-[11px] text-slate-400">Контекст: —</span>
@@ -534,14 +525,14 @@
                     </div>
                     <div class="px-3 py-1 rounded-full bg-[#181b2c] border border-[#252a3f] text-slate-300 font-display text-[11px] flex items-center gap-1">
                       <span class="material-symbols-outlined text-xs text-amber-400">bolt</span>
-                      <span id="aiSlaBadge">SLA ≤ 5000 мс</span>
+                      <span id="aiSlaBadge">Швидкі відповіді</span>
                     </div>
                   </div>
 
                   <div id="chatMessages" class="p-4 flex flex-col gap-3 max-h-[340px] overflow-y-auto"></div>
 
                   <div class="px-4 py-2 bg-[#10121e] border-t border-[#1e2235] flex items-center justify-between text-[11px] text-slate-400">
-                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-emerald-400">insights</span> KPI корисності ШІ (UC11):</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-emerald-400">insights</span> Корисність відповідей ШІ:</span>
                     <strong id="aiHelpfulnessKpi" class="text-emerald-400">100%</strong>
                   </div>
 
@@ -569,9 +560,7 @@
           </div>
         </section>
 
-        <!-- ================================================================= -->
-        <!-- SCREEN 3: MENTORS CATALOG & SESSIONS (/mentors)                   -->
-        <!-- ================================================================= -->
+        <!-- Каталог менторів та сесій -->
         <section id="page-mentors" class="page-view" data-page="/mentors">
           <div class="relative w-full overflow-hidden">
             <div class="absolute -top-32 left-1/4 w-[34rem] h-[34rem] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
@@ -583,7 +572,7 @@
                   <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/50 text-purple-200 font-display text-xs">
                       <span class="material-symbols-outlined text-sm text-purple-300">verified</span>
-                      Перевірені експерти SkillTree (UC6 / UC9)
+                      Перевірені експерти SkillTree
                     </span>
                   </div>
                   <h1 class="text-3xl lg:text-4xl text-white font-extrabold tracking-tight m-0">Каталог менторів та сесій</h1>
@@ -660,12 +649,12 @@
               <div id="mentorsDirectoryGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <!-- Booked Student Sessions Section (UC6 / UC9) -->
+            <!-- Бронювання студента -->
             <div class="glass-panel rounded-3xl p-6 flex flex-col gap-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h2 class="text-xl text-white font-bold m-0">🧾 Мої заброньовані сесії та оплати (UC6 / UC9)</h2>
-                  <p class="text-xs text-slate-400 mt-1">Оплачуйте консультації через PaymentAdapter, переглядайте електронні квитанції та оцінюйте менторів.</p>
+                  <h2 class="text-xl text-white font-bold m-0">🧾 Мої заброньовані сесії та оплати</h2>
+                  <p class="text-xs text-slate-400 mt-1">Оплачуйте консультації онлайн, переглядайте електронні квитанції та оцінюйте менторів.</p>
                 </div>
               </div>
               <div id="learnerSessionsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -679,7 +668,7 @@
                 <div>
                   <h3 class="text-lg text-white font-bold m-0">Синхронізація з вашим SkillTree</h3>
                   <p class="text-sm text-slate-300 max-w-xl leading-relaxed mt-1">
-                    Обов'язкова оплата активує підтвердження ментора, а після завершення сесії ви можете поставити оцінку 1–5 ★, яка миттєво оновлює рейтинг експерта у БД.
+                    Обов'язкова оплата активує підтвердження ментора, а після завершення сесії ви можете поставити оцінку 1–5 ★, яка миттєво оновлює рейтинг експерта.
                   </p>
                 </div>
               </div>
@@ -690,9 +679,7 @@
           </div>
         </section>
 
-        <!-- ================================================================= -->
-        <!-- SCREEN 4: MENTOR CABINET (/mentor-cabinet)                        -->
-        <!-- ================================================================= -->
+        <!-- Кабінет ментора -->
         <section id="page-mentor-cabinet" class="page-view" data-page="/mentor-cabinet">
           <div class="relative w-full px-4 sm:px-6 lg:px-10 py-8 max-w-7xl mx-auto">
             <!-- Guest / Non-Mentor Notice -->
@@ -837,7 +824,7 @@
                     </div>
                     <div class="flex flex-col gap-1">
                       <span class="text-sm text-primary font-bold">Порада ШІ-асистента</span>
-                      <p class="text-xs text-slate-300 leading-relaxed m-0">Публікуйте стислі практичні чеклісти та приклади коду у вузли студентів (UC5), щоб підвищити кількість платних 1-на-1 бронювань.</p>
+                      <p class="text-xs text-slate-300 leading-relaxed m-0">Публікуйте стислі практичні чеклісти та приклади коду у вузли студентів, щоб підвищити кількість платних 1-на-1 бронювань.</p>
                     </div>
                   </div>
                 </div>
@@ -846,9 +833,7 @@
           </div>
         </section>
 
-        <!-- ================================================================= -->
-        <!-- SCREEN 5: B2B SKILL MATRIX (/b2b)                                 -->
-        <!-- ================================================================= -->
+        <!-- Аналітика команд B2B -->
         <section id="page-b2b" class="page-view" data-page="/b2b">
           <div id="b2bGateNotice" class="hidden px-4 sm:px-6 lg:px-10 py-8"></div>
 
@@ -879,7 +864,7 @@
                 </button>
                 <button id="exportCsvBtn" type="button" class="relative flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-variant/80 border border-tertiary/40 hover:border-tertiary text-tertiary text-xs font-semibold transition-all shadow-[0_0_14px_rgba(123,208,255,0.2)] cursor-pointer">
                   <span class="material-symbols-outlined text-base">download</span>
-                  <span>Експорт звіту у CSV (RFC-4180)</span>
+                  <span>Експорт звіту у CSV</span>
                 </button>
                 <button id="openCreateTeamBtn" type="button" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-variant/60 hover:bg-surface-variant border border-violet-500/30 text-white text-xs font-semibold transition-all cursor-pointer">
                   <span class="material-symbols-outlined text-base text-primary">group_add</span>
@@ -966,7 +951,7 @@
                 <div>
                   <div class="flex items-center gap-2.5">
                     <h2 class="text-xl text-white font-bold tracking-tight m-0">Матриця компетенцій та Heatmap</h2>
-                    <span class="px-2.5 py-0.5 rounded-full bg-primary-container/20 border border-primary/40 text-primary font-display text-xs font-semibold">UC7 / UC8</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-primary-container/20 border border-primary/40 text-primary font-display text-xs font-semibold">Огляд команди</span>
                   </div>
                   <p class="text-sm text-slate-400 mt-1 m-0">Прогрес учасників команди, кількість пройдених вузлів, накопичений досвід і виявлені прогалини.</p>
                 </div>
@@ -986,7 +971,7 @@
                       <th class="py-3.5 px-4">Карти / Вузли</th>
                       <th class="py-3.5 px-4">Прогрес</th>
                       <th class="py-3.5 px-4 text-center">XP</th>
-                      <th class="py-3.5 px-5 text-right">Дії (UC8)</th>
+                      <th class="py-3.5 px-5 text-right">Дії</th>
                     </tr>
                   </thead>
                   <tbody id="hrMembersTableBody" class="divide-y divide-violet-500/10 text-sm text-slate-200"></tbody>
@@ -1020,7 +1005,7 @@
                 <div>
                   <div class="flex items-center justify-between mb-4">
                     <span class="font-semibold text-white">Баланс компетенцій стеку</span>
-                    <span class="font-display text-[11px] px-2.5 py-0.5 rounded-full bg-violet-950/80 border border-violet-500/40 text-tertiary">Матриця UC7</span>
+                    <span class="font-display text-[11px] px-2.5 py-0.5 rounded-full bg-violet-950/80 border border-violet-500/40 text-tertiary">Баланс навичок</span>
                   </div>
                   <div id="b2bBalanceBars" class="space-y-3"></div>
                 </div>
@@ -1032,9 +1017,9 @@
                     <div class="w-8 h-8 rounded-full bg-cyan-950/60 border border-tertiary/40 text-tertiary flex items-center justify-center">
                       <span class="material-symbols-outlined text-base">table_chart</span>
                     </div>
-                    <span class="font-semibold text-white">Аудит відповідності RFC-4180</span>
+                    <span class="font-semibold text-white">Експорт таблиці для Excel</span>
                   </div>
-                  <p class="text-xs text-slate-300 leading-relaxed m-0">Експорт формує CSV-файл із UTF-8 BOM для коректного відкриття кирилиці в Excel (ID, ПІБ, Email, Професія, Рівень, Прогрес %, Бали).</p>
+                  <p class="text-xs text-slate-300 leading-relaxed m-0">Експорт формує готовий CSV-файл із коректним відображенням кирилиці в Excel та Google Sheets (ID, ПІБ, Email, Професія, Рівень, Прогрес %, Бали).</p>
                 </div>
                 <button id="downloadCsvSecondaryBtn" type="button" class="w-full py-2.5 px-4 rounded-full bg-[#292930]/80 hover:bg-[#34343b] border border-violet-500/30 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer">
                   <span class="material-symbols-outlined text-base text-tertiary">file_download</span>
@@ -1045,24 +1030,22 @@
           </div>
         </section>
 
-        <!-- ================================================================= -->
-        <!-- SCREEN 6: PROFILE & ACTIVE SQLITE SESSIONS (/profile)             -->
-        <!-- ================================================================= -->
+        <!-- Профіль та активні сесії -->
         <section id="page-profile" class="page-view" data-page="/profile">
           <div class="relative w-full px-4 sm:px-6 lg:px-10 py-8 overflow-hidden max-w-7xl mx-auto">
             <!-- Header Banner -->
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
               <div class="flex flex-col gap-1.5 max-w-3xl">
                 <div class="flex items-center gap-2">
-                  <span class="font-display text-[11px] uppercase tracking-widest text-tertiary-fixed-dim bg-[#292930] px-2.5 py-0.5 rounded-full">// SESSION_SECURITY_CONDUIT</span>
+                  <span class="font-display text-[11px] uppercase tracking-widest text-tertiary-fixed-dim bg-[#292930] px-2.5 py-0.5 rounded-full">Безпека акаунта</span>
                   <span class="text-slate-500">•</span>
-                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">SQLite AuthSessions / UC1</span>
+                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">Активні сесії</span>
                 </div>
                 <h1 class="text-3xl text-white font-bold tracking-tight mt-1 m-0">
                   Профіль та <span class="text-primary font-extrabold">активні сесії</span>
                 </h1>
                 <p class="text-sm text-slate-300 max-w-2xl leading-relaxed m-0">
-                  Керування обліковим записом, безпечне оновлення пароля із перевіркою поточного та аудит реальних HttpOnly-сесій у SQLite.
+                  Керування обліковим записом, зміна пароля та контроль активних пристроїв і сесій.
                 </p>
               </div>
 
@@ -1093,7 +1076,7 @@
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span id="profileHeroRole" class="font-display text-[11px] uppercase tracking-wider text-primary bg-primary-container/30 px-2.5 py-0.5 rounded-full font-semibold">LEARNER</span>
+                      <span id="profileHeroRole" class="font-display text-[11px] uppercase tracking-wider text-primary bg-primary-container/30 px-2.5 py-0.5 rounded-full font-semibold">Користувач</span>
                       <span id="profileHeroId" class="font-display text-[11px] text-tertiary bg-[#292930] px-2.5 py-0.5 rounded-full">ID: #0</span>
                       <span class="flex items-center gap-1 text-cyan-300 font-display text-[11px]">
                         <span class="material-symbols-outlined text-sm">verified</span> Верифікована сесія
@@ -1120,9 +1103,9 @@
                   <div class="text-left xl:text-right">
                     <div class="flex items-center xl:justify-end gap-1.5 font-display text-xs text-white">
                       <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                      <span id="profileSessionStatusText">Активна HttpOnly сесія</span>
+                      <span id="profileSessionStatusText">Активна сесія</span>
                     </div>
-                    <span class="text-xs text-slate-400">Персистентна БД SQLite / Turso</span>
+                    <span class="text-xs text-slate-400">Дані синхронізовано</span>
                   </div>
                   <div class="flex flex-wrap items-center gap-2">
                     <a id="profileWorkspaceLink" href="/roadmap" data-route="/roadmap" class="flex items-center gap-1.5 bg-primary text-on-primary hover:bg-primary-fixed px-4 py-2.5 rounded-xl font-display text-xs font-bold transition-all shadow-[0_0_16px_rgba(208,188,255,0.3)]">
@@ -1140,13 +1123,13 @@
               </div>
             </div>
 
-            <!-- Inline Auth Gateway + Real Active Connections Ledger -->
+            <!-- Форма входу та активні підключення -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
               <div class="lg:col-span-5 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
                 <div class="flex flex-col gap-4">
                   <div class="flex items-center justify-between">
                     <div>
-                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// AUTH_GATEWAY</span>
+                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">Швидкий вхід</span>
                       <h3 class="text-lg text-white font-semibold m-0">Увійти в інший акаунт</h3>
                     </div>
                     <div class="w-8 h-8 rounded-lg bg-[#292930] flex items-center justify-center text-primary">
@@ -1181,7 +1164,7 @@
                 <div class="flex flex-col gap-4">
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// SQLITE_AUTH_SESSIONS</span>
+                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">Активні пристрої</span>
                       <h3 class="text-lg text-white font-semibold m-0">Журнал активних підключень</h3>
                     </div>
                     <div class="flex items-center gap-2 bg-[#292930] px-3 py-1 rounded-full">
@@ -1212,16 +1195,14 @@
     </div>
   </div>
 
-  <!-- ======================================================================= -->
-  <!-- SLIDE-OVER DRAWER 1: BOOKING & PAYMENT CHECKOUT (Screen 3 - UC6 / UC9)  -->
-  <!-- ======================================================================= -->
+  <!-- Панель бронювання та оплати -->
   <div id="bookingDrawerOverlay" class="fixed inset-0 bg-[#060810]/75 backdrop-blur-md z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex justify-end">
     <div id="bookingDrawer" class="w-full max-w-xl bg-[#0f1220]/95 backdrop-blur-2xl border-l border-purple-500/30 h-full shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-y-auto transform translate-x-full transition-transform duration-300 flex flex-col justify-between relative">
       <div class="p-6 lg:p-8 flex flex-col gap-5">
         <div class="flex items-center justify-between pb-3 border-b border-purple-500/20">
           <div class="flex items-center gap-2.5">
             <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-            <span class="font-display text-xs uppercase tracking-wider text-cyan-400 font-bold">Бронювання сесії (UC6 & UC9 PaymentAdapter)</span>
+            <span class="font-display text-xs uppercase tracking-wider text-cyan-400 font-bold">Бронювання та оплата сесії</span>
           </div>
           <button id="closeBookingDrawerBtn" type="button" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] cursor-pointer">
             <span class="material-symbols-outlined">close</span>
@@ -1230,7 +1211,7 @@
 
         <div>
           <h2 class="text-xl lg:text-2xl text-white font-bold m-0">Бронювання 1-на-1 консультації</h2>
-          <p class="text-xs text-slate-300 mt-1 m-0">Атомарне бронювання та миттєве проведення оплати в одній транзакції SQLite.</p>
+          <p class="text-xs text-slate-300 mt-1 m-0">Оберіть зручний час та підтвердіть оплату консультації в один крок.</p>
         </div>
 
         <div class="p-4 rounded-2xl bg-[#141829] border border-purple-500/30 flex items-center justify-between gap-4">
@@ -1287,7 +1268,7 @@
             </button>
           </div>
           <div class="p-3 rounded-xl bg-[#121629] border border-cyan-500/30 text-xs text-slate-300 leading-relaxed">
-            <strong class="text-white">Обов'язкова оплата (UC9):</strong> ментор зможе підтвердити бронювання лише після успішної оплати.
+            <strong class="text-white">Обов'язкова оплата:</strong> ментор зможе підтвердити бронювання лише після успішної оплати.
           </div>
         </div>
       </div>
@@ -1313,16 +1294,14 @@
           <span class="material-symbols-outlined text-4xl">check</span>
         </div>
         <h3 class="text-xl text-white font-bold m-0">Сесію заброньовано та оплачено!</h3>
-        <p class="text-xs text-slate-300 max-w-sm leading-relaxed m-0">Квитанцію збережено в SQLite. Ментор може підтвердити проведення консультації у своєму кабінеті.</p>
+        <p class="text-xs text-slate-300 max-w-sm leading-relaxed m-0">Електронну квитанцію збережено у вашому кабінеті. Ментор зможе підтвердити проведення консультації.</p>
         <div id="paymentTxnId" class="p-3 bg-[#141829] border border-purple-500/30 rounded-2xl w-full max-w-xs font-mono text-xs text-cyan-300">TXN</div>
         <button id="closePaymentSuccessBtn" type="button" class="px-8 py-3 rounded-full bg-gradient-to-r from-brand-500 to-purple-600 text-white text-sm font-semibold cyber-glow-purple cursor-pointer">Повернутися до каталогу</button>
       </div>
     </div>
   </div>
 
-  <!-- ======================================================================= -->
-  <!-- SLIDE-OVER DRAWER 2: HR ASSIGN ROADMAP (Screen 5 - UC8)                 -->
-  <!-- ======================================================================= -->
+  <!-- Панель призначення карти розвитку -->
   <div id="assignModalBackdrop" class="fixed inset-0 bg-[#07080d]/80 backdrop-blur-md z-50 hidden transition-opacity duration-300">
     <div id="assignModalPanel" class="fixed inset-y-0 right-0 max-w-xl w-full glass-panel-elevated border-l border-violet-500/30 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col justify-between p-6 sm:p-8 transform transition-transform duration-300 translate-x-full">
       <div class="flex flex-col gap-5 overflow-y-auto">
@@ -1333,7 +1312,7 @@
             </div>
             <div>
               <h2 class="text-xl font-bold text-white m-0">Призначити карту розвитку</h2>
-              <span class="font-display text-xs text-tertiary">UC8: Індивідуальний план співробітника</span>
+              <span class="font-display text-xs text-tertiary">Індивідуальний план співробітника</span>
             </div>
           </div>
           <button id="closeAssignModalBtn" type="button" class="w-10 h-10 rounded-full hover:bg-[#34343b] text-slate-300 flex items-center justify-center cursor-pointer">
@@ -1354,15 +1333,15 @@
           <div>
             <label class="text-xs font-semibold text-white block mb-1.5" for="hrAssignLevel">Цільовий рівень</label>
             <select id="hrAssignLevel" class="w-full px-4 py-3 bg-[#0d0e14]/90 border border-violet-500/30 rounded-2xl text-white text-sm outline-none focus:border-tertiary">
-              <option value="BEGINNER">BEGINNER</option>
-              <option value="INTERMEDIATE">INTERMEDIATE</option>
-              <option value="ADVANCED">ADVANCED</option>
+              <option value="BEGINNER">Початковий</option>
+              <option value="INTERMEDIATE">Середній</option>
+              <option value="ADVANCED">Просунутий</option>
             </select>
           </div>
 
           <div class="p-3.5 rounded-2xl bg-cyan-950/30 border border-tertiary/25 flex items-center gap-3 text-xs text-slate-200">
             <span class="material-symbols-outlined text-tertiary">info</span>
-            <span>Працівник миттєво отримає клоновану карту розвитку зі статусами NOT_STARTED у своєму кабінеті.</span>
+            <span>Працівник миттєво отримає персональну карту розвитку у своєму кабінеті та зможе розпочати навчання.</span>
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-4 border-t border-violet-500/20">
@@ -1376,11 +1355,9 @@
     </div>
   </div>
 
-  <!-- ======================================================================= -->
-  <!-- MODALS                                                                  -->
-  <!-- ======================================================================= -->
+  <!-- Модальні вікна -->
 
-  <!-- Modal: Publish Material (Screen 4 - UC5) -->
+  <!-- Модальне вікно публікації матеріалу -->
   <div id="addMaterialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-xl bg-[#131625] border border-primary/40 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.25)] overflow-hidden">
       <div class="flex items-center justify-between px-6 py-4 bg-[#171b2d] border-b border-[#292f4c]">
@@ -1388,7 +1365,7 @@
           <div class="w-8 h-8 rounded-lg bg-primary/20 border border-primary/50 text-primary flex items-center justify-center">
             <span class="material-symbols-outlined text-base">add</span>
           </div>
-          <span class="text-base text-white font-bold">Опублікувати навчальний матеріал (UC5)</span>
+          <span class="text-base text-white font-bold">Опублікувати навчальний матеріал</span>
         </div>
         <button id="closeModalBtn" type="button" class="p-1.5 rounded-xl text-slate-400 hover:text-white cursor-pointer">
           <span class="material-symbols-outlined">close</span>
@@ -1408,15 +1385,15 @@
           <div class="flex items-center gap-3">
             <label class="flex-1 cursor-pointer">
               <input checked class="peer sr-only" name="mat_type" type="radio" value="TEXT" />
-              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary text-slate-400 text-xs font-semibold">TEXT</div>
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary text-slate-400 text-xs font-semibold">Текст</div>
             </label>
             <label class="flex-1 cursor-pointer">
               <input class="peer sr-only" name="mat_type" type="radio" value="VIDEO" />
-              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-cyan-500/20 peer-checked:border-cyan-400 peer-checked:text-cyan-300 text-slate-400 text-xs font-semibold">VIDEO</div>
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-cyan-500/20 peer-checked:border-cyan-400 peer-checked:text-cyan-300 text-slate-400 text-xs font-semibold">Відео</div>
             </label>
             <label class="flex-1 cursor-pointer">
               <input class="peer sr-only" name="mat_type" type="radio" value="LINK" />
-              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-secondary/20 peer-checked:border-secondary peer-checked:text-secondary text-slate-400 text-xs font-semibold">LINK</div>
+              <div class="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-[#0e101a] border border-[#2b314e] peer-checked:bg-secondary/20 peer-checked:border-secondary peer-checked:text-secondary text-slate-400 text-xs font-semibold">Посилання</div>
             </label>
           </div>
         </div>
@@ -1442,11 +1419,11 @@
     </div>
   </div>
 
-  <!-- Modal: AI SkillTree Wizard (UC2) -->
+  <!-- Модальне вікно генерації карти розвитку -->
   <div id="wizardModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">✨ Генерація карти розвитку через ШІ (UC2)</h2>
+        <h2 class="text-lg text-white font-bold m-0">✨ Генерація карти розвитку через ШІ</h2>
         <button type="button" data-close-modal="wizardModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
       <form id="wizardForm" class="flex flex-col gap-4">
@@ -1457,9 +1434,9 @@
         <div>
           <label class="text-xs text-slate-300 block mb-1" for="wizardLevel">Рівень підготовки</label>
           <select id="wizardLevel" class="w-full px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none">
-            <option value="BEGINNER">BEGINNER (Початковий)</option>
-            <option value="INTERMEDIATE">INTERMEDIATE (Середній)</option>
-            <option value="ADVANCED">ADVANCED (Просунутий)</option>
+            <option value="BEGINNER">Початковий</option>
+            <option value="INTERMEDIATE">Середній</option>
+            <option value="ADVANCED">Просунутий</option>
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-2">
@@ -1470,11 +1447,11 @@
     </div>
   </div>
 
-  <!-- Modal: Add Custom SkillNode (UC10) -->
+  <!-- Модальне вікно додавання вузла -->
   <div id="addNodeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">➕ Додати власний вузол (UC10)</h2>
+        <h2 class="text-lg text-white font-bold m-0">➕ Додати власний вузол</h2>
         <button type="button" data-close-modal="addNodeModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
       <form id="addNodeForm" class="flex flex-col gap-4">
@@ -1504,12 +1481,12 @@
     </div>
   </div>
 
-  <!-- Modal: Lesson / Material Reader (UC3) -->
+  <!-- Модальне вікно перегляду матеріалу -->
   <div id="materialModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
       <div class="flex items-start justify-between gap-3 pb-3 mb-3 border-b border-[#292f4c]">
         <div>
-          <span id="materialModalType" class="px-2.5 py-0.5 rounded-full bg-primary/20 text-primary font-mono text-[11px] font-bold">TEXT</span>
+          <span id="materialModalType" class="px-2.5 py-0.5 rounded-full bg-primary/20 text-primary font-mono text-[11px] font-bold">Матеріал</span>
           <h2 id="materialModalTitle" class="text-lg text-white font-bold mt-1 m-0">Матеріал</h2>
           <small id="materialModalAuthor" class="text-xs text-slate-400"></small>
         </div>
@@ -1524,11 +1501,11 @@
     </div>
   </div>
 
-  <!-- Modal: Create Team / Add Member (Screen 5) -->
+  <!-- Модальне вікно керування командами -->
   <div id="createTeamModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-lg bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)] flex flex-col gap-5">
       <div class="flex items-center justify-between pb-3 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">👥 Керування командами B2B (UC7)</h2>
+        <h2 class="text-lg text-white font-bold m-0">👥 Керування командами</h2>
         <button type="button" data-close-modal="createTeamModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
       <form id="createTeamForm" class="flex flex-col gap-3">
@@ -1549,7 +1526,7 @@
     </div>
   </div>
 
-  <!-- Modal: Edit Profile & Security Password (Screen 6) -->
+  <!-- Модальне вікно налаштувань профілю та пароля -->
   <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)] flex flex-col gap-5">
       <div class="flex items-center justify-between pb-3 border-b border-[#292f4c]">
@@ -1566,7 +1543,7 @@
       </form>
       <div class="h-px bg-[#292f4c]"></div>
       <form id="profilePasswordForm" class="flex flex-col gap-3">
-        <span class="text-xs font-bold text-white">Безпечна зміна пароля (UC1)</span>
+        <span class="text-xs font-bold text-white">Зміна пароля</span>
         <input id="profileCurrentPassword" type="password" required autocomplete="current-password" placeholder="Поточний пароль" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input id="profileNewPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Новий пароль (мін. 8 симв.)" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
@@ -1577,11 +1554,11 @@
     </div>
   </div>
 
-  <!-- Modal: Receipt Viewer (UC9) -->
+  <!-- Модальне вікно квитанції -->
   <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-md bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">🧾 Електронна квитанція (UC9)</h2>
+        <h2 class="text-lg text-white font-bold m-0">🧾 Електронна квитанція</h2>
         <button type="button" data-close-modal="receiptModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div id="receiptBody" class="p-4 rounded-2xl bg-[#0e101a] border border-[#2b314e] text-xs text-slate-200 leading-relaxed space-y-1.5 mb-4"></div>
@@ -1591,11 +1568,11 @@
     </div>
   </div>
 
-  <!-- Modal: CSV Preview (UC12) -->
+  <!-- Модальне вікно попереднього перегляду CSV -->
   <div id="csvPreviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
     <div class="relative w-full max-w-3xl bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">📄 Попередній перегляд CSV-звіту (RFC-4180)</h2>
+        <h2 class="text-lg text-white font-bold m-0">📄 Попередній перегляд CSV-звіту</h2>
         <button type="button" data-close-modal="csvPreviewModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
       </div>
       <pre id="csvPreviewContent" class="p-4 rounded-2xl bg-[#0e101a] border border-[#2b314e] text-xs text-cyan-200 font-mono overflow-x-auto max-h-96"></pre>

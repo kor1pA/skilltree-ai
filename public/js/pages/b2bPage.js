@@ -4,6 +4,7 @@ import {
   closeModal,
   escapeHtml,
   getInitials,
+  getLevelLabel,
   openModal,
   renderRoleGateCard,
   showToast,
@@ -46,7 +47,7 @@ export function renderB2bPage() {
             icon: 'grid_view',
             title: 'B2B Skill Matrix доступний лише для ролі HR / TeamLead',
             description:
-              'Керування командами, призначення корпоративних планів і експорт RFC-4180 CSV доступні в кабінеті HR-менеджера.',
+              'Керування командами, призначення корпоративних планів та експорт CSV-звітів доступні в кабінеті HR-менеджера.',
             primaryHref: roleDest,
             primaryLabel: 'Повернутися в кабінет',
             secondaryHref: '/auth',
@@ -204,7 +205,7 @@ export function renderB2bPage() {
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="text-xs font-semibold text-primary">${escapeHtml(m.targetProfession)}</div>
-                  <div class="text-[11px] text-slate-400">${escapeHtml(m.level)}</div>
+                  <div class="text-[11px] text-slate-400">${escapeHtml(getLevelLabel(m.level))}</div>
                 </td>
                 <td class="py-3.5 px-4 text-xs text-slate-300">${m.treesCount} карт • ${m.doneNodes}/${m.totalNodes} вузлів</td>
                 <td class="py-3.5 px-4">
@@ -218,7 +219,7 @@ export function renderB2bPage() {
                 <td class="py-3.5 px-4 text-center font-mono text-xs text-cyan-300 font-bold">${m.points} XP</td>
                 <td class="py-3.5 px-5 text-right">
                   <button type="button" data-assign-learner="${m.learnerId}" class="px-3 py-1.5 rounded-full bg-[#1e2238] hover:bg-primary-container/40 border border-violet-500/30 text-xs text-white font-semibold cursor-pointer">
-                    + Карта (UC8)
+                    + Призначити карту
                   </button>
                 </td>
               </tr>
@@ -251,7 +252,7 @@ export function renderB2bPage() {
 
   if ($('b2bAiInsightText')) {
     $('b2bAiInsightText').textContent = gaps.length
-      ? `AI Insight: Рекомендовано підсилити модулі «${gaps[0][0]}» (${gaps[0][1]}% прогресу) через UC8.`
+      ? `AI Insight: Рекомендовано підсилити модулі «${gaps[0][0]}» (${gaps[0][1]}% прогресу) за допомогою персонального плану розвитку.`
       : 'AI Insight: Баланс навичок команди стабільний — критичних відставань не виявлено.';
   }
 }
@@ -375,7 +376,7 @@ export function bindB2bEvents({ renderActiveView }) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      showToast('CSV-звіт сформовано (RFC-4180 + UTF-8 BOM).');
+      showToast('CSV-звіт успішно завантажено.');
     } catch (err) {
       showToast(err.message, true);
     }

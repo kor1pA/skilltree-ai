@@ -44,6 +44,50 @@ export function getRoleLabel(role) {
   return 'Гість';
 }
 
+export function getLevelLabel(level) {
+  const key = String(level || '').toUpperCase();
+  if (key === 'INTERMEDIATE') return 'Середній';
+  if (key === 'ADVANCED') return 'Просунутий';
+  return 'Початковий';
+}
+
+export function getNodeStatusLabel(status) {
+  const key = String(status || '').toUpperCase();
+  if (key === 'DONE') return 'Завершено';
+  if (key === 'IN_PROGRESS') return 'В процесі';
+  return 'Очікує';
+}
+
+export function getMaterialTypeLabel(type) {
+  const key = String(type || '').toUpperCase();
+  if (key === 'VIDEO') return 'Відео';
+  if (key === 'LINK') return 'Посилання';
+  return 'Текст';
+}
+
+export function getSessionStatusLabel(status) {
+  const key = String(status || '').toUpperCase();
+  if (key === 'CONFIRMED') return 'Підтверджено';
+  if (key === 'DONE') return 'Завершено';
+  if (key === 'CANCELLED') return 'Скасовано';
+  return 'Заброньовано';
+}
+
+export function getPaymentStatusLabel(status) {
+  const key = String(status || '').toUpperCase();
+  if (key === 'PAID') return 'Оплачено';
+  if (key === 'REFUNDED') return 'Повернено';
+  return 'Очікує оплати';
+}
+
+export function getPaymentMethodLabel(method) {
+  const key = String(method || '').toUpperCase();
+  if (key === 'APPLE_PAY') return 'Apple Pay';
+  if (key === 'GOOGLE_PAY') return 'Google Pay';
+  if (key === 'INVOICE') return 'Рахунок / IBAN';
+  return 'Картка';
+}
+
 export function showToast(message, isError = false) {
   const toast = $('toastNotification');
   const msgEl = $('toastMessage');
@@ -102,9 +146,11 @@ export function renderSessionStatusBadges(session, includePrice = false) {
         : 'bg-amber-950/60 border border-amber-500/40 text-amber-300';
 
   const priceSuffix = includePrice ? ` (${session.price} ₴)` : '';
+  const statusLabel = getSessionStatusLabel(session.status);
+  const paymentLabel = getPaymentStatusLabel(session.paymentStatus);
   return `
-    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#181b2c] border border-purple-500/30 text-purple-200">${escapeHtml(session.status)}</span>
-    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${paymentBadgeClass}">${escapeHtml(session.paymentStatus)}${escapeHtml(priceSuffix)}</span>
+    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#181b2c] border border-purple-500/30 text-purple-200">${escapeHtml(statusLabel)}</span>
+    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${paymentBadgeClass}">${escapeHtml(paymentLabel)}${escapeHtml(priceSuffix)}</span>
   `;
 }
 

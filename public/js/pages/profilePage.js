@@ -37,9 +37,9 @@ export function openEditProfileModal() {
         <div>
           <label class="text-xs text-slate-300 block mb-1" for="profLevel">Поточний рівень</label>
           <select id="profLevel" class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none">
-            <option value="BEGINNER" ${learner.level === 'BEGINNER' ? 'selected' : ''}>BEGINNER</option>
-            <option value="INTERMEDIATE" ${learner.level === 'INTERMEDIATE' ? 'selected' : ''}>INTERMEDIATE</option>
-            <option value="ADVANCED" ${learner.level === 'ADVANCED' ? 'selected' : ''}>ADVANCED</option>
+            <option value="BEGINNER" ${learner.level === 'BEGINNER' ? 'selected' : ''}>Початковий</option>
+            <option value="INTERMEDIATE" ${learner.level === 'INTERMEDIATE' ? 'selected' : ''}>Середній</option>
+            <option value="ADVANCED" ${learner.level === 'ADVANCED' ? 'selected' : ''}>Просунутий</option>
           </select>
         </div>
       `;
@@ -88,7 +88,7 @@ export function renderProfilePage() {
         icon: 'badge',
         title: 'Авторизуйтеся для управління профілем і сесіями',
         description:
-          'Увійдіть або створіть акаунт — ви зможете редагувати дані, безпечно змінювати пароль і контролювати активні сесії з SQLite.',
+          'Увійдіть або створіть акаунт — ви зможете редагувати дані, безпечно змінювати пароль і контролювати активні сесії на ваших пристроях.',
         primaryHref: '/auth',
         primaryLabel: 'Увійти / Реєстрація',
         secondaryHref: '/mentors',
@@ -131,7 +131,7 @@ export function renderProfilePage() {
   } else if (currentUser.role === 'HR') {
     if ($('profileHeroTrack')) $('profileHeroTrack').textContent = `Компанія: ${currentUser.company}`;
     if ($('profileHeroNode')) {
-      $('profileHeroNode').textContent = `Команд у базі: ${(state.data?.teams || []).length}`;
+      $('profileHeroNode').textContent = `Команд: ${(state.data?.teams || []).length}`;
     }
   } else {
     const learner = getActiveLearner();
@@ -146,10 +146,10 @@ export function renderProfilePage() {
   }
 
   if ($('profileSessionStatusText')) {
-    $('profileSessionStatusText').textContent = 'Активна HttpOnly сесія';
+    $('profileSessionStatusText').textContent = 'Активна сесія';
   }
 
-  // Реальні активні сесії із таблиці auth_sessions у SQLite
+  // Активні сесії користувача
   const authSessions = state.data?.authSessions || [];
   if ($('onlineDevicesBadge')) {
     $('onlineDevicesBadge').textContent = `${authSessions.length} активн.`;
@@ -302,7 +302,7 @@ export function bindProfileEvents({ navigateTo, renderActiveView }) {
       {
         button: btn,
         renderView: renderActiveView,
-        successMessage: 'Сесію відкликано в SQLite.',
+        successMessage: 'Сесію успішно завершено.',
       }
     );
   });

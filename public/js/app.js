@@ -1,5 +1,5 @@
 import { getActiveLearner, getCurrentUser, state } from './core/state.js';
-import { $, closeModal, debounce, getInitials, getRoleLabel, showToast } from './core/dom.js';
+import { $, closeModal, debounce, getInitials, getLevelLabel, getRoleLabel, showToast } from './core/dom.js';
 import { api, mutateAndSync } from './core/api.js';
 import { configureRouter, navigateTo, renderActiveView } from './core/router.js';
 import { createConstellationController } from './visuals/constellationCanvas.js';
@@ -31,7 +31,7 @@ function renderHeaderAndDropdown() {
     $('headerXpText').textContent = `${learner.points ?? 0} XP`;
   }
   if ($('headerLevelText') && learner) {
-    $('headerLevelText').textContent = learner.level ?? 'BEGINNER';
+    $('headerLevelText').textContent = getLevelLabel(learner.level);
   }
 
   const label = currentUser ? currentUser.fullName : 'Гість (Увійти)';

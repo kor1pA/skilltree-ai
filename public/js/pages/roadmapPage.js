@@ -9,6 +9,9 @@ import {
   $,
   closeModal,
   escapeHtml,
+  getLevelLabel,
+  getMaterialTypeLabel,
+  getNodeStatusLabel,
   openModal,
   renderRoleGateCard,
   sanitizeExternalUrl,
@@ -89,7 +92,7 @@ function renderNodeInspector(learner, tree, node) {
 
   const badge = $('activeNodeBadge');
   if (badge) {
-    badge.textContent = node.status;
+    badge.textContent = getNodeStatusLabel(node.status);
     badge.className = `px-2.5 py-0.5 rounded-full font-display text-[11px] font-bold uppercase tracking-wider border ${
       node.status === 'DONE'
         ? 'bg-emerald-950/70 border-emerald-500/40 text-emerald-400'
@@ -130,7 +133,7 @@ function renderNodeInspector(learner, tree, node) {
                   </div>
                   <div class="min-w-0">
                     <div class="text-xs text-slate-100 font-semibold group-hover:text-primary truncate">${escapeHtml(m.title)}</div>
-                    <div class="text-[11px] text-slate-400 truncate">${escapeHtml(m.type)} • ${escapeHtml(m.description || 'Натисніть щоб відкрити урок')}</div>
+                    <div class="text-[11px] text-slate-400 truncate">${escapeHtml(getMaterialTypeLabel(m.type))} • ${escapeHtml(m.description || 'Натисніть щоб відкрити урок')}</div>
                   </div>
                 </div>
                 <span class="material-symbols-outlined text-slate-500 text-sm group-hover:text-cyan-400 shrink-0">open_in_new</span>
@@ -196,12 +199,12 @@ function renderNodeInspector(learner, tree, node) {
         `
           )
           .join('')
-      : '<p class="text-xs text-slate-400 text-center py-6">Історія діалогу порожня. Задайте питання ШІ-помічнику нижче (відповідь ≤ 5 с).</p>';
+      : '<p class="text-xs text-slate-400 text-center py-6">Історія діалогу порожня. Задайте питання ШІ-помічнику нижче — він враховує контекст обраної теми.</p>';
   }
 
   const kpi = computeAiKpi(learner);
   if ($('aiSlaBadge')) {
-    $('aiSlaBadge').textContent = kpi.avgMs > 0 ? `${kpi.avgMs} мс (SLA ≤ 5000 мс)` : 'SLA ≤ 5000 мс';
+    $('aiSlaBadge').textContent = kpi.avgMs > 0 ? `Середня відповідь: ${kpi.avgMs} мс` : 'Швидка відповідь ШІ';
   }
   if ($('aiHelpfulnessKpi')) {
     $('aiHelpfulnessKpi').textContent = `${kpi.helpfulPct}%`;
@@ -220,17 +223,17 @@ function openMaterialReader(materialId) {
       ? state.data?.authorNames?.[String(material.authorId)] || ''
       : '';
 
-  if ($('materialModalType')) $('materialModalType').textContent = material.type;
+  if ($('materialModalType')) $('materialModalType').textContent = getMaterialTypeLabel(material.type);
   if ($('materialModalTitle')) $('materialModalTitle').textContent = material.title;
   if ($('materialModalAuthor')) {
     $('materialModalAuthor').textContent = authorName
       ? `Автор: ${authorName}`
-      : 'Вбудована бібліотекa SkillTree AI';
+      : 'Вбудована бібліотека SkillTree AI';
   }
   if ($('materialModalDesc')) $('materialModalDesc').textContent = material.description || '';
   if ($('materialModalBody')) {
     $('materialModalBody').textContent =
-      material.content || `Навчальний ресурс (${material.type}) для модуля «${node.title}».`;
+      material.content || `Навчальний ресурс (${getMaterialTypeLabel(material.type).toLowerCase()}) для модуля «${node.title}».`;
   }
 
   const ext = $('materialModalExternal');
@@ -280,7 +283,7 @@ export function renderRoadmapPage() {
             icon: 'account_tree',
             title: 'Увійдіть або зареєструйтеся, щоб будувати свою карту навичок',
             description:
-              'Після реєстрації ШІ автоматично згенерує персоналізований маршрут навчання та збереже прогрес у SQLite.',
+              'Після реєстрації ШІ автоматично згенерує персоналізований маршрут навчання та зберігатиме ваш прогрес.',
             primaryHref: '/auth',
             primaryLabel: 'Увійти / Зареєструватися',
             secondaryHref: '/mentors',
@@ -300,7 +303,7 @@ export function renderRoadmapPage() {
     treeSelect.innerHTML = trees
       .map(
         (t) =>
-          `<option value="${t.id}" class="bg-[#121422]">${escapeHtml(t.targetProfession)} (${escapeHtml(t.level)}) — ${Math.round(t.progress)}%</option>`
+          `<option value="${t.id}" class="bg-[#121422]">${escapeHtml(t.targetProfession)} (${escapeHtml(getLevelLabel(t.level))}) — ${Math.round(t.progress)}%</option>`
       )
       .join('');
   }
@@ -311,7 +314,7 @@ export function renderRoadmapPage() {
 
   if ($('treeTitle')) $('treeTitle').textContent = tree.targetProfession || tree.title;
   if ($('treeTechBadge')) {
-    $('treeTechBadge').textContent = `${tree.level} • ${tree.nodes.length} ВУЗЛІВ`;
+    $('treeTechBadge').textContent = `${getLevelLabel(tree.level)} • ${tree.nodes.length} вузлів`;
   }
   if ($('treeLevelBadge')) $('treeLevelBadge').textContent = `Студент: ${learner.fullName}`;
 
@@ -347,7 +350,7 @@ export function renderRoadmapPage() {
     $('hudActiveFocusTitle').textContent = activeNode ? `#${activeNode.orderNumber} ${activeNode.title}` : '—';
   }
   if ($('hudActiveFocusStatus')) {
-    $('hudActiveFocusStatus').textContent = activeNode ? activeNode.status : '—';
+    $('hudActiveFocusStatus').textContent = activeNode ? getNodeStatusLabel(activeNode.status) : '—';
   }
   if ($('hudNodesCount')) {
     $('hudNodesCount').textContent = `${tree.nodes.length} взаємопов'язаних вузлів`;
