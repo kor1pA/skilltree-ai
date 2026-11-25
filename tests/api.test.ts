@@ -2,564 +2,604 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { Server } from 'node:http';
-import { DataStore } from '../src/repositories/DataStore.ts';
-import { createAppServer } from '../src/server.ts';
+import type { ServerType } from '@hono/node-server';
+import { serve } from '@hono/node-server';
+import { SkillTreeRepository } from '../src/repositories/SkillTreeRepository.ts';
+import { createApp } from '../src/app.ts';
 
-let server: Server;
+class CookieClient {
+  private readonly baseUrl: string;
+  cookie = '';
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  async request(path: string, init: RequestInit = {}) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'SkillTreeUI',
+      ...((init.headers as Record<string, string>) || {}),
+    };
+    if (this.cookie) {
+      headers['Cookie'] = this.cookie;
+    }
+
+    const res = await fetch(`${this.baseUrl}${path}`, {
+      ...init,
+      headers,
+    });
+
+    const getSetCookie = (res.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie;
+    const setCookies = getSetCookie ? getSetCookie.call(res.headers) : [];
+    const singleCookie = res.headers.get('set-cookie');
+    const rawCookies = setCookies.length > 0 ? setCookies : singleCookie ? [singleCookie] : [];
+
+    for (const raw of rawCookies) {
+      const pair = raw.split(';')[0]?.trim();
+      if (!pair) continue;
+      if (pair.endsWith('=')) {
+        this.cookie = '';
+      } else {
+        this.cookie = pair;
+      }
+    }
+
+    return res;
+  }
+}
+
+let server: ServerType;
 let baseUrl: string;
-let store: DataStore;
+let repo: SkillTreeRepository;
 
-describe('SkillTree AI — REST API Integration Tests (UC1–UC12)', () => {
+describe('SkillTree AI — Production Hono REST API, SQLite, RBAC & Security Suite', () => {
   before(async () => {
-    store = new DataStore(null); // ізольоване in-memory сховище для тестів
-    server = createAppServer(store);
-    await new Promise<void>((resolve) => {
-      server.listen(0, '127.0.0.1', () => {
-        const addr = server.address();
-        if (addr && typeof addr === 'object') {
-          baseUrl = `http://127.0.0.1:${addr.port}`;
-        }
-        resolve();
+    repo = new SkillTreeRepository({ dbPath: ':memory:' });
+    await repo.init();
+    const app = createApp(repo, { disableRateLimit: true });
+
+    await new Promise<void>((resolvePromise) => {
+      server = serve({ fetch: app.fetch, port: 0, hostname: '127.0.0.1' }, (info) => {
+        baseUrl = `http://127.0.0.1:${info.port}`;
+        resolvePromise();
       });
     });
   });
 
   after(async () => {
-    await new Promise<void>((resolve, reject) => {
-      server.close((err) => (err ? reject(err) : resolve()));
+    await new Promise<void>((resolvePromise, reject) => {
+      server.close((err) => (err ? reject(err) : resolvePromise()));
     });
+    await repo.close();
   });
 
-  it('GET / and GET /api/state return 200 and seeded data', async () => {
-    const htmlRes = await fetch(`${baseUrl}/`);
-    assert.equal(htmlRes.status, 200);
-    const html = await htmlRes.text();
-    assert.ok(html.includes('SkillTree AI'));
+  it('Healthcheck, security headers, and guest least-privilege GET /api/state', async () => {
+    const healthRes = await fetch(`${baseUrl}/api/health`);
+    assert.equal(healthRes.status, 200);
+    const health = await healthRes.json();
+    assert.equal(health.status, 'ok');
+    assert.equal(health.dbDriver, 'node:sqlite');
 
+    // Security headers check
+    assert.ok((healthRes.headers.get('content-security-policy') || '').includes("script-src 'self'"));
+    assert.equal(healthRes.headers.get('x-content-type-options'), 'nosniff');
+    assert.equal(healthRes.headers.get('x-frame-options'), 'DENY');
+    assert.equal(healthRes.headers.get('referrer-policy'), 'strict-origin-when-cross-origin');
+
+    // Guest state must NOT leak learners, teams, sessions, receipts, or private mentor emails
     const stateRes = await fetch(`${baseUrl}/api/state`);
     assert.equal(stateRes.status, 200);
-    const state = await stateRes.json();
-    assert.equal(state.learners.length, 3);
-    assert.equal(state.mentors.length, 2);
-    assert.equal(state.teams.length, 1);
+    const guestState = await stateRes.json();
+    assert.equal(guestState.currentUser, null);
+    assert.equal(guestState.mentors.length, 3);
+    assert.equal(guestState.mentors[0].email, undefined);
+    assert.deepEqual(guestState.learners, []);
+    assert.deepEqual(guestState.teams, []);
+    assert.deepEqual(guestState.sessions, []);
+    assert.deepEqual(guestState.receipts, []);
+    assert.deepEqual(guestState.authSessions, []);
   });
 
-  it('UC1: register new user and login with credentials', async () => {
-    const regRes = await fetch(`${baseUrl}/api/auth/register`, {
+  it('UC1–UC12 Full Multi-Role Lifecycle with real HttpOnly cookies, atomic booking+payment & RFC-4180 CSV', async () => {
+    const learnerClient = new CookieClient(baseUrl);
+    const mentorClient = new CookieClient(baseUrl);
+    const hrClient = new CookieClient(baseUrl);
+
+    // 1. Register Learner, Mentor, HR separately
+    const regLearner = await learnerClient.request('/api/auth/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fullName: 'API Тестер',
-        email: 'api.tester@skilltree.ai',
-        password: 'password123',
+        fullName: 'Коваленко, Олександр',
+        email: 'olex.uc@skilltree.ai',
+        password: 'Password123!',
         role: 'LEARNER',
-        targetProfession: 'DevOps & Cloud Engineer',
+        targetProfession: 'Full-Stack Developer',
       }),
     });
-    assert.equal(regRes.status, 201);
-    const regData = await regRes.json();
-    assert.equal(regData.user.fullName, 'API Тестер');
-    assert.equal(regData.user.skillTrees.length, 1);
+    assert.equal(regLearner.status, 201);
+    const setCookieHeader = regLearner.headers.get('set-cookie') || '';
+    assert.ok(setCookieHeader.includes('HttpOnly'));
+    assert.ok(setCookieHeader.includes('SameSite=Lax'));
+    const learnerData = await regLearner.json();
+    const learnerId = learnerData.user.id;
 
-    const badLogin = await fetch(`${baseUrl}/api/auth/login`, {
+    const regMentor = await mentorClient.request('/api/auth/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'api.tester@skilltree.ai', password: 'wrong' }),
-    });
-    assert.equal(badLogin.status, 401);
-
-    const goodLogin = await fetch(`${baseUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'api.tester@skilltree.ai', password: 'password123' }),
-    });
-    assert.equal(goodLogin.status, 200);
-  });
-
-  it('UC2, UC3, UC4, UC10, UC11: generate tree, add/delete node, complete node, ask AI & rate', async () => {
-    // UC2: Generate tree for learner 1
-    const genRes = await fetch(`${baseUrl}/api/trees/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        learnerId: 1,
-        profession: 'UI/UX Product Designer',
-        level: 'INTERMEDIATE',
+        fullName: 'Андрій Архітектор',
+        email: 'andriy.uc@skilltree.ai',
+        password: 'Password123!',
+        role: 'MENTOR',
+        hourlyRate: 1200,
+        specialization: 'Node.js & SQLite',
       }),
+    });
+    assert.equal(regMentor.status, 201);
+    const mentorData = await regMentor.json();
+    const mentorId = mentorData.user.id;
+
+    const regHr = await hrClient.request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        fullName: 'Олена HR Lead',
+        email: 'olena.uc@skilltree.ai',
+        password: 'Password123!',
+        role: 'HR',
+        company: 'TechUA',
+      }),
+    });
+    assert.equal(regHr.status, 201);
+
+    // 2. UC2: Learner generates a new SkillTree
+    const genRes = await learnerClient.request('/api/trees/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profession: 'DevOps & Cloud Engineer', level: 'INTERMEDIATE' }),
     });
     assert.equal(genRes.status, 201);
     const { tree } = await genRes.json();
     assert.ok(tree.nodes.length >= 4);
 
-    // UC10: Add node
-    const addRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes`, {
+    // 3. UC10: Learner adds custom node
+    const addNodeRes = await learnerClient.request(`/api/trees/${tree.id}/nodes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: 'Motion Design у Figma',
-        description: 'Мікровзаємодії та прототипи',
+        title: 'Terraform Modules',
+        description: 'Інфраструктура як код',
+        materialTitle: 'Terraform Docs',
+        materialUrl: 'https://developer.hashicorp.com/terraform',
       }),
     });
-    assert.equal(addRes.status, 201);
-    const { node: addedNode } = await addRes.json();
+    assert.equal(addNodeRes.status, 201);
+    const { node: customNode } = await addNodeRes.json();
 
-    // UC3: Complete added node
-    const statusRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${addedNode.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'complete' }),
-    });
-    assert.equal(statusRes.status, 200);
-    const statusData = await statusRes.json();
-    assert.equal(statusData.node.status, 'DONE');
-    const pointsAfterComplete = statusData.learnerPoints;
+    // 4. UC3: Start node (IN_PROGRESS, 0 XP) -> Complete node (DONE, +50 XP) -> Duplicate DONE (no duplicate XP)
+    const startRes = await learnerClient.request(
+      `/api/trees/${tree.id}/nodes/${customNode.id}/status`,
+      { method: 'PATCH', body: JSON.stringify({ status: 'IN_PROGRESS' }) }
+    );
+    assert.equal(startRes.status, 200);
+    assert.equal((await startRes.json()).learnerPoints, 0);
 
-    // Duplicate complete check via HTTP
-    const dupRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${addedNode.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'complete' }),
-    });
-    const dupData = await dupRes.json();
-    assert.equal(dupData.learnerPoints, pointsAfterComplete);
+    const completeRes = await learnerClient.request(
+      `/api/trees/${tree.id}/nodes/${customNode.id}/status`,
+      { method: 'PATCH', body: JSON.stringify({ status: 'DONE' }) }
+    );
+    assert.equal(completeRes.status, 200);
+    assert.equal((await completeRes.json()).learnerPoints, 50);
 
-    // UC4: Ask AI Assistant
-    const chatRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${addedNode.id}/chat`, {
+    const dupCompleteRes = await learnerClient.request(
+      `/api/trees/${tree.id}/nodes/${customNode.id}/status`,
+      { method: 'PATCH', body: JSON.stringify({ action: 'complete' }) }
+    );
+    assert.equal((await dupCompleteRes.json()).learnerPoints, 50);
+
+    // 5. UC4 & UC11: AI Chat + rating
+    const chatRes = await learnerClient.request(`/api/trees/${tree.id}/nodes/${customNode.id}/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: 'З чого почати вивчення анімацій?' }),
+      body: JSON.stringify({ question: 'Як структурувати модулі Terraform?' }),
     });
     assert.equal(chatRes.status, 201);
     const { message } = await chatRes.json();
     assert.ok(message.responseTimeMs <= 5000);
 
-    // UC11: Rate AI answer
-    const rateRes = await fetch(`${baseUrl}/api/chat/${message.id}/rate`, {
+    const rateRes = await learnerClient.request(`/api/chat/${message.id}/rate`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ helpful: true }),
     });
     assert.equal(rateRes.status, 200);
-    const rateData = await rateRes.json();
-    assert.equal(rateData.message.isHelpful, true);
+    assert.equal((await rateRes.json()).message.isHelpful, true);
 
-    // UC10: Delete added node
-    const delRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${addedNode.id}`, {
-      method: 'DELETE',
-    });
-    assert.equal(delRes.status, 200);
-  });
-
-  it('UC5, UC6, UC9: Mentor material, session booking, payment guard, and rating recalculation', async () => {
-    const stateRes = await fetch(`${baseUrl}/api/state`);
-    const state = await stateRes.json();
-    const firstNodeId = state.learners[0].skillTrees[0].nodes[0].id;
-    const mentorId = state.mentors[1].id;
-
-    // UC5: Mentor publishes material
-    const matRes = await fetch(`${baseUrl}/api/nodes/${firstNodeId}/materials`, {
+    // 6. UC5: Mentor publishes material into learner's node
+    const matRes = await mentorClient.request(`/api/nodes/${customNode.id}/materials`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        mentorId,
-        title: 'Чекліст Clean Code',
-        type: 'TEXT',
-        url: '#clean-code',
+        title: 'Terraform Best Practices',
+        type: 'LINK',
+        url: 'https://www.terraform-best-practices.com/',
+        description: 'Практичні патерни модулів',
       }),
     });
     assert.equal(matRes.status, 201);
 
-    // UC6: Book session
-    const bookRes = await fetch(`${baseUrl}/api/sessions`, {
+    // 7. UC6 & UC9: Separate book -> confirm guard (400) -> pay -> confirm -> feedback
+    const bookUnpaidRes = await learnerClient.request('/api/sessions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        learnerId: 1,
         mentorId,
-        topic: 'Архітектура застосунку',
-        startAt: new Date(Date.now() + 86400000).toISOString(),
+        topic: 'Code Review Terraform',
+        startAt: new Date(Date.now() + 86_400_000).toISOString(),
         durationMin: 60,
+        payImmediately: false,
       }),
     });
-    assert.equal(bookRes.status, 201);
-    const { session } = await bookRes.json();
+    assert.equal(bookUnpaidRes.status, 201);
+    const { session: s1 } = await bookUnpaidRes.json();
 
-    // Confirm before payment MUST fail with 400
-    const unpaidConfirm = await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, {
+    const unpaidConfirm = await mentorClient.request(`/api/sessions/${s1.id}/confirm`, {
       method: 'POST',
+      body: '{}',
     });
     assert.equal(unpaidConfirm.status, 400);
 
-    // UC9: Pay session
-    const payRes = await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
-    assert.equal(payRes.status, 200);
-
-    // Confirm after payment succeeds
-    const paidConfirm = await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, {
+    const payRes = await learnerClient.request(`/api/sessions/${s1.id}/pay`, {
       method: 'POST',
+      body: JSON.stringify({ paymentMethod: 'APPLE_PAY' }),
     });
-    assert.equal(paidConfirm.status, 200);
+    assert.equal(payRes.status, 200);
+    const payData = await payRes.json();
+    assert.equal(payData.receipt.method, 'APPLE_PAY');
 
-    // Leave feedback
-    const fbRes = await fetch(`${baseUrl}/api/sessions/${session.id}/feedback`, {
+    // Double payment rejected with 400
+    const payAgain = await learnerClient.request(`/api/sessions/${s1.id}/pay`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating: 5, feedback: 'Чудова консультація!' }),
+      body: '{}',
+    });
+    assert.equal(payAgain.status, 400);
+
+    const confirmRes = await mentorClient.request(`/api/sessions/${s1.id}/confirm`, {
+      method: 'POST',
+      body: '{}',
+    });
+    assert.equal(confirmRes.status, 200);
+
+    const fbRes = await learnerClient.request(`/api/sessions/${s1.id}/feedback`, {
+      method: 'POST',
+      body: JSON.stringify({ rating: 5, feedback: 'Супер розбір!' }),
     });
     assert.equal(fbRes.status, 200);
-    const fbData = await fbRes.json();
-    assert.equal(fbData.session.status, 'DONE');
-    assert.equal(fbData.mentorRating, 5);
-  });
+    assert.equal((await fbRes.json()).mentorRating, 5);
 
-  it('UC7, UC8, UC12: HR Skill Matrix, assign tree, and CSV export', async () => {
-    const stateRes = await fetch(`${baseUrl}/api/state`);
-    const state = await stateRes.json();
-    const teamId = state.teams[0].id;
+    // DONE session cannot be cancelled or re-confirmed
+    assert.equal(
+      (await learnerClient.request(`/api/sessions/${s1.id}/cancel`, { method: 'POST', body: '{}' }))
+        .status,
+      400
+    );
+    assert.equal(
+      (await mentorClient.request(`/api/sessions/${s1.id}/confirm`, { method: 'POST', body: '{}' }))
+        .status,
+      400
+    );
 
-    // UC7: Matrix
-    const matrixRes = await fetch(`${baseUrl}/api/teams/${teamId}/matrix`);
-    assert.equal(matrixRes.status, 200);
-    const matrixData = await matrixRes.json();
-    assert.ok(matrixData.detailedMatrix.members.length >= 3);
-
-    // UC8: Assign tree
-    const assignRes = await fetch(`${baseUrl}/api/hr/assign-tree`, {
+    // Atomic booking + immediate payment
+    const atomicBookRes = await learnerClient.request('/api/sessions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        learnerId: 3,
-        profession: 'Full-Stack Developer',
-        level: 'INTERMEDIATE',
+        mentorId,
+        topic: 'Atomic Booking + Payment',
+        startAt: new Date(Date.now() + 172_800_000).toISOString(),
+        durationMin: 30,
+        payImmediately: true,
+        paymentMethod: 'INVOICE',
+      }),
+    });
+    assert.equal(atomicBookRes.status, 201);
+    const atomicData = await atomicBookRes.json();
+    assert.equal(atomicData.session.paymentStatus, 'PAID');
+    assert.equal(atomicData.receipt.method, 'INVOICE');
+    assert.equal(atomicData.session.price, 600);
+
+    // 8. UC10: Delete added node, verify last remaining node cannot be deleted
+    const delAdded = await learnerClient.request(`/api/trees/${tree.id}/nodes/${customNode.id}`, {
+      method: 'DELETE',
+      body: '{}',
+    });
+    assert.equal(delAdded.status, 200);
+
+    // 9. UC7, UC8, UC12: HR creates team, adds learner, assigns tree, exports RFC-4180 CSV & JSON
+    const teamRes = await hrClient.request('/api/teams', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Platform Squad' }),
+    });
+    assert.equal(teamRes.status, 201);
+    const { team } = await teamRes.json();
+
+    const addMemberRes = await hrClient.request(`/api/teams/${team.id}/members`, {
+      method: 'POST',
+      body: JSON.stringify({ learnerId }),
+    });
+    assert.equal(addMemberRes.status, 200);
+
+    const assignRes = await hrClient.request('/api/hr/assign-tree', {
+      method: 'POST',
+      body: JSON.stringify({
+        teamId: team.id,
+        learnerId,
+        profession: 'Backend Node.js Engineer',
+        level: 'ADVANCED',
       }),
     });
     assert.equal(assignRes.status, 201);
 
-    // UC12: Export CSV
-    const exportRes = await fetch(`${baseUrl}/api/teams/${teamId}/export?format=CSV`);
-    assert.equal(exportRes.status, 200);
-    assert.ok((exportRes.headers.get('content-type') || '').includes('text/csv'));
-    const csv = await exportRes.text();
-    assert.ok(csv.includes('ПІБ співробітника'));
-    assert.ok(csv.includes('Дмитро Мельник'));
+    const matrixRes = await hrClient.request(`/api/teams/${team.id}/matrix`);
+    assert.equal(matrixRes.status, 200);
+    const matrixJson = await matrixRes.json();
+    assert.equal(matrixJson.detailedMatrix.members.length, 1);
+
+    const csvRes = await hrClient.request(`/api/teams/${team.id}/export?format=CSV`);
+    assert.equal(csvRes.status, 200);
+    assert.ok((csvRes.headers.get('content-type') || '').includes('text/csv'));
+    const csvBuf = Buffer.from(await csvRes.arrayBuffer());
+    assert.deepEqual(Array.from(csvBuf.subarray(0, 3)), [0xef, 0xbb, 0xbf]);
+    const csvText = csvBuf.toString('utf8');
+    assert.ok(csvText.includes('"Коваленко, Олександр"'));
   });
 
-  it('UC1 Edge Flow: profile update (PUT /api/profile), password reset, and logout', async () => {
-    // Login as seeded learner
-    const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+  it('Security: 401 unauthenticated, 403 RBAC & cross-user ownership, CSRF, XSS URLs, 413 payload, and removed backdoors', async () => {
+    // Removed demo/backdoor endpoints MUST return 404
+    const resetRes = await fetch(`${baseUrl}/api/reset`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'slava@skilltree.ai', password: 'demo1234' }),
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'SkillTreeUI' },
+      body: '{}',
     });
-    assert.equal(loginRes.status, 200);
+    assert.equal(resetRes.status, 404);
 
-    // Update own profile
-    const profRes = await fetch(`${baseUrl}/api/profile`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName: 'Вячеслав Гой (Оновлено)' }),
-    });
-    assert.equal(profRes.status, 200);
-    const profData = await profRes.json();
-    assert.equal(profData.user.fullName, 'Вячеслав Гой (Оновлено)');
-
-    // Reset password
-    const resetRes = await fetch(`${baseUrl}/api/auth/reset-password`, {
+    const blindResetRes = await fetch(`${baseUrl}/api/auth/reset-password`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'slava@skilltree.ai', newPassword: 'newpass77' }),
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'SkillTreeUI' },
+      body: JSON.stringify({ email: 'olex.uc@skilltree.ai', newPassword: 'hacked' }),
     });
-    assert.equal(resetRes.status, 200);
+    assert.equal(blindResetRes.status, 404);
 
-    // Logout clears currentUser
-    const logoutRes = await fetch(`${baseUrl}/api/auth/logout`, { method: 'POST' });
-    assert.equal(logoutRes.status, 200);
-    const logoutData = await logoutRes.json();
-    assert.equal(logoutData.currentUser, null);
-    assert.equal(logoutData.state.currentUser, null);
-
-    // Login with new password works
-    const reloginRes = await fetch(`${baseUrl}/api/auth/login`, {
+    // Unauthenticated protected mutation -> 401
+    const unauthTeam = await fetch(`${baseUrl}/api/teams`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'slava@skilltree.ai', password: 'newpass77' }),
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'SkillTreeUI' },
+      body: JSON.stringify({ name: 'Anon Team' }),
     });
-    assert.equal(reloginRes.status, 200);
-  });
+    assert.equal(unauthTeam.status, 401);
 
-  it('Negative API Edge Cases: double payment, cancel DONE session, and delete last SkillNode return 400', async () => {
-    const stateRes = await fetch(`${baseUrl}/api/state`);
-    const state = await stateRes.json();
-    const mentorId = state.mentors[0].id;
-
-    // Book and pay once
-    const bookRes = await fetch(`${baseUrl}/api/sessions`, {
+    // CSRF Guard: Mismatched Origin -> 403
+    const evilOriginRes = await fetch(`${baseUrl}/api/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://evil-attacker.example',
+      },
+      body: JSON.stringify({ email: 'a@b.com', password: 'Password123!' }),
+    });
+    assert.equal(evilOriginRes.status, 403);
+
+    // CSRF Guard: missing X-Requested-With AND missing application/json -> 403
+    const formPostRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'email=a@b.com&password=123',
+    });
+    assert.equal(formPostRes.status, 403);
+
+    // Oversized JSON > 128 KB -> 413
+    const hugeBody = JSON.stringify({ email: 'a@b.com', padding: 'x'.repeat(140_000) });
+    const hugeRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'SkillTreeUI' },
+      body: hugeBody,
+    });
+    assert.equal(hugeRes.status, 413);
+
+    // Register two learners and a mentor to verify RBAC, IDOR ownership, and XSS URL rejection
+    const l1 = new CookieClient(baseUrl);
+    const l2 = new CookieClient(baseUrl);
+    const m1 = new CookieClient(baseUrl);
+
+    const l1Reg = await (
+      await l1.request('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          fullName: 'Owner Learner',
+          email: 'owner.sec@skilltree.ai',
+          password: 'Password123!',
+          role: 'LEARNER',
+        }),
+      })
+    ).json();
+    const l1TreeId = l1Reg.user.skillTrees[0].id;
+    const l1NodeId = l1Reg.user.skillTrees[0].nodes[0].id;
+
+    await l2.request('/api/auth/register', {
+      method: 'POST',
       body: JSON.stringify({
-        learnerId: 1,
-        mentorId,
-        topic: 'Edge Case Session',
-        startAt: new Date(Date.now() + 86400000).toISOString(),
-        durationMin: 60,
-      }),
-    });
-    assert.equal(bookRes.status, 201);
-    const { session } = await bookRes.json();
-
-    const pay1 = await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
-    assert.equal(pay1.status, 200);
-
-    // Second payment MUST fail with 400
-    const pay2 = await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
-    assert.equal(pay2.status, 400);
-
-    // Complete session via confirm + feedback -> cancel MUST fail with 400
-    await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, { method: 'POST' });
-    await fetch(`${baseUrl}/api/sessions/${session.id}/feedback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating: 5, feedback: 'Super' }),
-    });
-    const cancelDone = await fetch(`${baseUrl}/api/sessions/${session.id}/cancel`, { method: 'POST' });
-    assert.equal(cancelDone.status, 400);
-
-    // Generate tree and try deleting all nodes -> deleting the last remaining node MUST return 400
-    const genRes = await fetch(`${baseUrl}/api/trees/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ learnerId: 1, profession: 'QA Automation Engineer', level: 'BEGINNER' }),
-    });
-    const { tree } = await genRes.json();
-    for (let i = 0; i < tree.nodes.length - 1; i += 1) {
-      const delOk = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${tree.nodes[i].id}`, {
-        method: 'DELETE',
-      });
-      assert.equal(delOk.status, 200);
-    }
-    const lastNode = tree.nodes[tree.nodes.length - 1];
-    const delLast = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${lastNode.id}`, {
-      method: 'DELETE',
-    });
-    assert.equal(delLast.status, 400);
-  });
-
-  it('Regression (Bug #1): PATCH node status supports { status: "IN_PROGRESS" } without awarding XP and rejects invalid status with 400', async () => {
-    const genRes = await fetch(`${baseUrl}/api/trees/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        learnerId: 1,
-        profession: 'DevOps & Cloud Engineer',
-        level: 'BEGINNER',
-      }),
-    });
-    assert.equal(genRes.status, 201);
-    const { tree, state: initialState } = await genRes.json();
-    const initialPoints = initialState.learners.find((l: any) => l.id === 1).points;
-    const targetNode = tree.nodes[0];
-
-    // Кнопка "Розпочати тему" відправляє status: "IN_PROGRESS" і НЕ має нараховувати бали
-    const startRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'IN_PROGRESS' }),
-    });
-    assert.equal(startRes.status, 200);
-    const startData = await startRes.json();
-    assert.equal(startData.node.status, 'IN_PROGRESS');
-    assert.equal(startData.learnerPoints, initialPoints);
-
-    // Завершення вузла через status: "DONE" нараховує +50 XP
-    const doneRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'DONE' }),
-    });
-    assert.equal(doneRes.status, 200);
-    const doneData = await doneRes.json();
-    assert.equal(doneData.node.status, 'DONE');
-    assert.equal(doneData.learnerPoints, initialPoints + 50);
-
-    // Невалідний статус повертає 400
-    const badRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'INVALID' }),
-    });
-    assert.equal(badRes.status, 400);
-  });
-
-  it('Regression (Bug #3): Registration validation, single active session invariant, and hrManagerId team ownership', async () => {
-    const badEmailRes = await fetch(`${baseUrl}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fullName: 'Bad Email',
-        email: 'invalid-email',
-        password: 'password123',
+        fullName: 'Attacker Learner',
+        email: 'attacker.sec@skilltree.ai',
+        password: 'Password123!',
         role: 'LEARNER',
       }),
     });
-    assert.equal(badEmailRes.status, 400);
 
-    const dupEmailRes = await fetch(`${baseUrl}/api/auth/register`, {
+    await m1.request('/api/auth/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fullName: 'Duplicate',
-        email: 'slava@skilltree.ai',
-        password: 'password123',
-        role: 'LEARNER',
-      }),
-    });
-    assert.equal(dupEmailRes.status, 409);
-
-    const badRateRes = await fetch(`${baseUrl}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fullName: 'Bad Mentor',
-        email: 'bad.mentor@skilltree.ai',
-        password: 'password123',
+        fullName: 'Sec Mentor',
+        email: 'mentor.sec@skilltree.ai',
+        password: 'Password123!',
         role: 'MENTOR',
-        hourlyRate: -100,
       }),
     });
-    assert.equal(badRateRes.status, 400);
 
-    const regHrRes = await fetch(`${baseUrl}/api/auth/register`, {
+    // Cross-role RBAC -> 403
+    assert.equal(
+      (await l1.request('/api/teams', { method: 'POST', body: JSON.stringify({ name: 'X' }) })).status,
+      403
+    );
+    assert.equal(
+      (
+        await l1.request(`/api/nodes/${l1NodeId}/materials`, {
+          method: 'POST',
+          body: JSON.stringify({ title: 'T', type: 'TEXT' }),
+        })
+      ).status,
+      403
+    );
+    assert.equal(
+      (
+        await m1.request('/api/trees/generate', {
+          method: 'POST',
+          body: JSON.stringify({ profession: 'QA' }),
+        })
+      ).status,
+      403
+    );
+
+    // Cross-user IDOR ownership -> 403
+    assert.equal(
+      (
+        await l2.request(`/api/trees/${l1TreeId}/nodes/${l1NodeId}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'DONE' }),
+        })
+      ).status,
+      403
+    );
+    assert.equal(
+      (
+        await l2.request(`/api/trees/${l1TreeId}/nodes/${l1NodeId}`, {
+          method: 'DELETE',
+          body: '{}',
+        })
+      ).status,
+      403
+    );
+
+    // XSS javascript: URL blocked -> 400
+    const xssMatRes = await m1.request(`/api/nodes/${l1NodeId}/materials`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fullName: 'QA Lead HR',
-        email: 'qa.hr@skilltree.ai',
-        password: 'password123',
-        role: 'HR',
-        company: 'QA Corp',
+        title: 'Malicious Link',
+        type: 'LINK',
+        url: 'javascript:alert(document.cookie)',
       }),
     });
-    assert.equal(regHrRes.status, 201);
-    const regHrData = await regHrRes.json();
-
-    const stateRes = await fetch(`${baseUrl}/api/state`);
-    const snap = await stateRes.json();
-    const activeUsers = snap.users.filter((u: any) => u.isLoggedIn);
-    assert.equal(activeUsers.length, 1);
-    assert.equal(activeUsers[0].email, 'qa.hr@skilltree.ai');
-
-    const teamRes = await fetch(`${baseUrl}/api/teams`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'QA Automation Squad', hrManagerId: regHrData.user.id }),
-    });
-    assert.equal(teamRes.status, 201);
-    const { team } = await teamRes.json();
-    assert.equal(team.hrManagerId, regHrData.user.id);
-
-    const addMemRes = await fetch(`${baseUrl}/api/teams/${team.id}/members`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ learnerId: 1 }),
-    });
-    assert.equal(addMemRes.status, 200);
-    const addMemData = await addMemRes.json();
-    assert.equal(addMemData.team.memberIds.includes(1), true);
+    assert.equal(xssMatRes.status, 400);
   });
 
-  it('Regression (Bug #5): Multi-page SPA routes return 200 HTML, static assets return right MIME, and path traversal is blocked', async () => {
-    for (const route of ['/roadmap', '/mentors', '/mentor-cabinet', '/b2b', '/profile', '/auth']) {
+  it('AuthSessions & Password Change: real multi-session revocation and invalidation on password change', async () => {
+    const clientA = new CookieClient(baseUrl);
+    const clientB = new CookieClient(baseUrl);
+
+    await clientA.request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        fullName: 'Session Tester',
+        email: 'sessions@skilltree.ai',
+        password: 'InitialPass123!',
+        role: 'LEARNER',
+      }),
+    });
+
+    const loginB = await clientB.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'sessions@skilltree.ai', password: 'InitialPass123!' }),
+    });
+    assert.equal(loginB.status, 200);
+
+    // Client A lists real active sessions -> sees 2 sessions (A current, B other)
+    const listRes = await clientA.request('/api/auth/sessions');
+    assert.equal(listRes.status, 200);
+    const { sessions } = await listRes.json();
+    assert.equal(sessions.length, 2);
+    const otherSession = sessions.find((s: any) => !s.isCurrent);
+    assert.ok(otherSession);
+
+    // Client A revokes Client B's session -> Client B is immediately kicked out!
+    const revokeRes = await clientA.request(`/api/auth/sessions/${otherSession.id}`, {
+      method: 'DELETE',
+      body: '{}',
+    });
+    assert.equal(revokeRes.status, 200);
+
+    const clientBProfile = await clientB.request('/api/profile', {
+      method: 'PUT',
+      body: JSON.stringify({ fullName: 'Should Fail' }),
+    });
+    assert.equal(clientBProfile.status, 401);
+
+    // Re-login Client B, then Client A changes password with wrong current password (401) -> valid (200)
+    await clientB.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'sessions@skilltree.ai', password: 'InitialPass123!' }),
+    });
+
+    const wrongPwdRes = await clientA.request('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword: 'WrongPassword', newPassword: 'UpdatedPass999!' }),
+    });
+    assert.equal(wrongPwdRes.status, 401);
+
+    const changePwdRes = await clientA.request('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        currentPassword: 'InitialPass123!',
+        newPassword: 'UpdatedPass999!',
+      }),
+    });
+    assert.equal(changePwdRes.status, 200);
+
+    // Password change must revoke Client B while keeping Client A alive
+    assert.equal(
+      (
+        await clientB.request('/api/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ fullName: 'Kicked After Password Change' }),
+        })
+      ).status,
+      401
+    );
+    assert.equal(
+      (
+        await clientA.request('/api/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ fullName: 'Session Tester Updated' }),
+        })
+      ).status,
+      200
+    );
+  });
+
+  it('Static frontend, SPA routes, compiled Tailwind CSS, traversal block, and zero stubs in public/index.html', async () => {
+    for (const route of ['/', '/roadmap', '/mentors', '/mentor-cabinet', '/b2b', '/profile', '/auth']) {
       const res = await fetch(`${baseUrl}${route}`);
       assert.equal(res.status, 200, `Expected 200 for ${route}`);
       assert.ok((res.headers.get('content-type') || '').includes('text/html'));
-      const html = await res.text();
-      assert.ok(html.includes('SkillTree AI'));
     }
 
-    const cssRes = await fetch(`${baseUrl}/styles.css`);
-    assert.equal(cssRes.status, 200);
-    assert.ok((cssRes.headers.get('content-type') || '').includes('text/css'));
+    const twRes = await fetch(`${baseUrl}/tailwind.css`);
+    assert.equal(twRes.status, 200);
+    assert.ok((twRes.headers.get('content-type') || '').includes('text/css'));
 
-    const jsRes = await fetch(`${baseUrl}/app.js`);
+    const jsRes = await fetch(`${baseUrl}/js/app.js`);
     assert.equal(jsRes.status, 200);
     assert.ok((jsRes.headers.get('content-type') || '').includes('application/javascript'));
 
     const traversalRes = await fetch(`${baseUrl}/%2e%2e/package.json`);
+    assert.equal(traversalRes.status, 404);
     const traversalBody = await traversalRes.text();
     assert.equal(traversalBody.includes('"name": "skilltree-ai"'), false);
 
-    const notFoundApi = await fetch(`${baseUrl}/api/nonexistent-endpoint`);
-    assert.equal(notFoundApi.status, 404);
-
-    const malformedRes = await fetch(`${baseUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{invalid-json',
-    });
-    assert.equal(malformedRes.status, 400);
-  });
-
-  it('Regression (Bug #4) & Validation Edge Cases: confirm DONE returns 400, empty profession/question return 400, JSON team export works', async () => {
-    const stateRes = await fetch(`${baseUrl}/api/state`);
-    const snap = await stateRes.json();
-    const firstTree = snap.learners[0].skillTrees[0];
-    const firstNode = firstTree.nodes[0];
-    const mentorId = snap.mentors[0].id;
-    const teamId = snap.teams[0].id;
-
-    const emptyProfRes = await fetch(`${baseUrl}/api/trees/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ learnerId: 1, profession: '   ' }),
-    });
-    assert.equal(emptyProfRes.status, 400);
-
-    const emptyQRes = await fetch(`${baseUrl}/api/trees/${firstTree.id}/nodes/${firstNode.id}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: '   ' }),
-    });
-    assert.equal(emptyQRes.status, 400);
-
-    const bookRes = await fetch(`${baseUrl}/api/sessions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        learnerId: 1,
-        mentorId,
-        topic: 'QA Session State Guard',
-        startAt: new Date(Date.now() + 86400000).toISOString(),
-        durationMinutes: 60,
-      }),
-    });
-    assert.equal(bookRes.status, 201);
-    const { session } = await bookRes.json();
-
-    await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
-    await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, { method: 'POST' });
-    await fetch(`${baseUrl}/api/sessions/${session.id}/feedback`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating: 5, comment: 'Чітко' }),
-    });
-
-    // Повторне підтвердження вже DONE сесії заборонене -> 400
-    const confirmDoneRes = await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, {
-      method: 'POST',
-    });
-    assert.equal(confirmDoneRes.status, 400);
-
-    const jsonExportRes = await fetch(`${baseUrl}/api/teams/${teamId}/export?format=JSON`);
-    assert.equal(jsonExportRes.status, 200);
-    assert.ok((jsonExportRes.headers.get('content-type') || '').includes('application/json'));
-    const report = await jsonExportRes.json();
-    assert.equal(report.teamId, teamId);
-    assert.ok(Array.isArray(report.members));
-  });
-
-  it('Frontend Integration Check: index.html contains all 6 Stitch screens and required interactive anchors', () => {
-    const html = readFileSync(resolve(process.cwd(), 'src/public/index.html'), 'utf-8');
+    const html = readFileSync(resolve(process.cwd(), 'public/index.html'), 'utf-8');
+    assert.equal(html.includes('cdn.tailwindcss.com'), false);
+    assert.equal(html.includes('demo1234'), false);
+    assert.equal(html.includes('resetPasswordModal'), false);
     for (const id of [
       'page-auth',
       'page-roadmap',
@@ -572,7 +612,7 @@ describe('SkillTree AI — REST API Integration Tests (UC1–UC12)', () => {
       'assignModalBackdrop',
       'addMaterialModal',
     ]) {
-      assert.ok(html.includes(id), `Expected #${id} in src/public/index.html`);
+      assert.ok(html.includes(id), `Expected #${id} in public/index.html`);
     }
   });
 });

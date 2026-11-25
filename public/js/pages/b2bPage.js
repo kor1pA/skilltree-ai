@@ -365,7 +365,8 @@ export function bindB2bEvents({ renderActiveView }) {
     }
     try {
       const csvText = await api(`/api/teams/${state.selectedTeamId}/export?format=CSV`);
-      const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+      const bomSafeCsv = csvText.startsWith('\uFEFF') ? csvText : `\uFEFF${csvText}`;
+      const blob = new Blob([bomSafeCsv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
