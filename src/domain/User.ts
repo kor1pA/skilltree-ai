@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import {
   MaterialType,
   NodeStatus,
@@ -15,6 +15,13 @@ import { Team } from './Team.ts';
 import { SkillMatrixService } from '../services/SkillMatrixService.ts';
 
 export type UserRole = 'LEARNER' | 'MENTOR' | 'HR';
+
+let domainIdSequence = Date.now() * 100;
+
+function nextDomainId(): number {
+  domainIdSequence += 1;
+  return domainIdSequence;
+}
 
 export interface UserParams {
   id: number;
@@ -46,12 +53,37 @@ export abstract class User {
   }
 
   static hashPassword(rawPassword: string): string {
-    return createHash('sha256').update(rawPassword).digest('hex');
+    const salt = randomBytes(16).toString('hex');
+    const derivedKey = scryptSync(rawPassword, salt, 64).toString('hex');
+    return `scrypt$${salt}$${derivedKey}`;
+  }
+
+  static verifyPassword(rawPassword: string, storedHash: string): boolean {
+    if (typeof rawPassword !== 'string' || typeof storedHash !== 'string') {
+      return false;
+    }
+    const parts = storedHash.split('$');
+    if (parts.length !== 3 || parts[0] !== 'scrypt') {
+      return false;
+    }
+    const [, salt, expectedHex] = parts;
+    if (!salt || !expectedHex || expectedHex.length % 2 !== 0) {
+      return false;
+    }
+    try {
+      const expectedBuf = Buffer.from(expectedHex, 'hex');
+      const derivedBuf = scryptSync(rawPassword, salt, expectedBuf.length);
+      if (derivedBuf.length !== expectedBuf.length) {
+        return false;
+      }
+      return timingSafeEqual(derivedBuf, expectedBuf);
+    } catch {
+      return false;
+    }
   }
 
   login(password: string): boolean {
-    const valid =
-      this.passwordHash === User.hashPassword(password) || this.passwordHash === password;
+    const valid = User.verifyPassword(password, this.passwordHash);
     if (valid) {
       this.isLoggedIn = true;
     }
@@ -63,8 +95,8 @@ export abstract class User {
   }
 
   resetPassword(newPassword: string): void {
-    if (!newPassword || newPassword.length < 4) {
-      throw new Error('Новий пароль має містити щонайменше 4 символи.');
+    if (!newPassword || newPassword.length < 8) {
+      throw new Error('Новий пароль має містити щонайменше 8 символів.');
     }
     this.passwordHash = User.hashPassword(newPassword);
   }
@@ -119,7 +151,8 @@ export class Learner extends User {
   requestSkillTree(
     profession: string,
     level: SkillLevel,
-    treeFactory?: (learnerId: number, profession: string, level: SkillLevel) => SkillTree
+    treeFactory?: (learnerId: number, profession: string, level: SkillLevel) => SkillTree,
+    idGenerator: () => number = nextDomainId
   ): SkillTree {
     this.targetProfession = profession;
     this.level = level;
@@ -127,21 +160,21 @@ export class Learner extends User {
     const tree = treeFactory
       ? treeFactory(this.id, profession, level)
       : new SkillTree({
-          id: Date.now(),
+          id: idGenerator(),
           title: `Шлях: ${profession}`,
           targetProfession: profession,
           level,
           learnerId: this.id,
           nodes: [
             new SkillNode({
-              id: Date.now() + 1,
+              id: idGenerator(),
               title: `Основи ${profession}`,
               orderNumber: 1,
               status: NodeStatus.NOT_STARTED,
               description: `Стартовий модуль напряму ${profession}`,
               materials: [
                 new LearningMaterial({
-                  id: Date.now() + 2,
+                  id: idGenerator(),
                   title: `Вступний конспект: ${profession}`,
                   type: MaterialType.TEXT,
                   url: '',
@@ -160,7 +193,8 @@ export class Learner extends User {
   askAssistant(
     nodeId: number,
     text: string,
-    answerGenerator?: (node: SkillNode, question: string) => { answer: string; responseTimeMs: number }
+    answerGenerator?: (node: SkillNode, question: string) => { answer: string; responseTimeMs: number },
+    idGenerator: () => number = nextDomainId
   ): ChatMessage {
     let targetNode: SkillNode | undefined;
     for (const tree of this.skillTrees) {
@@ -180,7 +214,7 @@ export class Learner extends User {
         };
 
     const message = new ChatMessage({
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: idGenerator(),
       nodeId,
       learnerId: this.id,
       question: text,
@@ -192,7 +226,13 @@ export class Learner extends User {
     return message;
   }
 
-  bookSession(mentor: Mentor, startAt: Date, topic?: string, durationMin = 60): MentorSession {
+  bookSession(
+    mentor: Mentor,
+    startAt: Date,
+    topic?: string,
+    durationMin = 60,
+    idGenerator: () => number = nextDomainId
+  ): MentorSession {
     if (!Number.isFinite(durationMin) || durationMin <= 0) {
       throw new Error('Тривалість сесії має бути більшою за 0 хвилин.');
     }
@@ -201,7 +241,7 @@ export class Learner extends User {
     }
     const price = Number(((mentor.hourlyRate * durationMin) / 60).toFixed(2));
     const session = new MentorSession({
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: idGenerator(),
       learnerId: this.id,
       mentorId: mentor.id,
       topic: topic || `Консультація з ${mentor.specialization}`,
@@ -310,10 +350,11 @@ export class Mentor extends User {
     url: string,
     type: MaterialType = MaterialType.LINK,
     description?: string,
-    content?: string
+    content?: string,
+    idGenerator: () => number = nextDomainId
   ): LearningMaterial {
     const material = new LearningMaterial({
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: idGenerator(),
       title,
       type,
       url,
@@ -382,9 +423,9 @@ export class HRManager extends User {
     this.teams = params.teams ?? [];
   }
 
-  createTeam(name: string): Team {
+  createTeam(name: string, idGenerator: () => number = nextDomainId): Team {
     const team = new Team({
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: idGenerator(),
       name,
       hrManagerId: this.id,
     });
@@ -392,25 +433,29 @@ export class HRManager extends User {
     return team;
   }
 
-  assignSkillTree(learner: Learner, tree: SkillTree): void {
+  assignSkillTree(
+    learner: Learner,
+    tree: SkillTree,
+    idGenerator: () => number = nextDomainId
+  ): SkillTree {
     const clonedTree = new SkillTree({
-      id: Date.now() + Math.floor(Math.random() * 1000),
+      id: idGenerator(),
       title: tree.title,
       targetProfession: tree.targetProfession,
       level: tree.level,
       learnerId: learner.id,
       nodes: tree.nodes.map(
-        (n, idx) =>
+        (n) =>
           new SkillNode({
-            id: Date.now() + idx + 100,
+            id: idGenerator(),
             title: n.title,
             orderNumber: n.orderNumber,
             status: NodeStatus.NOT_STARTED,
             description: n.description,
             materials: n.materials.map(
-              (m, mIdx) =>
+              (m) =>
                 new LearningMaterial({
-                  id: Date.now() + idx * 10 + mIdx + 500,
+                  id: idGenerator(),
                   title: m.title,
                   type: m.type,
                   url: m.url,
@@ -423,6 +468,7 @@ export class HRManager extends User {
       ),
     });
     learner.skillTrees.push(clonedTree);
+    return clonedTree;
   }
 
   exportReport(team: Team, format = 'CSV'): string {
