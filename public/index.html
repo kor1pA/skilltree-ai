@@ -11,92 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            'surface-tint': '#d0bcff',
-            'primary': '#d0bcff',
-            'primary-container': '#a078ff',
-            'on-primary': '#3c0091',
-            'on-primary-container': '#340080',
-            'primary-fixed': '#e9ddff',
-            'primary-fixed-dim': '#d0bcff',
-            'secondary': '#c0c1ff',
-            'secondary-container': '#3131c0',
-            'on-secondary': '#1000a9',
-            'secondary-fixed': '#e1e0ff',
-            'secondary-fixed-dim': '#c0c1ff',
-            'tertiary': '#7bd0ff',
-            'tertiary-container': '#009bd1',
-            'on-tertiary': '#00354a',
-            'tertiary-fixed': '#c4e7ff',
-            'tertiary-fixed-dim': '#7bd0ff',
-            'surface': '#121319',
-            'surface-dim': '#121319',
-            'surface-bright': '#383940',
-            'surface-container-lowest': '#0d0e14',
-            'surface-container-low': '#1a1b22',
-            'surface-container': '#1e1f26',
-            'surface-container-high': '#292930',
-            'surface-container-highest': '#34343b',
-            'surface-variant': '#34343b',
-            'background': '#0b0d14',
-            'on-background': '#e3e1eb',
-            'on-surface': '#e3e1eb',
-            'on-surface-variant': '#cbc3d7',
-            'outline': '#958ea0',
-            'outline-variant': '#494454',
-            'inverse-primary': '#6d3bd7',
-            'error': '#ffb4ab',
-            'error-container': '#93000a',
-            'on-error-container': '#ffdad6',
-            'status-done': '#10b981',
-            'status-in-progress': '#06b6d4',
-            'status-not-started': '#494454',
-            brand: {
-              300: '#c4b5fd',
-              400: '#a78bfa',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
-            },
-          },
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            display: ['Space Grotesk', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            'title-sm': ['Plus Jakarta Sans', 'sans-serif'],
-            'title-md': ['Plus Jakarta Sans', 'sans-serif'],
-            'title-lg': ['Plus Jakarta Sans', 'sans-serif'],
-            'headline-sm': ['Plus Jakarta Sans', 'sans-serif'],
-            'headline-md': ['Plus Jakarta Sans', 'sans-serif'],
-            'headline-lg': ['Plus Jakarta Sans', 'sans-serif'],
-            'headline-xl': ['Plus Jakarta Sans', 'sans-serif'],
-            'display-lg': ['Plus Jakarta Sans', 'sans-serif'],
-            'body-sm': ['Plus Jakarta Sans', 'sans-serif'],
-            'body-md': ['Plus Jakarta Sans', 'sans-serif'],
-            'body-lg': ['Plus Jakarta Sans', 'sans-serif'],
-            'label-sm': ['Space Grotesk', 'sans-serif'],
-            'label-md': ['Space Grotesk', 'sans-serif'],
-            'label-lg': ['Space Grotesk', 'sans-serif'],
-          },
-          spacing: {
-            'space-xs': '0.25rem',
-            'space-sm': '0.5rem',
-            'space-md': '1rem',
-            'space-lg': '1.5rem',
-            'space-xl': '2.5rem',
-            margin: '2.5rem',
-            gutter: '1.5rem',
-          },
-        },
-      },
-    };
-  </script>
+  <link rel="stylesheet" href="/tailwind.css" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="bg-[#0b0d14] font-sans text-[#e3e1eb] min-h-screen selection:bg-brand-500 selection:text-white relative overflow-x-hidden antialiased">
@@ -112,7 +27,7 @@
 
     <!-- Top Brand Navigation -->
     <header class="relative z-10 w-full max-w-5xl px-6 pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between gap-4 mx-auto">
-      <a href="/roadmap" data-route="/roadmap" class="flex items-center gap-3 self-start sm:self-auto group">
+      <a href="/mentors" data-route="/mentors" class="flex items-center gap-3 self-start sm:self-auto group">
         <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-brand-500 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-brand-500/30 flex items-center justify-center">
           <div class="w-full h-full bg-[#121422] rounded-[15px] flex items-center justify-center text-cyan-300">
             <span class="material-symbols-outlined text-2xl">account_tree</span>
@@ -127,10 +42,10 @@
       <div class="flex items-center gap-2.5 self-end sm:self-auto">
         <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161827]/90 border border-brand-500/30 text-xs text-slate-300 backdrop-blur-md shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-          <span class="font-mono text-[11px]">SHA-256 Auth</span>
+          <span class="font-mono text-[11px]">Scrypt + HttpOnly Auth</span>
         </div>
-        <a href="/roadmap" data-route="/roadmap" class="px-3.5 py-1.5 rounded-full bg-[#181b2c] hover:bg-[#22263f] border border-brand-500/40 text-xs text-white font-semibold transition-all">
-          Перейти в дашборд →
+        <a href="/mentors" data-route="/mentors" class="px-3.5 py-1.5 rounded-full bg-[#181b2c] hover:bg-[#22263f] border border-brand-500/40 text-xs text-white font-semibold transition-all">
+          Каталог менторів →
         </a>
       </div>
     </header>
@@ -141,38 +56,26 @@
         <div id="card-glare" class="holographic-glare absolute inset-0 z-0"></div>
         <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-400 via-cyan-400 to-transparent z-10"></div>
 
-        <div class="relative z-10" style="transform: translateZ(20px);">
+        <div class="relative z-10">
           <div class="text-center mb-5">
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold mb-2.5">
               <span class="material-symbols-outlined text-sm text-cyan-300">lock</span>
               <span>Безпечна автентифікація користувача (UC1)</span>
             </div>
             <h1 id="portal-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1.5 font-display">Вхід до SkillTree AI</h1>
-            <p id="portal-subtitle" class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">Оберіть роль у системі, увійдіть за паролем або використайте швидкий вхід</p>
+            <p id="portal-subtitle" class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">Увійдіть за email і паролем або створіть новий обліковий запис</p>
           </div>
 
           <!-- Mode Tabs -->
           <div class="grid grid-cols-2 p-1 mb-5 rounded-2xl bg-[#0e101a]/95 border border-slate-800 text-xs font-semibold">
-            <button id="tab-login" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-600/30">
+            <button id="tab-login" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-600/30 cursor-pointer">
               <span class="material-symbols-outlined text-base">login</span>
               <span>Увійти</span>
             </button>
-            <button id="tab-register" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+            <button id="tab-register" type="button" class="py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-slate-400 hover:text-white cursor-pointer">
               <span class="material-symbols-outlined text-base">person_add</span>
-              <span>Реєстрація (+100 XP)</span>
+              <span>Реєстрація</span>
             </button>
-          </div>
-
-          <!-- Quick Demo Profiles Strip -->
-          <div id="saved-sessions-section" class="mb-5 p-3 rounded-2xl bg-[#131627]/80 border border-brand-500/20">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-semibold tracking-wider uppercase text-slate-400 flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-brand-400">bolt</span>
-                Останні збережені сесії (швидкий вхід):
-              </span>
-              <span class="text-[10px] text-cyan-400 font-mono font-medium">1-Click Sign In</span>
-            </div>
-            <div id="authQuickDemoGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-2"></div>
           </div>
 
           <!-- Role Selector Chips (visible on Register) -->
@@ -218,20 +121,20 @@
               <label class="block text-xs font-medium text-slate-300 mb-1.5" for="input-fullname">Повне ім'я (ПІБ)</label>
               <div class="relative flex items-center">
                 <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">person</span>
-                <input id="input-fullname" type="text" placeholder="Олександр Коваленко" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
+                <input id="input-fullname" type="text" autocomplete="name" placeholder="Олександр Коваленко" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
               </div>
             </div>
 
             <div id="field-extra" class="hidden">
               <label id="input-extra-label" class="block text-xs font-medium text-slate-300 mb-1.5" for="input-extra">Цільова професія</label>
-              <input id="input-extra" type="text" placeholder="Full-Stack Developer" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
+              <input id="input-extra" type="text" list="professionList" placeholder="Full-Stack Developer" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" />
             </div>
 
             <div>
               <label class="block text-xs font-medium text-slate-300 mb-1.5" for="input-email">Корпоративна або персональна пошта</label>
               <div class="relative flex items-center">
                 <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">mail</span>
-                <input id="input-email" type="email" required value="slava@skilltree.ai" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono" />
+                <input id="input-email" type="email" required autocomplete="email" placeholder="name@company.ua" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono" />
               </div>
             </div>
 
@@ -240,24 +143,24 @@
                 <label class="block text-xs font-medium text-slate-300" for="input-password">Пароль</label>
                 <div class="flex items-center gap-1.5 text-[11px] text-cyan-400 font-mono">
                   <span class="material-symbols-outlined text-xs">verified_user</span>
-                  <span>Захищене з'єднання</span>
+                  <span>Scrypt Захист</span>
                 </div>
               </div>
               <div class="relative flex items-center">
                 <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-base pointer-events-none">key</span>
-                <input id="input-password" type="password" required value="demo1234" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono tracking-widest" />
+                <input id="input-password" type="password" required autocomplete="current-password" placeholder="Введіть пароль" class="w-full bg-[#0a0d18]/90 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition font-mono tracking-widest" />
                 <button id="togglePasswordBtn" type="button" aria-label="Показати або приховати пароль" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition cursor-pointer">
                   <span class="material-symbols-outlined text-base">visibility</span>
                 </button>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-xs pt-1">
+            <div id="rememberMeRow" class="flex items-center justify-between text-xs pt-1">
               <label class="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 select-none">
-                <input type="checkbox" checked class="w-4 h-4 rounded bg-[#0a0d18] border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer" />
-                <span>Запам'ятати мене на цьому пристрої</span>
+                <input id="rememberMeCheckbox" type="checkbox" checked class="w-4 h-4 rounded bg-[#0a0d18] border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer" />
+                <span>Запам'ятати мене на 7 днів</span>
               </label>
-              <button id="forgotPasswordLink" type="button" class="text-brand-400 hover:text-brand-300 underline underline-offset-2 transition">Забули пароль?</button>
+              <button id="forgotPasswordLink" type="button" class="text-brand-400 hover:text-brand-300 underline underline-offset-2 transition cursor-pointer">Забули пароль?</button>
             </div>
 
             <button id="auth-submit-btn" type="submit" class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-500 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm tracking-wide transition shadow-lg shadow-brand-600/35 hover:shadow-brand-500/50 cursor-pointer">
@@ -265,30 +168,18 @@
               <span id="submit-btn-text">Увійти в кабінет</span>
             </button>
           </form>
-
-          <div class="relative my-4 flex items-center">
-            <div class="flex-grow border-t border-slate-800"></div>
-            <span class="flex-shrink mx-4 text-[11px] font-mono uppercase tracking-wider text-slate-500">або авторизація через</span>
-            <div class="flex-grow border-t border-slate-800"></div>
-          </div>
-
-          <button id="googleOAuthBtn" type="button" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-900/80 hover:bg-slate-800/95 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold transition shadow-sm cursor-pointer">
-            <span class="material-symbols-outlined text-base text-cyan-400">passkey</span>
-            <span id="google-btn-text">Швидкий вхід як Студент (Demo OAuth)</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30 ml-auto">OAuth 2.0</span>
-          </button>
         </div>
       </div>
 
       <div class="mt-4 flex flex-wrap items-center justify-between text-xs text-slate-500 px-2 gap-2">
         <div class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm text-brand-400">shield</span>
-          <span>Захищене шифрування сесії SHA-256</span>
+          <span>Захищене хешування паролів scrypt & HttpOnly сесії</span>
         </div>
         <div class="flex items-center gap-3">
-          <a href="/roadmap" data-route="/roadmap" class="hover:text-slate-300 transition">Гостьовий доступ</a>
+          <a href="/mentors" data-route="/mentors" class="hover:text-slate-300 transition">Каталог менторів</a>
           <span>•</span>
-          <span class="font-mono text-slate-400">SkillTree AI v3.2</span>
+          <span class="font-mono text-slate-400">SkillTree AI • SQLite</span>
         </div>
       </div>
     </main>
@@ -341,7 +232,7 @@
           </a>
           <a href="/profile" data-route="/profile" class="sidebar-nav-link group flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm">
             <span class="material-symbols-outlined text-xl transition-transform group-hover:scale-110">badge</span>
-            <span>Вхід / Профілі</span>
+            <span>Профіль та сесії</span>
           </a>
         </nav>
       </div>
@@ -363,7 +254,7 @@
             <span class="font-display text-xs text-white font-semibold">AI Асистент</span>
             <span class="font-mono text-[10px] text-emerald-400 flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              ONLINE // V3.2
+              SQLITE // ONLINE
             </span>
           </div>
         </div>
@@ -386,71 +277,49 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <div class="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141624] border border-[#23273c] text-white font-display text-xs shadow-[0_0_12px_rgba(139,92,246,0.15)]">
+          <div id="headerXpPill" class="hidden items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141624] border border-[#23273c] text-white font-display text-xs shadow-[0_0_12px_rgba(139,92,246,0.15)]">
             <span class="text-amber-400">⭐</span>
             <span id="headerXpText" class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-cyan-300">0 XP</span>
             <span class="text-slate-600">|</span>
             <span class="text-slate-400">Рівень: <span id="headerLevelText" class="text-slate-200 font-semibold">BEGINNER</span></span>
           </div>
 
-          <!-- User Profile & Quick Role Switcher Dropdown -->
+          <!-- User Account Menu Dropdown -->
           <div class="relative" id="userProfileDropdownContainer">
             <button id="userProfileMenuBtn" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#141624] border border-[#23273c] text-slate-200 hover:border-primary/50 hover:bg-[#1b1e30] transition-colors cursor-pointer">
               <span id="headerUserAvatar" class="w-6 h-6 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white text-[10px] font-bold flex items-center justify-center">ГТ</span>
-              <span id="headerUserName" class="font-display text-xs font-semibold hidden sm:inline">Гість (Студент)</span>
+              <span id="headerUserName" class="font-display text-xs font-semibold hidden sm:inline">Гість (Увійти)</span>
               <span class="material-symbols-outlined text-sm text-slate-400">expand_more</span>
             </button>
 
             <div id="userProfileDropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-[#0d0e14]/95 backdrop-blur-2xl rounded-2xl p-4 shadow-[0_12px_36px_rgba(0,0,0,0.8)] ring-1 ring-[#494454] z-50 flex flex-col gap-3">
               <div class="flex items-center gap-3 bg-[#1a1b22]/80 p-3 rounded-xl">
-                <div id="dropdownAvatarLg" class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white font-bold flex items-center justify-center shrink-0">ВГ</div>
+                <div id="dropdownAvatarLg" class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white font-bold flex items-center justify-center shrink-0">ГТ</div>
                 <div class="flex flex-col min-w-0">
-                  <span id="dropdownUserName" class="font-bold text-white text-sm truncate">В'ячеслав Гой</span>
-                  <span id="dropdownUserMeta" class="font-display text-[11px] text-primary font-semibold truncate">Студент • BEGINNER</span>
+                  <span id="dropdownUserName" class="font-bold text-white text-sm truncate">Гість</span>
+                  <span id="dropdownUserMeta" class="font-display text-[11px] text-primary font-semibold truncate">Сесію не розпочато</span>
                 </div>
               </div>
-
-              <div class="flex flex-col gap-1.5">
-                <span class="font-display text-[10px] uppercase tracking-wider text-slate-400 px-1">Швидке перемикання ролей</span>
-                <div class="grid grid-cols-3 gap-1 bg-[#121319] p-1 rounded-xl border border-[#23273c]">
-                  <button type="button" data-quick-role="LEARNER" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-primary text-[11px] font-semibold transition-all">
-                    <span class="material-symbols-outlined text-base">school</span>
-                    <span>Студент</span>
-                  </button>
-                  <button type="button" data-quick-role="MENTOR" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-cyan-300 text-[11px] font-semibold transition-all">
-                    <span class="material-symbols-outlined text-base">psychology</span>
-                    <span>Ментор</span>
-                  </button>
-                  <button type="button" data-quick-role="HR" class="flex flex-col items-center py-1.5 px-1 rounded-lg hover:bg-[#222534] text-purple-300 text-[11px] font-semibold transition-all">
-                    <span class="material-symbols-outlined text-base">corporate_fare</span>
-                    <span>HR-Lead</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="h-px bg-[#2b304c]"></div>
 
               <div class="flex flex-col gap-0.5 text-xs">
                 <a href="/profile" data-route="/profile" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-slate-200 hover:bg-[#1e1f26] transition-all">
                   <span class="material-symbols-outlined text-slate-400 text-lg">account_circle</span>
-                  <span>Профіль та акаунт</span>
+                  <span>Профіль та активні сесії</span>
                 </a>
-                <button id="dropdownEditProfileBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-slate-200 hover:bg-[#1e1f26] transition-all text-left w-full">
+                <button id="dropdownEditProfileBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-slate-200 hover:bg-[#1e1f26] transition-all text-left w-full cursor-pointer">
                   <span class="material-symbols-outlined text-slate-400 text-lg">security</span>
                   <span>Налаштування та пароль</span>
                 </button>
                 <a href="/auth" data-route="/auth" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-cyan-300 hover:bg-[#1e1f26] transition-all">
                   <span class="flex items-center gap-2.5">
                     <span class="material-symbols-outlined text-lg">switch_account</span>
-                    <span>3D Портал входу</span>
+                    <span>Увійти / Створити акаунт</span>
                   </span>
-                  <span class="font-mono text-[10px] bg-[#292930] px-1.5 py-0.5 rounded text-cyan-200">US-04</span>
+                  <span class="font-mono text-[10px] bg-[#292930] px-1.5 py-0.5 rounded text-cyan-200">/auth</span>
                 </a>
               </div>
 
-              <div class="h-px bg-[#2b304c]"></div>
-
-              <button id="headerLogoutBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-rose-400 hover:bg-rose-950/40 transition-all text-xs font-semibold text-left">
+              <button id="headerLogoutBtn" type="button" class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-rose-400 hover:bg-rose-950/40 transition-all text-xs font-semibold text-left border-t border-[#2b304c] pt-3 cursor-pointer">
                 <span class="material-symbols-outlined text-lg">logout</span>
                 <span>Вийти з акаунту</span>
               </button>
@@ -471,7 +340,9 @@
             <div class="absolute -top-20 right-10 w-96 h-96 bg-tertiary/15 rounded-full blur-[100px]"></div>
           </div>
 
-          <div class="px-4 sm:px-6 py-6 max-w-[1600px] w-full mx-auto flex flex-col gap-6 relative z-10">
+          <div id="roadmapGateNotice" class="hidden px-4 sm:px-6 py-8 relative z-10"></div>
+
+          <div id="roadmapContent" class="px-4 sm:px-6 py-6 max-w-[1600px] w-full mx-auto flex flex-col gap-6 relative z-10">
             <!-- Header Context & Progress -->
             <div class="flex flex-col lg:flex-row gap-5 items-stretch justify-between">
               <div class="flex-1 bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-4">
@@ -518,7 +389,7 @@
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex flex-col">
                     <span class="text-sm text-white font-semibold">Прогрес карти</span>
-                    <span id="treeMeta" class="text-xs text-slate-400">0 з 5 вузлів закрито</span>
+                    <span id="treeMeta" class="text-xs text-slate-400">0 з 0 вузлів закрито</span>
                   </div>
                   <span id="treePercentBadge" class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-300 to-tertiary">0%</span>
                 </div>
@@ -553,11 +424,11 @@
                   </div>
                   <div class="flex items-center gap-2">
                     <div class="bg-[#121422] p-1 rounded-full flex items-center gap-1 border border-[#23273c]">
-                      <button id="view-mode-3d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-display text-xs font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                      <button id="view-mode-3d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-display text-xs font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.3)] cursor-pointer">
                         <span class="material-symbols-outlined text-sm">view_in_ar</span>
                         <span>3D Сузір'я</span>
                       </button>
-                      <button id="view-mode-2d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-400 hover:text-white font-display text-xs font-medium transition-all">
+                      <button id="view-mode-2d" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-400 hover:text-white font-display text-xs font-medium transition-all cursor-pointer">
                         <span class="material-symbols-outlined text-sm">format_list_bulleted</span>
                         <span>2D Список</span>
                       </button>
@@ -571,7 +442,6 @@
                   <div class="pointer-events-none absolute -top-12 -left-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
                   <div class="pointer-events-none absolute -bottom-12 -right-12 w-72 h-72 bg-tertiary/20 rounded-full blur-3xl"></div>
 
-                  <!-- Top HUD -->
                   <div class="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
                     <div class="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0d0e18]/85 backdrop-blur-md border border-[#262b42] text-white font-display text-xs">
                       <span class="material-symbols-outlined text-sm text-amber-400 animate-pulse">bolt</span>
@@ -580,28 +450,26 @@
                       <span id="hudActiveFocusStatus" class="px-2 py-0.5 rounded-full bg-primary/30 border border-primary/50 text-[10px] font-bold text-purple-200">—</span>
                     </div>
                     <div class="pointer-events-auto flex items-center gap-1 bg-[#0d0e18]/85 backdrop-blur-md border border-[#262b42] p-1 rounded-full">
-                      <button id="reset3dViewBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors" title="Скинути ракурс">
+                      <button id="reset3dViewBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer" title="Скинути ракурс">
                         <span class="material-symbols-outlined text-xs">restart_alt</span>
                         <span class="hidden sm:inline">Скинути</span>
                       </button>
-                      <button id="focus3dNodeBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors" title="Фокус на активний вузол">
+                      <button id="focus3dNodeBtn" type="button" class="px-2.5 py-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer" title="Фокус на активний вузол">
                         <span class="material-symbols-outlined text-xs">filter_center_focus</span>
                         <span class="hidden sm:inline">Фокус</span>
                       </button>
-                      <button id="fullscreen3dBtn" type="button" class="p-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-colors" title="На весь екран">
+                      <button id="fullscreen3dBtn" type="button" class="p-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer" title="На весь екран">
                         <span class="material-symbols-outlined text-xs">fullscreen</span>
                       </button>
                     </div>
                   </div>
 
-                  <!-- Hint -->
                   <div class="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none z-20">
                     <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#090b14]/75 backdrop-blur-md border border-[#242940] text-slate-300 text-xs shadow-md whitespace-nowrap">
                       <span>🖱️ Перетягуйте для обертання • Клік по сфері вибирає вузол</span>
                     </div>
                   </div>
 
-                  <!-- Bottom HUD Legend -->
                   <div class="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2.5 pointer-events-none">
                     <div class="pointer-events-auto flex flex-wrap items-center gap-3 px-3.5 py-2 rounded-xl bg-[#0d0e18]/90 backdrop-blur-md border border-[#262b42] text-xs text-slate-200">
                       <span class="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Стани:</span>
@@ -622,13 +490,12 @@
 
               <!-- Right 5 Columns: Active Node Inspector + AI Blocker Chat -->
               <div class="lg:col-span-5 flex flex-col gap-5">
-                <!-- Selected Node Detail -->
                 <div class="bg-[#121422]/90 backdrop-blur-md border border-[#202538] rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col gap-4">
                   <div class="flex items-center justify-between gap-2">
                     <span id="activeNodeBadge" class="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 font-display text-[11px] font-bold uppercase tracking-wider">IN_PROGRESS</span>
                     <div class="flex items-center gap-2">
                       <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/40 text-purple-200 font-display text-xs font-bold">+50 XP</span>
-                      <button id="deleteNodeBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors" title="Видалити вузол (UC10)">
+                      <button id="deleteNodeBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors cursor-pointer" title="Видалити вузол (UC10)">
                         <span class="material-symbols-outlined text-base">delete</span>
                       </button>
                     </div>
@@ -679,13 +546,13 @@
                   </div>
 
                   <div class="px-4 py-2 bg-[#10121e] border-t border-[#1e2235] flex flex-wrap gap-1.5">
-                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Поясни простими словами ключову концепцію цієї теми">
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1 cursor-pointer" data-prompt="Поясни простими словами ключову концепцію цієї теми">
                       <span class="material-symbols-outlined text-xs text-primary">add</span> З чого почати?
                     </button>
-                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Наведи практичний приклад коду для цього вузла">
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1 cursor-pointer" data-prompt="Наведи практичний приклад коду для цього вузла">
                       <span class="material-symbols-outlined text-xs text-primary">add</span> Приклад коду
                     </button>
-                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1" data-prompt="Які типові помилки роблять новачки в цій темі?">
+                    <button type="button" class="chip-btn px-3 py-1 rounded-full bg-[#181b2c] hover:bg-[#20243a] border border-[#262b42] text-slate-300 hover:text-white font-display text-xs transition-colors flex items-center gap-1 cursor-pointer" data-prompt="Які типові помилки роблять новачки в цій темі?">
                       <span class="material-symbols-outlined text-xs text-primary">add</span> Типові помилки
                     </button>
                   </div>
@@ -765,11 +632,11 @@
                 </div>
 
                 <div class="flex items-center gap-2 overflow-x-auto pb-1">
-                  <button type="button" data-spec="ALL" class="chip-filter active inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Всі спеціалізації</button>
-                  <button type="button" data-spec="Backend" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Backend & TypeScript</button>
-                  <button type="button" data-spec="Data" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Data & Python</button>
-                  <button type="button" data-spec="Cloud" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">DevOps & Cloud</button>
-                  <button type="button" data-spec="Frontend" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap">Frontend & React</button>
+                  <button type="button" data-spec="ALL" class="chip-filter active inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap cursor-pointer">Всі спеціалізації</button>
+                  <button type="button" data-spec="Full-Stack" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap cursor-pointer">Full-Stack & TypeScript</button>
+                  <button type="button" data-spec="Data" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap cursor-pointer">Data & AI</button>
+                  <button type="button" data-spec="Cloud" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap cursor-pointer">DevOps & Cloud</button>
+                  <button type="button" data-spec="Frontend" class="chip-filter inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#161a2b] text-slate-300 border border-purple-500/20 font-display text-xs whitespace-nowrap cursor-pointer">Frontend & React</button>
                 </div>
               </div>
             </div>
@@ -781,7 +648,8 @@
                 <div class="flex items-center gap-2">
                   <span class="text-lg text-white font-bold">Доступні ментори</span>
                   <span class="px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-display text-[11px] flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Онлайн зараз
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span id="mentorsOnlineBadge">0 доступно зараз</span>
                   </span>
                 </div>
                 <span class="text-purple-300 font-display text-xs flex items-center gap-1">
@@ -803,7 +671,6 @@
               <div id="learnerSessionsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- Bottom Sync Banner -->
             <div class="bg-gradient-to-r from-[#141829]/90 via-[#181d36]/90 to-[#141829]/90 border border-purple-500/30 rounded-3xl p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
               <div class="flex items-start gap-4 z-10">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-700 text-white flex items-center justify-center shrink-0 cyber-glow-purple">
@@ -812,7 +679,7 @@
                 <div>
                   <h3 class="text-lg text-white font-bold m-0">Синхронізація з вашим SkillTree</h3>
                   <p class="text-sm text-slate-300 max-w-xl leading-relaxed mt-1">
-                    Обов'язкова оплата активує підтвердження ментора, а після завершення сесії ви можете поставити оцінку 1–5 ★, яка миттєво оновлює рейтинг експерта.
+                    Обов'язкова оплата активує підтвердження ментора, а після завершення сесії ви можете поставити оцінку 1–5 ★, яка миттєво оновлює рейтинг експерта у БД.
                   </p>
                 </div>
               </div>
@@ -834,24 +701,23 @@
                 <span class="material-symbols-outlined text-3xl">school</span>
               </div>
               <h2 class="text-2xl font-bold text-white mb-2">Потрібна роль «Ментор / Експерт»</h2>
-              <p class="text-sm text-slate-300 mb-6">Щоб публікувати матеріали у вузли карти навичок та підтверджувати вхідні сесії студентів, перемкніть роль на Ментора або увійдіть у свій обліковий запис ментора.</p>
+              <p class="text-sm text-slate-300 mb-6">Щоб публікувати матеріали у вузли карти навичок та підтверджувати вхідні сесії студентів, увійдіть або зареєструйте обліковий запис ментора.</p>
               <div class="flex flex-wrap justify-center gap-3">
-                <button id="switchToMentorQuickBtn" type="button" class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm cyber-glow-purple cursor-pointer">
-                  Увійти як Ментор в 1 клік
-                </button>
-                <a href="/auth" data-route="/auth" class="px-6 py-3 rounded-xl bg-[#181b2c] border border-[#2b304c] text-slate-200 hover:text-white text-sm font-semibold">
-                  Відкрити 3D Портал входу
+                <a href="/auth" data-route="/auth" class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white font-bold text-sm cyber-glow-purple">
+                  Увійти як Ментор
+                </a>
+                <a href="/mentors" data-route="/mentors" class="px-6 py-3 rounded-xl bg-[#181b2c] border border-[#2b304c] text-slate-200 hover:text-white text-sm font-semibold">
+                  Каталог менторів
                 </a>
               </div>
             </div>
 
             <!-- Active Mentor Workspace -->
             <div id="mentorCabinetContent" class="flex flex-col gap-8">
-              <!-- Mentor Profile Banner -->
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 lg:p-8 bg-[#141724]/80 backdrop-blur-xl border border-[#2b304c] rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.6)] relative overflow-hidden">
                 <div class="flex items-center gap-5 relative z-10">
                   <div class="relative">
-                    <div id="mentorBannerAvatar" class="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.35)] ring-2 ring-primary/60">АС</div>
+                    <div id="mentorBannerAvatar" class="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-tr from-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.35)] ring-2 ring-primary/60">М</div>
                     <span class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs ring-2 ring-[#141724]">
                       <span class="material-symbols-outlined text-[14px]">check</span>
                     </span>
@@ -859,12 +725,12 @@
                   <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-2">
                       <span class="px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/40 text-primary font-display text-[11px] tracking-wider uppercase font-bold">Top Rated Mentor</span>
-                      <span class="px-2 py-0.5 rounded-full bg-tertiary/15 border border-tertiary/40 text-tertiary font-display text-[11px] font-semibold">B2B Verified</span>
+                      <span class="px-2 py-0.5 rounded-full bg-tertiary/15 border border-tertiary/40 text-tertiary font-display text-[11px] font-semibold">Verified</span>
                     </div>
-                    <h1 id="mentorBannerName" class="text-2xl text-white font-bold tracking-tight m-0">Андрій Савченко</h1>
+                    <h1 id="mentorBannerName" class="text-2xl text-white font-bold tracking-tight m-0">Кабінет ментора</h1>
                     <p id="mentorBannerSpec" class="text-sm text-slate-300 flex items-center gap-1.5 m-0">
                       <span class="material-symbols-outlined text-base text-tertiary">terminal</span>
-                      <span>Full-Stack & TypeScript Architecture</span>
+                      <span>Specialization</span>
                     </p>
                   </div>
                 </div>
@@ -888,7 +754,7 @@
                   </div>
                   <div class="mt-4">
                     <div class="flex items-baseline gap-1.5">
-                      <span id="mentorKpiRating" class="text-3xl font-extrabold text-white">4.9</span>
+                      <span id="mentorKpiRating" class="text-3xl font-extrabold text-white">5.00</span>
                       <span class="text-sm text-slate-400 font-mono">/ 5.0</span>
                     </div>
                     <span class="mt-1 text-xs text-emerald-400 font-mono block">Динамічний рейтинг</span>
@@ -984,7 +850,9 @@
         <!-- SCREEN 5: B2B SKILL MATRIX (/b2b)                                 -->
         <!-- ================================================================= -->
         <section id="page-b2b" class="page-view" data-page="/b2b">
-          <div class="p-4 sm:p-6 md:p-8 flex flex-col gap-8 max-w-[1520px] mx-auto w-full">
+          <div id="b2bGateNotice" class="hidden px-4 sm:px-6 lg:px-10 py-8"></div>
+
+          <div id="b2bWorkspaceContent" class="p-4 sm:p-6 md:p-8 flex flex-col gap-8 max-w-[1520px] mx-auto w-full">
             <!-- Top Corporate Action Bar -->
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-5 glass-panel p-6 rounded-3xl border border-violet-500/25 relative overflow-hidden">
               <div class="flex flex-col sm:flex-row sm:items-center gap-4 relative z-10">
@@ -1178,7 +1046,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- SCREEN 6: PROFILES, ROLE SWITCHER & SESSIONS (/profile)           -->
+        <!-- SCREEN 6: PROFILE & ACTIVE SQLITE SESSIONS (/profile)             -->
         <!-- ================================================================= -->
         <section id="page-profile" class="page-view" data-page="/profile">
           <div class="relative w-full px-4 sm:px-6 lg:px-10 py-8 overflow-hidden max-w-7xl mx-auto">
@@ -1186,15 +1054,15 @@
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
               <div class="flex flex-col gap-1.5 max-w-3xl">
                 <div class="flex items-center gap-2">
-                  <span class="font-display text-[11px] uppercase tracking-widest text-tertiary-fixed-dim bg-[#292930] px-2.5 py-0.5 rounded-full">// AUTH_MATRIX_PROTO_04</span>
+                  <span class="font-display text-[11px] uppercase tracking-widest text-tertiary-fixed-dim bg-[#292930] px-2.5 py-0.5 rounded-full">// SESSION_SECURITY_CONDUIT</span>
                   <span class="text-slate-500">•</span>
-                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">DOM_REQ: US-04 / UC-01</span>
+                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">SQLite AuthSessions / UC1</span>
                 </div>
                 <h1 class="text-3xl text-white font-bold tracking-tight mt-1 m-0">
-                  Вхід та управління <span class="text-primary font-extrabold">профілями</span>
+                  Профіль та <span class="text-primary font-extrabold">активні сесії</span>
                 </h1>
                 <p class="text-sm text-slate-300 max-w-2xl leading-relaxed m-0">
-                  Швидке перемикання між ролями в системі (<span class="text-tertiary font-semibold">Студент</span>, <span class="text-primary font-semibold">Ментор</span>, <span class="text-secondary font-semibold">HR-менеджер</span>), редагування даних профілю та моніторинг активних сесій.
+                  Керування обліковим записом, безпечне оновлення пароля із перевіркою поточного та аудит реальних HttpOnly-сесій у SQLite.
                 </p>
               </div>
 
@@ -1210,13 +1078,15 @@
               </div>
             </div>
 
+            <div id="profileGuestNotice" class="hidden mb-8"></div>
+
             <!-- Current Active Profile Hero Card -->
-            <div class="relative bg-[#1e1f26]/80 backdrop-blur-2xl rounded-2xl p-6 lg:p-8 mb-8 border border-[#34343b] shadow-[0_12px_36px_rgba(0,0,0,0.5)]">
+            <div id="profileHeroCard" class="relative bg-[#1e1f26]/80 backdrop-blur-2xl rounded-2xl p-6 lg:p-8 mb-8 border border-[#34343b] shadow-[0_12px_36px_rgba(0,0,0,0.5)]">
               <div class="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-80"></div>
               <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                   <div class="relative shrink-0">
-                    <div id="profileHeroAvatar" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-primary via-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_24px_rgba(208,188,255,0.4)]">ВГ</div>
+                    <div id="profileHeroAvatar" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-primary via-primary-container to-tertiary text-white text-2xl font-extrabold flex items-center justify-center shadow-[0_0_24px_rgba(208,188,255,0.4)]">ST</div>
                     <div class="absolute bottom-0 right-1 w-6 h-6 rounded-full bg-[#0d0e14] flex items-center justify-center">
                       <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     </div>
@@ -1224,13 +1094,13 @@
                   <div class="flex flex-col gap-1.5">
                     <div class="flex flex-wrap items-center gap-2">
                       <span id="profileHeroRole" class="font-display text-[11px] uppercase tracking-wider text-primary bg-primary-container/30 px-2.5 py-0.5 rounded-full font-semibold">LEARNER</span>
-                      <span id="profileHeroId" class="font-display text-[11px] text-tertiary bg-[#292930] px-2.5 py-0.5 rounded-full">ID: #1</span>
+                      <span id="profileHeroId" class="font-display text-[11px] text-tertiary bg-[#292930] px-2.5 py-0.5 rounded-full">ID: #0</span>
                       <span class="flex items-center gap-1 text-cyan-300 font-display text-[11px]">
-                        <span class="material-symbols-outlined text-sm">verified</span> Валідний акаунт
+                        <span class="material-symbols-outlined text-sm">verified</span> Верифікована сесія
                       </span>
                     </div>
                     <div class="flex flex-wrap items-baseline gap-2 mt-0.5">
-                      <h2 id="profileHeroName" class="text-2xl text-white font-bold tracking-tight m-0">Гість платформи</h2>
+                      <h2 id="profileHeroName" class="text-2xl text-white font-bold tracking-tight m-0">Користувач</h2>
                       <span id="profileHeroHandle" class="font-mono text-xs text-slate-400"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1.5">
@@ -1250,9 +1120,9 @@
                   <div class="text-left xl:text-right">
                     <div class="flex items-center xl:justify-end gap-1.5 font-display text-xs text-white">
                       <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                      <span id="profileSessionStatusText">Сесія активна</span>
+                      <span id="profileSessionStatusText">Активна HttpOnly сесія</span>
                     </div>
-                    <span class="text-xs text-slate-400">Автономний веб-контур SkillTree AI</span>
+                    <span class="text-xs text-slate-400">Персистентна БД SQLite / Turso</span>
                   </div>
                   <div class="flex flex-wrap items-center gap-2">
                     <a id="profileWorkspaceLink" href="/roadmap" data-route="/roadmap" class="flex items-center gap-1.5 bg-primary text-on-primary hover:bg-primary-fixed px-4 py-2.5 rounded-xl font-display text-xs font-bold transition-all shadow-[0_0_16px_rgba(208,188,255,0.3)]">
@@ -1270,28 +1140,14 @@
               </div>
             </div>
 
-            <!-- 3 Role Switcher Cards -->
-            <div class="flex flex-col gap-4 mb-8">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// ROLE_SIMULATION_CONDUIT</span>
-                  <h3 class="text-lg text-white font-semibold m-0">Демо-профілі та швидке перемикання ролей (US-04)</h3>
-                </div>
-                <span class="hidden sm:inline-flex items-center gap-1 font-display text-xs text-tertiary bg-[#1e1f26] px-3 py-1 rounded-full">
-                  <span class="material-symbols-outlined text-sm">touch_app</span> 1 клік авторизації
-                </span>
-              </div>
-              <div id="roleDemoCards" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-            </div>
-
-            <!-- Inline Auth Gateway + Active Connections Ledger -->
+            <!-- Inline Auth Gateway + Real Active Connections Ledger -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
               <div class="lg:col-span-5 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
                 <div class="flex flex-col gap-4">
                   <div class="flex items-center justify-between">
                     <div>
                       <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// AUTH_GATEWAY</span>
-                      <h3 class="text-lg text-white font-semibold m-0">Авторизація іншого профілю</h3>
+                      <h3 class="text-lg text-white font-semibold m-0">Увійти в інший акаунт</h3>
                     </div>
                     <div class="w-8 h-8 rounded-lg bg-[#292930] flex items-center justify-center text-primary">
                       <span class="material-symbols-outlined text-lg">key</span>
@@ -1302,12 +1158,12 @@
                   <form id="inlineLoginForm" class="flex flex-col gap-3.5">
                     <div>
                       <label class="font-display text-[11px] text-slate-400 uppercase tracking-wider block mb-1" for="inlineLoginEmail">Робоча пошта (Email)</label>
-                      <input id="inlineLoginEmail" type="email" required placeholder="slava@skilltree.ai" class="w-full bg-[#1a1b22] text-white text-xs px-3.5 py-2.5 rounded-xl border border-[#2b304c] focus:border-primary outline-none" />
+                      <input id="inlineLoginEmail" type="email" required placeholder="name@company.ua" class="w-full bg-[#1a1b22] text-white text-xs px-3.5 py-2.5 rounded-xl border border-[#2b304c] focus:border-primary outline-none" />
                     </div>
                     <div>
                       <div class="flex items-center justify-between mb-1">
                         <label class="font-display text-[11px] text-slate-400 uppercase tracking-wider" for="inlineLoginPassword">Пароль</label>
-                        <button id="inlineResetPwdBtn" type="button" class="text-[11px] text-tertiary hover:underline cursor-pointer">Скинути пароль?</button>
+                        <button id="inlineResetPwdBtn" type="button" class="text-[11px] text-tertiary hover:underline cursor-pointer">Зміна пароля</button>
                       </div>
                       <input id="inlineLoginPassword" type="password" required placeholder="••••••••" class="w-full bg-[#1a1b22] text-white text-xs px-3.5 py-2.5 rounded-xl border border-[#2b304c] focus:border-primary outline-none" />
                     </div>
@@ -1321,16 +1177,16 @@
                 </div>
               </div>
 
-              <div class="lg:col-span-7 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
+              <div id="profileSessionsCard" class="lg:col-span-7 bg-[#1e1f26]/70 backdrop-blur-xl rounded-2xl p-6 flex flex-col justify-between border border-[#2b304c]">
                 <div class="flex flex-col gap-4">
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// SESSION_SUPERVISION</span>
+                      <span class="font-display text-[11px] uppercase tracking-wider text-slate-400">// SQLITE_AUTH_SESSIONS</span>
                       <h3 class="text-lg text-white font-semibold m-0">Журнал активних підключень</h3>
                     </div>
                     <div class="flex items-center gap-2 bg-[#292930] px-3 py-1 rounded-full">
                       <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                      <span id="onlineDevicesBadge" class="font-display text-xs text-white">3 сесії активні</span>
+                      <span id="onlineDevicesBadge" class="font-display text-xs text-white">0 активн.</span>
                     </div>
                   </div>
                   <div class="overflow-x-auto">
@@ -1338,8 +1194,8 @@
                       <thead>
                         <tr class="bg-[#1a1b22] text-slate-400 font-display uppercase">
                           <th class="py-2.5 px-3 rounded-l-lg">Клієнт / Браузер</th>
-                          <th class="py-2.5 px-3">Контур</th>
-                          <th class="py-2.5 px-3">Статус</th>
+                          <th class="py-2.5 px-3">IP-адреса</th>
+                          <th class="py-2.5 px-3">Остання активність</th>
                           <th class="py-2.5 px-3 rounded-r-lg text-right">Дія</th>
                         </tr>
                       </thead>
@@ -1374,7 +1230,7 @@
 
         <div>
           <h2 class="text-xl lg:text-2xl text-white font-bold m-0">Бронювання 1-на-1 консультації</h2>
-          <p class="text-xs text-slate-300 mt-1 m-0">Персональна робота з експертом та резервування оплати через PaymentAdapter.</p>
+          <p class="text-xs text-slate-300 mt-1 m-0">Атомарне бронювання та миттєве проведення оплати в одній транзакції SQLite.</p>
         </div>
 
         <div class="p-4 rounded-2xl bg-[#141829] border border-purple-500/30 flex items-center justify-between gap-4">
@@ -1426,8 +1282,8 @@
             <button type="button" data-pay-method="APPLE_PAY" class="pay-method-btn p-2.5 rounded-xl bg-[#141829] border border-purple-500/20 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
               <span class="material-symbols-outlined text-base">smartphone</span> Apple Pay
             </button>
-            <button type="button" data-pay-method="IBAN" class="pay-method-btn p-2.5 rounded-xl bg-[#141829] border border-purple-500/20 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
-              <span class="material-symbols-outlined text-base">account_balance</span> IBAN
+            <button type="button" data-pay-method="INVOICE" class="pay-method-btn p-2.5 rounded-xl bg-[#141829] border border-purple-500/20 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-base">account_balance</span> Рахунок / IBAN
             </button>
           </div>
           <div class="p-3 rounded-xl bg-[#121629] border border-cyan-500/30 text-xs text-slate-300 leading-relaxed">
@@ -1452,13 +1308,12 @@
         </button>
       </div>
 
-      <!-- Success Overlay -->
       <div id="paymentSuccessToast" class="hidden absolute inset-0 bg-[#0c0f1c]/98 backdrop-blur-2xl p-8 flex flex-col items-center justify-center text-center gap-4 z-20">
         <div class="w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-400/60 text-emerald-300 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.5)]">
           <span class="material-symbols-outlined text-4xl">check</span>
         </div>
         <h3 class="text-xl text-white font-bold m-0">Сесію заброньовано та оплачено!</h3>
-        <p class="text-xs text-slate-300 max-w-sm leading-relaxed m-0">Квитанцію збережено у вашому кабінеті. Ментор може підтвердити проведення консультації.</p>
+        <p class="text-xs text-slate-300 max-w-sm leading-relaxed m-0">Квитанцію збережено в SQLite. Ментор може підтвердити проведення консультації у своєму кабінеті.</p>
         <div id="paymentTxnId" class="p-3 bg-[#141829] border border-purple-500/30 rounded-2xl w-full max-w-xs font-mono text-xs text-cyan-300">TXN</div>
         <button id="closePaymentSuccessBtn" type="button" class="px-8 py-3 rounded-full bg-gradient-to-r from-brand-500 to-purple-600 text-white text-sm font-semibold cyber-glow-purple cursor-pointer">Повернутися до каталогу</button>
       </div>
@@ -1522,7 +1377,7 @@
   </div>
 
   <!-- ======================================================================= -->
-  <!-- MODALS (Screen 4 Publish Material + Supporting Functional Modals)       -->
+  <!-- MODALS                                                                  -->
   <!-- ======================================================================= -->
 
   <!-- Modal: Publish Material (Screen 4 - UC5) -->
@@ -1571,7 +1426,7 @@
             <input id="materialDesc" type="text" required placeholder="Що вивчає цей модуль" class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
           </div>
           <div>
-            <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialUrl">URL (необов'язково)</label>
+            <label class="text-xs text-slate-300 font-mono block mb-1.5" for="materialUrl">URL (https://, необов'язково)</label>
             <input id="materialUrl" type="url" placeholder="https://..." class="w-full px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] focus:border-primary text-white rounded-xl text-sm outline-none" />
           </div>
         </div>
@@ -1637,7 +1492,7 @@
             <input id="newNodeMaterialTitle" type="text" placeholder="Офіційна документація" class="w-full px-3 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-xs outline-none" />
           </div>
           <div>
-            <label class="text-xs text-slate-300 block mb-1" for="newNodeMaterialUrl">URL (опц.)</label>
+            <label class="text-xs text-slate-300 block mb-1" for="newNodeMaterialUrl">URL (https://, опц.)</label>
             <input id="newNodeMaterialUrl" type="url" placeholder="https://..." class="w-full px-3 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-xs outline-none" />
           </div>
         </div>
@@ -1711,27 +1566,13 @@
       </form>
       <div class="h-px bg-[#292f4c]"></div>
       <form id="profilePasswordForm" class="flex flex-col gap-3">
-        <span class="text-xs font-bold text-white">Зміна пароля поточного акаунта (UC1)</span>
-        <div class="grid grid-cols-2 gap-3">
-          <input id="profileNewPassword" type="password" minlength="4" required placeholder="Новий пароль" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
-          <input id="profileConfirmPassword" type="password" minlength="4" required placeholder="Підтвердження" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        <span class="text-xs font-bold text-white">Безпечна зміна пароля (UC1)</span>
+        <input id="profileCurrentPassword" type="password" required autocomplete="current-password" placeholder="Поточний пароль" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input id="profileNewPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Новий пароль (мін. 8 симв.)" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
+          <input id="profileConfirmPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Підтвердження" class="px-3.5 py-2 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
         </div>
         <button type="submit" class="px-5 py-2 rounded-xl bg-[#181b2c] border border-cyan-500/40 text-cyan-300 text-xs font-bold cursor-pointer">Оновити пароль</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: Reset Password (from Auth Screen) -->
-  <div id="resetPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080910]/80 backdrop-blur-md hidden">
-    <div class="relative w-full max-w-md bg-[#131625] border border-primary/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.25)]">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#292f4c]">
-        <h2 class="text-lg text-white font-bold m-0">🔑 Скидання пароля (UC1)</h2>
-        <button type="button" data-close-modal="resetPasswordModal" class="text-slate-400 hover:text-white cursor-pointer"><span class="material-symbols-outlined">close</span></button>
-      </div>
-      <form id="resetPasswordForm" class="flex flex-col gap-3">
-        <input id="resetEmail" type="email" required placeholder="Email акаунта" class="px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
-        <input id="resetNewPassword" type="password" minlength="4" required placeholder="Новий пароль (мін. 4 символи)" class="px-4 py-2.5 bg-[#0e101a] border border-[#2b314e] text-white rounded-xl text-sm outline-none" />
-        <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#6d3bd7] to-[#9a6eff] text-white text-xs font-bold cursor-pointer">Оновити пароль</button>
       </form>
     </div>
   </div>
@@ -1767,6 +1608,6 @@
     <span id="toastMessage" class="font-display text-xs font-semibold">Готово</span>
   </div>
 
-  <script src="/app.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>
