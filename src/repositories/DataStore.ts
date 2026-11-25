@@ -293,6 +293,29 @@ export class DataStore {
         })
     );
 
+    // Відновлюємо посилання publishedMaterials для менторів та прапорець активної сесії
+    for (const learner of this.learners) {
+      for (const tree of learner.skillTrees) {
+        for (const node of tree.nodes) {
+          for (const material of node.materials) {
+            if (material.authorId !== undefined) {
+              const mentor = this.mentors.find((m) => m.id === material.authorId);
+              if (mentor && !mentor.publishedMaterials.some((m) => m.id === material.id)) {
+                mentor.publishedMaterials.push(material);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (this.currentUserId > 0) {
+      const activeUser = this.findUserById(this.currentUserId);
+      if (activeUser) {
+        activeUser.isLoggedIn = true;
+      }
+    }
+
     this.sessions = data.sessions.map((sData) => new MentorSession(sData));
     for (const s of this.sessions) {
       const learner = this.learners.find((l) => l.id === s.learnerId);

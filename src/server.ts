@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
-import { extname, join, resolve } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   HRManager,
@@ -112,7 +112,7 @@ export function createAppServer(store: DataStore): Server {
           const password = String(body.password ?? '');
           const role = String(body.role ?? 'LEARNER').toUpperCase();
 
-          if (!fullName || !email || password.length < 4) {
+          if (!fullName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 4) {
             sendError(
               res,
               400,
@@ -129,13 +129,18 @@ export function createAppServer(store: DataStore): Server {
           let createdUser: Learner | Mentor | HRManager;
 
           if (role === 'MENTOR') {
+            const parsedRate = body.hourlyRate !== undefined ? Number(body.hourlyRate) : 850;
+            if (!Number.isFinite(parsedRate) || parsedRate <= 0) {
+              sendError(res, 400, 'Ставка ментора має бути додатним числом.');
+              return;
+            }
             createdUser = new Mentor({
               id: store.nextId(),
               fullName,
               email,
               passwordHash,
               bio: String(body.bio ?? 'Практикуючий ментор на платформі SkillTree AI'),
-              hourlyRate: Number(body.hourlyRate ?? 850),
+              hourlyRate: parsedRate,
               specialization: String(body.specialization ?? 'Full-Stack Development'),
             });
             store.mentors.push(createdUser);
@@ -172,6 +177,9 @@ export function createAppServer(store: DataStore): Server {
             createdUser = learner;
           }
 
+          for (const u of store.getAllUsers()) {
+            if (u.id !== createdUser.id) u.logout();
+          }
           createdUser.isLoggedIn = true;
           store.currentUserId = createdUser.id;
           store.saveToDisk();
@@ -204,8 +212,13 @@ export function createAppServer(store: DataStore): Server {
             if (typeof body.bio === 'string' && body.bio.trim()) {
               user.bio = body.bio.trim();
             }
-            if (body.hourlyRate !== undefined && Number(body.hourlyRate) > 0) {
-              user.hourlyRate = Number(body.hourlyRate);
+            if (body.hourlyRate !== undefined) {
+              const parsedRate = Number(body.hourlyRate);
+              if (!Number.isFinite(parsedRate) || parsedRate <= 0) {
+                sendError(res, 400, 'Ставка ментора має бути додатним числом.');
+                return;
+              }
+              user.hourlyRate = parsedRate;
             }
           } else if (user instanceof HRManager) {
             if (typeof body.company === 'string' && body.company.trim()) {
@@ -241,6 +254,10 @@ export function createAppServer(store: DataStore): Server {
             store.learners.find((l) => l.id === learnerId) ?? store.learners[0];
           if (!learner) {
             sendError(res, 404, 'Студента не знайдено.');
+            return;
+          }
+          if (body.profession !== undefined && String(body.profession).trim() === '') {
+            sendError(res, 400, 'Вкажіть коректну назву цільової професії.');
             return;
           }
           const profession = String(body.profession ?? learner.targetProfession).trim();
@@ -342,14 +359,27 @@ export function createAppServer(store: DataStore): Server {
           }
 
           const body = await readJsonBody(req);
-          const action = String(body.action ?? 'complete').toLowerCase();
+          let normalizedAction = '';
+          if (body.action !== undefined) {
+            normalizedAction = String(body.action).trim().toLowerCase();
+          } else if (body.status !== undefined) {
+            const upperStatus = String(body.status).trim().toUpperCase();
+            if (upperStatus === 'IN_PROGRESS') normalizedAction = 'start';
+            else if (upperStatus === 'DONE') normalizedAction = 'complete';
+          } else {
+            normalizedAction = 'complete';
+          }
 
-          if (action === 'start') {
+          if (normalizedAction === 'start') {
             node.start();
-          } else if (action === 'complete') {
+          } else if (normalizedAction === 'complete') {
             found.owner.completeNode(treeId, nodeId);
           } else {
-            sendError(res, 400, 'Невідома дія статусу. Очікується start або complete.');
+            sendError(
+              res,
+              400,
+              'Невідома дія статусу. Очікується start/complete або IN_PROGRESS/DONE.'
+            );
             return;
           }
 
@@ -479,7 +509,7 @@ export function createAppServer(store: DataStore): Server {
           }
 
           const startAt = body.startAt ? new Date(body.startAt) : new Date(Date.now() + 86400000);
-          const durationMin = Number(body.durationMin ?? 60);
+          const durationMin = Number(body.durationMin ?? body.durationMinutes ?? 60);
           const topic = String(body.topic ?? '').trim();
 
           const session = learner.bookSession(mentor, startAt, topic, durationMin);
@@ -556,7 +586,7 @@ export function createAppServer(store: DataStore): Server {
             return;
           }
           const body = await readJsonBody(req);
-          session.leaveFeedback(Number(body.rating), String(body.feedback ?? ''));
+          session.leaveFeedback(Number(body.rating), String(body.feedback ?? body.comment ?? ''));
           const mentorRating = mentor.recalculateRating();
           store.saveToDisk();
           sendJson(res, 200, {
@@ -587,8 +617,9 @@ export function createAppServer(store: DataStore): Server {
         if (method === 'POST' && pathname === '/api/teams') {
           const body = await readJsonBody(req);
           const hr =
-            store.hrManagers.find((h) => h.id === Number(body.hrId || store.currentUserId)) ??
-            store.hrManagers[0];
+            store.hrManagers.find(
+              (h) => h.id === Number(body.hrManagerId || body.hrId || store.currentUserId)
+            ) ?? store.hrManagers[0];
           if (!hr) {
             sendError(res, 404, 'HR-менеджера не знайдено.');
             return;
@@ -631,8 +662,9 @@ export function createAppServer(store: DataStore): Server {
         if (method === 'POST' && pathname === '/api/hr/assign-tree') {
           const body = await readJsonBody(req);
           const hr =
-            store.hrManagers.find((h) => h.id === Number(body.hrId || store.currentUserId)) ??
-            store.hrManagers[0];
+            store.hrManagers.find(
+              (h) => h.id === Number(body.hrManagerId || body.hrId || store.currentUserId)
+            ) ?? store.hrManagers[0];
           const learner = store.learners.find((l) => l.id === Number(body.learnerId));
           if (!hr || !learner) {
             sendError(res, 404, 'HR-менеджера або співробітника не знайдено.');
@@ -701,9 +733,19 @@ export function createAppServer(store: DataStore): Server {
       }
 
       // === STATIC FRONTEND FILES ===
-      const requestedFile = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
+      let requestedFile = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
+      try {
+        requestedFile = decodeURIComponent(requestedFile);
+      } catch {
+        // Залишаємо оригінальний сегмент при некоректному percent-encoding
+      }
       const safePath = resolve(PUBLIC_DIR, requestedFile);
-      if (!safePath.startsWith(PUBLIC_DIR) || !existsSync(safePath)) {
+      const isInsidePublic =
+        safePath === PUBLIC_DIR || safePath.startsWith(`${PUBLIC_DIR}${sep}`);
+      const isExistingFile =
+        isInsidePublic && existsSync(safePath) && statSync(safePath).isFile();
+
+      if (!isExistingFile) {
         const fallbackIndex = join(PUBLIC_DIR, 'index.html');
         if (existsSync(fallbackIndex)) {
           res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

@@ -330,6 +330,9 @@ export class Mentor extends User {
     if (session.status === SessionStatus.CANCELLED) {
       throw new Error('Неможливо підтвердити скасовану сесію.');
     }
+    if (session.status === SessionStatus.DONE) {
+      throw new Error('Неможливо підтвердити вже завершену сесію.');
+    }
     if (session.paymentStatus !== PaymentStatus.PAID) {
       throw new Error(
         'Неможливо підтвердити неоплачену сесію: оплата є обов’язковою (UC6 → «include» UC9).'

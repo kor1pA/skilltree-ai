@@ -1853,7 +1853,12 @@ function bindEvents() {
   });
   $('togglePasswordBtn')?.addEventListener('click', () => {
     const inp = $('input-password');
-    if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+    const icon = $('togglePasswordBtn')?.querySelector('.material-symbols-outlined');
+    if (inp) {
+      const nextType = inp.type === 'password' ? 'text' : 'password';
+      inp.type = nextType;
+      if (icon) icon.textContent = nextType === 'text' ? 'visibility_off' : 'visibility';
+    }
   });
   $('forgotPasswordLink')?.addEventListener('click', () => openModal('resetPasswordModal'));
   $('inlineResetPwdBtn')?.addEventListener('click', () => openModal('resetPasswordModal'));
@@ -2085,9 +2090,13 @@ function bindEvents() {
     const node = getActiveNode(tree);
     if (!tree || !node) return;
     try {
+      const targetStatus = btn.getAttribute('data-node-status');
       const res = await api(`/api/trees/${tree.id}/nodes/${node.id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: btn.getAttribute('data-node-status') }),
+        body: JSON.stringify({
+          action: targetStatus === 'IN_PROGRESS' ? 'start' : 'complete',
+          status: targetStatus,
+        }),
       });
       state.data = res.state;
       renderAll();
@@ -2545,6 +2554,23 @@ function bindEvents() {
     state.revokedSessions.add('cli');
     renderProfilePage();
     showToast('Усі сторонні сесії завершено.');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    [
+      'wizardModal',
+      'addNodeModal',
+      'materialModal',
+      'addMaterialModal',
+      'createTeamModal',
+      'editProfileModal',
+      'resetPasswordModal',
+      'receiptModal',
+      'csvPreviewModal',
+    ].forEach(closeModal);
+    closeBookingDrawer();
+    closeAssignModal();
   });
 }
 

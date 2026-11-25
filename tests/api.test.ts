@@ -1,5 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { Server } from 'node:http';
 import { DataStore } from '../src/repositories/DataStore.ts';
 import { createAppServer } from '../src/server.ts';
@@ -341,5 +343,236 @@ describe('SkillTree AI — REST API Integration Tests (UC1–UC12)', () => {
       method: 'DELETE',
     });
     assert.equal(delLast.status, 400);
+  });
+
+  it('Regression (Bug #1): PATCH node status supports { status: "IN_PROGRESS" } without awarding XP and rejects invalid status with 400', async () => {
+    const genRes = await fetch(`${baseUrl}/api/trees/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        learnerId: 1,
+        profession: 'DevOps & Cloud Engineer',
+        level: 'BEGINNER',
+      }),
+    });
+    assert.equal(genRes.status, 201);
+    const { tree, state: initialState } = await genRes.json();
+    const initialPoints = initialState.learners.find((l: any) => l.id === 1).points;
+    const targetNode = tree.nodes[0];
+
+    // Кнопка "Розпочати тему" відправляє status: "IN_PROGRESS" і НЕ має нараховувати бали
+    const startRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'IN_PROGRESS' }),
+    });
+    assert.equal(startRes.status, 200);
+    const startData = await startRes.json();
+    assert.equal(startData.node.status, 'IN_PROGRESS');
+    assert.equal(startData.learnerPoints, initialPoints);
+
+    // Завершення вузла через status: "DONE" нараховує +50 XP
+    const doneRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'DONE' }),
+    });
+    assert.equal(doneRes.status, 200);
+    const doneData = await doneRes.json();
+    assert.equal(doneData.node.status, 'DONE');
+    assert.equal(doneData.learnerPoints, initialPoints + 50);
+
+    // Невалідний статус повертає 400
+    const badRes = await fetch(`${baseUrl}/api/trees/${tree.id}/nodes/${targetNode.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'INVALID' }),
+    });
+    assert.equal(badRes.status, 400);
+  });
+
+  it('Regression (Bug #3): Registration validation, single active session invariant, and hrManagerId team ownership', async () => {
+    const badEmailRes = await fetch(`${baseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: 'Bad Email',
+        email: 'invalid-email',
+        password: 'password123',
+        role: 'LEARNER',
+      }),
+    });
+    assert.equal(badEmailRes.status, 400);
+
+    const dupEmailRes = await fetch(`${baseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: 'Duplicate',
+        email: 'slava@skilltree.ai',
+        password: 'password123',
+        role: 'LEARNER',
+      }),
+    });
+    assert.equal(dupEmailRes.status, 409);
+
+    const badRateRes = await fetch(`${baseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: 'Bad Mentor',
+        email: 'bad.mentor@skilltree.ai',
+        password: 'password123',
+        role: 'MENTOR',
+        hourlyRate: -100,
+      }),
+    });
+    assert.equal(badRateRes.status, 400);
+
+    const regHrRes = await fetch(`${baseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: 'QA Lead HR',
+        email: 'qa.hr@skilltree.ai',
+        password: 'password123',
+        role: 'HR',
+        company: 'QA Corp',
+      }),
+    });
+    assert.equal(regHrRes.status, 201);
+    const regHrData = await regHrRes.json();
+
+    const stateRes = await fetch(`${baseUrl}/api/state`);
+    const snap = await stateRes.json();
+    const activeUsers = snap.users.filter((u: any) => u.isLoggedIn);
+    assert.equal(activeUsers.length, 1);
+    assert.equal(activeUsers[0].email, 'qa.hr@skilltree.ai');
+
+    const teamRes = await fetch(`${baseUrl}/api/teams`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'QA Automation Squad', hrManagerId: regHrData.user.id }),
+    });
+    assert.equal(teamRes.status, 201);
+    const { team } = await teamRes.json();
+    assert.equal(team.hrManagerId, regHrData.user.id);
+
+    const addMemRes = await fetch(`${baseUrl}/api/teams/${team.id}/members`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ learnerId: 1 }),
+    });
+    assert.equal(addMemRes.status, 200);
+    const addMemData = await addMemRes.json();
+    assert.equal(addMemData.team.memberIds.includes(1), true);
+  });
+
+  it('Regression (Bug #5): Multi-page SPA routes return 200 HTML, static assets return right MIME, and path traversal is blocked', async () => {
+    for (const route of ['/roadmap', '/mentors', '/mentor-cabinet', '/b2b', '/profile', '/auth']) {
+      const res = await fetch(`${baseUrl}${route}`);
+      assert.equal(res.status, 200, `Expected 200 for ${route}`);
+      assert.ok((res.headers.get('content-type') || '').includes('text/html'));
+      const html = await res.text();
+      assert.ok(html.includes('SkillTree AI'));
+    }
+
+    const cssRes = await fetch(`${baseUrl}/styles.css`);
+    assert.equal(cssRes.status, 200);
+    assert.ok((cssRes.headers.get('content-type') || '').includes('text/css'));
+
+    const jsRes = await fetch(`${baseUrl}/app.js`);
+    assert.equal(jsRes.status, 200);
+    assert.ok((jsRes.headers.get('content-type') || '').includes('application/javascript'));
+
+    const traversalRes = await fetch(`${baseUrl}/%2e%2e/package.json`);
+    const traversalBody = await traversalRes.text();
+    assert.equal(traversalBody.includes('"name": "skilltree-ai"'), false);
+
+    const notFoundApi = await fetch(`${baseUrl}/api/nonexistent-endpoint`);
+    assert.equal(notFoundApi.status, 404);
+
+    const malformedRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{invalid-json',
+    });
+    assert.equal(malformedRes.status, 400);
+  });
+
+  it('Regression (Bug #4) & Validation Edge Cases: confirm DONE returns 400, empty profession/question return 400, JSON team export works', async () => {
+    const stateRes = await fetch(`${baseUrl}/api/state`);
+    const snap = await stateRes.json();
+    const firstTree = snap.learners[0].skillTrees[0];
+    const firstNode = firstTree.nodes[0];
+    const mentorId = snap.mentors[0].id;
+    const teamId = snap.teams[0].id;
+
+    const emptyProfRes = await fetch(`${baseUrl}/api/trees/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ learnerId: 1, profession: '   ' }),
+    });
+    assert.equal(emptyProfRes.status, 400);
+
+    const emptyQRes = await fetch(`${baseUrl}/api/trees/${firstTree.id}/nodes/${firstNode.id}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: '   ' }),
+    });
+    assert.equal(emptyQRes.status, 400);
+
+    const bookRes = await fetch(`${baseUrl}/api/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        learnerId: 1,
+        mentorId,
+        topic: 'QA Session State Guard',
+        startAt: new Date(Date.now() + 86400000).toISOString(),
+        durationMinutes: 60,
+      }),
+    });
+    assert.equal(bookRes.status, 201);
+    const { session } = await bookRes.json();
+
+    await fetch(`${baseUrl}/api/sessions/${session.id}/pay`, { method: 'POST' });
+    await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, { method: 'POST' });
+    await fetch(`${baseUrl}/api/sessions/${session.id}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: 5, comment: 'Чітко' }),
+    });
+
+    // Повторне підтвердження вже DONE сесії заборонене -> 400
+    const confirmDoneRes = await fetch(`${baseUrl}/api/sessions/${session.id}/confirm`, {
+      method: 'POST',
+    });
+    assert.equal(confirmDoneRes.status, 400);
+
+    const jsonExportRes = await fetch(`${baseUrl}/api/teams/${teamId}/export?format=JSON`);
+    assert.equal(jsonExportRes.status, 200);
+    assert.ok((jsonExportRes.headers.get('content-type') || '').includes('application/json'));
+    const report = await jsonExportRes.json();
+    assert.equal(report.teamId, teamId);
+    assert.ok(Array.isArray(report.members));
+  });
+
+  it('Frontend Integration Check: index.html contains all 6 Stitch screens and required interactive anchors', () => {
+    const html = readFileSync(resolve(process.cwd(), 'src/public/index.html'), 'utf-8');
+    for (const id of [
+      'page-auth',
+      'page-roadmap',
+      'page-mentors',
+      'page-mentor-cabinet',
+      'page-b2b',
+      'page-profile',
+      'constellation-canvas',
+      'bookingDrawer',
+      'assignModalBackdrop',
+      'addMaterialModal',
+    ]) {
+      assert.ok(html.includes(id), `Expected #${id} in src/public/index.html`);
+    }
   });
 });

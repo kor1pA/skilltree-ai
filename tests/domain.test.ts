@@ -1,5 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   ChatMessage,
   HRManager,
@@ -19,6 +22,8 @@ import {
 } from '../src/domain/index.ts';
 import { AIServiceAdapter } from '../src/adapters/AIServiceAdapter.ts';
 import { PaymentAdapter } from '../src/adapters/PaymentAdapter.ts';
+import { DataStore } from '../src/repositories/DataStore.ts';
+import { SkillMatrixService } from '../src/services/SkillMatrixService.ts';
 
 describe('SkillTree AI — UML Domain Model (10 Classes & 5 Enums)', () => {
   it('UC1: User authentication, login, logout, and password reset', () => {
@@ -352,5 +357,138 @@ describe('SkillTree AI — UML Domain Model (10 Classes & 5 Enums)', () => {
     node.start();
     assert.equal(node.status, NodeStatus.DONE);
     assert.equal(tree.calculateProgress(), 100);
+  });
+
+  it('Regression: Mentor.confirmSession rejects DONE session and recalculateRating ignores unrated sessions', () => {
+    const learner = new Learner({
+      id: 80,
+      fullName: 'Тест Студент',
+      email: 'student80@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+    });
+    const mentor = new Mentor({
+      id: 81,
+      fullName: 'Тест Ментор',
+      email: 'mentor81@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+      hourlyRate: 900,
+    });
+    const paymentAdapter = new PaymentAdapter();
+
+    const s1 = learner.bookSession(mentor, new Date(Date.now() + 86400000), 'SQL', 60);
+    paymentAdapter.processPayment(s1);
+    mentor.confirmSession(s1);
+    s1.leaveFeedback(5, 'Чудово');
+    assert.equal(s1.status, SessionStatus.DONE);
+
+    // Повторне підтвердження вже завершеної сесії має кидати помилку
+    assert.throws(() => mentor.confirmSession(s1), /завершену/);
+
+    // Неоцінені (нова та скасована) сесії не змінюють середній рейтинг
+    learner.bookSession(mentor, new Date(Date.now() + 172800000), 'Docker', 60);
+    const s3 = learner.bookSession(mentor, new Date(Date.now() + 259200000), 'K8s', 60);
+    s3.cancel();
+    assert.equal(mentor.recalculateRating(), 5);
+  });
+
+  it('Persistence: DataStore.saveToDisk and loadFromDisk preserve mentor publishedMaterialsCount and currentUser.isLoggedIn', () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), 'skilltree-qa-'));
+    const storeFile = join(tmpDir, 'store.json');
+
+    try {
+      const store1 = new DataStore(storeFile);
+      const mentor = store1.mentors[0];
+      assert.ok(mentor.login('demo1234'));
+      store1.currentUserId = mentor.id;
+
+      const targetNode = store1.learners[0].skillTrees[0].nodes[0];
+      const mat = mentor.publishMaterial(
+        targetNode,
+        'Persisted SQL Optimization Guide',
+        'https://postgresql.org/docs',
+        MaterialType.LINK
+      );
+      mat.id = store1.nextId();
+      store1.saveToDisk();
+
+      const store2 = new DataStore(storeFile);
+      const snapshot = store2.getSnapshot();
+      assert.ok(snapshot.currentUser !== null);
+      assert.equal(snapshot.currentUser.id, mentor.id);
+      assert.equal(snapshot.currentUser.isLoggedIn, true);
+
+      const restoredMentor = store2.mentors.find((m) => m.id === mentor.id);
+      assert.ok(restoredMentor);
+      assert.ok(restoredMentor.publishedMaterials.some((m) => m.id === mat.id));
+      assert.ok(restoredMentor.toJSON().publishedMaterialsCount >= 1);
+    } finally {
+      rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('Edge Cases: AIServiceAdapter dynamic profession fallback & SkillMatrixService RFC-4180 special chars and empty team', () => {
+    const ai = new AIServiceAdapter();
+    let seq = 900;
+    const tree = ai.generateSkillTree(() => ++seq, 99, 'Rust Embedded Engineer', SkillLevel.ADVANCED);
+    assert.ok(tree.nodes.length >= 4);
+    for (const node of tree.nodes) {
+      assert.ok(node.materials.length >= 1);
+    }
+
+    const answer = ai.generateAssistantAnswer(tree.nodes[0], tree, 'Як налаштувати Cargo?');
+    assert.ok(answer.answer.length > 20);
+    assert.ok(answer.responseTimeMs <= 5000);
+
+    const emptyTeam = new Team({ id: 901, name: 'Empty Squad', hrManagerId: 6 });
+    assert.equal(emptyTeam.getDetailedMatrix().teamAverageProgress, 0);
+
+    const specialLearner = new Learner({
+      id: 902,
+      fullName: 'Іванов "Тим", Олексій',
+      email: 'ivanov@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+      targetProfession: 'Rust Embedded Engineer',
+    });
+    specialLearner.skillTrees.push(tree);
+    emptyTeam.addMember(specialLearner);
+
+    const csv = SkillMatrixService.exportCsv(emptyTeam);
+    assert.ok(csv.startsWith('\uFEFF'));
+    assert.ok(csv.includes('"Іванов ""Тим"", Олексій"'));
+  });
+
+  it('Edge Cases: SkillTree node re-indexing on middle removal & Team.addMember deduplication', () => {
+    const nodes = [10, 20, 30].map(
+      (id, idx) => new SkillNode({ id, title: `Skill ${idx + 1}`, orderNumber: idx + 1 })
+    );
+    const tree = new SkillTree({
+      id: 950,
+      title: 'Reindex Track',
+      targetProfession: 'Backend Developer',
+      learnerId: 1,
+      nodes,
+    });
+
+    assert.equal(tree.removeNode(20), true);
+    assert.equal(tree.nodes.length, 2);
+    assert.deepEqual(
+      tree.nodes.map((n) => n.id),
+      [10, 30]
+    );
+    assert.deepEqual(
+      tree.nodes.map((n) => n.orderNumber),
+      [1, 2]
+    );
+
+    const learner = new Learner({
+      id: 951,
+      fullName: 'Дублікат Юзер',
+      email: 'dup@test.ua',
+      passwordHash: User.hashPassword('pass1234'),
+    });
+    const team = new Team({ id: 952, name: 'Dedup Team', hrManagerId: 6 });
+    team.addMember(learner);
+    team.addMember(learner);
+    assert.equal(team.members.length, 1);
   });
 });
