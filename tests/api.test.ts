@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import type { ServerType } from '@hono/node-server';
 import { serve } from '@hono/node-server';
 import { SkillTreeRepository } from '../src/repositories/SkillTreeRepository.ts';
-import { createApp } from '../src/app.ts';
+import { createApp } from '../src/createApp.ts';
 
 class CookieClient {
   private readonly baseUrl: string;

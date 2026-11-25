@@ -96,7 +96,7 @@ SkillTree AI/
 │   ├── routes/                      # Модульні маршрути: authRoutes, treeRoutes, mentorRoutes, b2bRoutes
 │   ├── services/SkillMatrixService.ts
 │   ├── styles/input.css             # Джерело Tailwind для локальної збірки
-│   ├── app.ts                       # Фабрика Hono-застосунку та безпечна роздача статики
+│   ├── createApp.ts                 # Фабрика Hono-застосунку та безпечна роздача статики
 │   └── server.ts                    # Entrypoint для Vercel Fluid Compute (export default app) та локального запуску
 ├── tests/
 │   ├── domain.test.ts               # Юніт- та регресійні тести доменної моделі (11 тестів)

@@ -3,7 +3,7 @@ import { serve } from '@hono/node-server';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SkillTreeRepository } from './repositories/SkillTreeRepository.ts';
-import { createApp } from './app.ts';
+import { createApp } from './createApp.ts';
 
 const repo = new SkillTreeRepository();
 const coreApp = createApp(repo);

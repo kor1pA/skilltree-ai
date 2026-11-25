@@ -51,6 +51,11 @@ function resolvePublicDir(): string {
     resolve(__dirname, 'public'),
   ];
   for (const dir of candidates) {
+    if (existsSync(join(dir, 'index.html'))) {
+      return dir;
+    }
+  }
+  for (const dir of candidates) {
     if (existsSync(dir)) {
       return dir;
     }
