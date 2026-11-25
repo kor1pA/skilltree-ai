@@ -44,6 +44,60 @@ function toPlainRow<T extends SqlRow>(row: unknown): T {
   return Object.assign({}, row) as T;
 }
 
+class NodeSqliteTransactionHandle implements SqlExecutor {
+  readonly driverName = 'node:sqlite' as const;
+  private readonly db: NodeSqliteDatabase;
+  private readonly nextSavepointSeq: () => number;
+
+  constructor(db: NodeSqliteDatabase, nextSavepointSeq: () => number) {
+    this.db = db;
+    this.nextSavepointSeq = nextSavepointSeq;
+  }
+
+  async query<T extends SqlRow = SqlRow>(sql: string, params: SqlValue[] = []): Promise<T[]> {
+    const rows = this.db.prepare(sql).all(...normalizeParams(params));
+    return rows.map((row) => toPlainRow<T>(row));
+  }
+
+  async queryOne<T extends SqlRow = SqlRow>(
+    sql: string,
+    params: SqlValue[] = []
+  ): Promise<T | null> {
+    const row = this.db.prepare(sql).get(...normalizeParams(params));
+    return row ? toPlainRow<T>(row) : null;
+  }
+
+  async execute(sql: string, params: SqlValue[] = []): Promise<ExecuteResult> {
+    const res = this.db.prepare(sql).run(...normalizeParams(params));
+    return {
+      changes: Number(res.changes ?? 0),
+      lastInsertRowid: Number(res.lastInsertRowid ?? 0),
+    };
+  }
+
+  async execScript(sql: string): Promise<void> {
+    this.db.exec(sql);
+  }
+
+  async transaction<T>(fn: (tx: SqlExecutor) => Promise<T>): Promise<T> {
+    const spName = `sp_${this.nextSavepointSeq()}`;
+    this.db.exec(`SAVEPOINT ${spName};`);
+    try {
+      const result = await fn(this);
+      this.db.exec(`RELEASE SAVEPOINT ${spName};`);
+      return result;
+    } catch (err) {
+      this.db.exec(`ROLLBACK TO SAVEPOINT ${spName};`);
+      this.db.exec(`RELEASE SAVEPOINT ${spName};`);
+      throw err;
+    }
+  }
+
+  async close(): Promise<void> {
+    // Керується зовнішнім NodeSqliteExecutor
+  }
+}
+
 /**
  * Реалізація SqlExecutor поверх вбудованого в Node.js 22+ рушія `node:sqlite`.
  */
@@ -51,7 +105,6 @@ export class NodeSqliteExecutor implements SqlExecutor {
   readonly driverName = 'node:sqlite' as const;
   private readonly filePath: string;
   private db: NodeSqliteDatabase | null = null;
-  private txDepth = 0;
   private savepointSeq = 0;
   private mutexQueue: Promise<unknown> = Promise.resolve();
 
@@ -111,16 +164,15 @@ export class NodeSqliteExecutor implements SqlExecutor {
   }
 
   async transaction<T>(fn: (tx: SqlExecutor) => Promise<T>): Promise<T> {
-    if (this.txDepth > 0) {
-      return this.runNestedSavepoint(fn);
-    }
-
     const runOuter = async (): Promise<T> => {
       const db = await this.getDb();
-      this.txDepth += 1;
+      const txHandle = new NodeSqliteTransactionHandle(db, () => {
+        this.savepointSeq += 1;
+        return this.savepointSeq;
+      });
       db.exec('BEGIN IMMEDIATE;');
       try {
-        const result = await fn(this);
+        const result = await fn(txHandle);
         db.exec('COMMIT;');
         return result;
       } catch (err) {
@@ -130,33 +182,12 @@ export class NodeSqliteExecutor implements SqlExecutor {
           // Транзакція могла бути вже відкочена драйвером
         }
         throw err;
-      } finally {
-        this.txDepth -= 1;
       }
     };
 
     const next = this.mutexQueue.then(runOuter, runOuter);
     this.mutexQueue = next.catch(() => undefined);
     return next;
-  }
-
-  private async runNestedSavepoint<T>(fn: (tx: SqlExecutor) => Promise<T>): Promise<T> {
-    const db = await this.getDb();
-    this.savepointSeq += 1;
-    const spName = `sp_${this.savepointSeq}`;
-    this.txDepth += 1;
-    db.exec(`SAVEPOINT ${spName};`);
-    try {
-      const result = await fn(this);
-      db.exec(`RELEASE SAVEPOINT ${spName};`);
-      return result;
-    } catch (err) {
-      db.exec(`ROLLBACK TO SAVEPOINT ${spName};`);
-      db.exec(`RELEASE SAVEPOINT ${spName};`);
-      throw err;
-    } finally {
-      this.txDepth -= 1;
-    }
   }
 
   async close(): Promise<void> {
