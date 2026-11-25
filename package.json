@@ -3,9 +3,23 @@
   "version": "1.0.0",
   "description": "Платформа персоналізованих карт розвитку з гібридним менторством та ШІ-підтримкою (US-01..US-06, UC1..UC12)",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "start": "node --experimental-transform-types --no-warnings src/server.ts",
-    "test": "node --experimental-transform-types --no-warnings --test tests/domain.test.ts tests/api.test.ts"
+    "css:build": "tailwindcss -i src/styles/input.css -o public/tailwind.css --minify",
+    "test": "node --experimental-transform-types --no-warnings --test tests/domain.test.ts tests/sqlite.test.ts tests/api.test.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.4",
+    "@libsql/client": "^0.15.15",
+    "hono": "^4.7.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "tailwindcss": "^3.4.17"
   },
   "keywords": [
     "skilltree",
@@ -13,7 +27,9 @@
     "edtech",
     "mentorship",
     "uml",
-    "typescript"
+    "typescript",
+    "sqlite",
+    "hono"
   ],
   "author": "Гой Вячеслав Володимирович, КН-25",
   "license": "MIT"

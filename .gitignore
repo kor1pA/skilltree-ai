@@ -1,6 +1,12 @@
 node_modules/
 dist/
 .env
+.env.*
 *.log
 .DS_Store
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/store.json
 data/test-*.json
+.vercel/
